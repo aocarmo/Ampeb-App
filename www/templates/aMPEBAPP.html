@@ -1,0 +1,45 @@
+<ion-view title="AMPEB APP" hide-back-button="true" id="page3">
+  <ion-content padding="true" style="background: url(img/33b157mhSX5pmnuE8qnJ_bg-topo.png) no-repeat center;background-size:cover;" class="has-header">
+    <div id="aMPEBAPP-container9">
+      <div align="center" class="row">
+        <div class="col col-33">
+          <a ui-sref="notCias" class="button icon button-icon">
+            <i class="icon ion-social-rss"></i>
+            <br>Notícias
+          </a>
+        </div>
+        <div class="col col-33">
+          <a ui-sref="prXimosEventos" class="button icon button-icon">
+            <i class="icon ion-calendar"></i>
+            <br>Eventos
+          </a>
+        </div>
+        <div class="col col-33">
+          <a ui-sref="buscarConvNios" class="button icon button-icon">
+            <i class="icon ion-ios-pricetags"></i>
+            <br>Convênios
+          </a>
+        </div>
+      </div>
+    </div>
+    <div style="margin-left: -10px; width: calc(100% + 20px);">
+      <img src="img/R08BZblgTDuVWPqcCh2J_logo-ampeb.png" style="display: block; width: 100%; height: auto; margin-left: auto; margin-right: auto;">
+    </div>
+    <form id="aMPEBAPP-form2" class="list">
+      <div class="spacer" style="width: 300px; height: 15px;"></div>
+      <ion-list id="aMPEBAPP-list2">
+        <label class="item item-input" id="aMPEBAPP-input3" name="txtLogin">
+          <input type="text" placeholder="Informe seu CPF" mask="999.999.999-99" clean="true" ng-model="data.usuario">
+        </label>
+        <label class="item item-input" id="aMPEBAPP-input4" name="txtSenha">
+          <input type="password" placeholder="Senha" ng-model="data.senha">
+        </label>
+      </ion-list>
+      <a ng-click="login(data)" id="aMPEBAPP-button2" style="border-radius:0px 0px 0px 0px;" class="button button-assertive  button-block">Entrar</a>
+      <div align="center">      
+            <input type="checkbox" name="ckbMantenha" value="1" ng-model="data.manterConectado"> Mantenha-me conectado
+      </div>
+        <a ui-sref="esqueceuASenha" id="aMPEBAPP-button5" class="button button-positive  button-block button-clear">Esqueceu a senha?</a>
+</form>
+  </ion-content>
+</ion-view>

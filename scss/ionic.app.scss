@@ -1,0 +1,76 @@
+$assertive: #841119;
+$stable: #F3F3F3;
+$royal: #EF473A;
+$ionicons-font-path: "../lib/ionic/fonts" !default;
+@import "../www/lib/ionic/scss";
+.containerTopo {
+	background-image: url('http: //www.ampeb.org.br/wp-content/themes/ampeb/imgs/bg-topo.png');
+	background-repeat: repeat;
+}
+
+.topo-esquerda {
+	float: left;
+	width: 49%;
+}
+
+.topo-direita {
+	float: right;
+	width: 20%;
+	border-radius: 50%;
+}
+
+.imagem-perfil {
+	width: 80px;
+	height: 80px;
+	border-radius: 150px;
+	-webkit-border-radius: 150px;
+	-moz-border-radius: 150px;
+	background: url('http: //ap.imagensbrasil.org/images/2017/03/11/WhatsAppImage2017-03-07at23.13.07.jpg') no-repeat;
+	box-shadow: 0 0 8px rgba(0, 0, 0, .8);
+	-webkit-box-shadow: 0 0 8px rgba(0, 0, 0, .8);
+	-moz-box-shadow: 0 0 8px rgba(0, 0, 0, .8);
+}
+
+.padding-topo {
+	padding: 1px;
+}
+
+.nome-icone {
+	font-size: 18px;
+}
+
+.botaoMenu {
+	//background: linear-gradient(#FFFFFF , #EEEEEE);
+	background: linear-gradient(#FFFFFF , #F5E5DE);
+	border: 1px solid #F5E5DE;
+	margin: 2px;
+	border-radius: 20px;
+}
+
+.hr-topoPagina {
+	color: #821723;
+	background-color: #821723;
+	height: 2px;
+}
+
+.bg-color-titulo-card {
+	background: linear-gradient(#FFFFFF , #ECEEF3);
+}
+
+.bg-color-rodape-card {
+	background-color: #769D00;
+	color: #FFFFFF;
+}
+
+.img-tipo-convenio {
+	height: 50%;
+	width: 50%;
+}
+
+.ckb_login {
+	background-color: transparent;
+	box-shadow: 0 0 0 0;
+	border: 0 none;
+	outline: 0;
+}
+
