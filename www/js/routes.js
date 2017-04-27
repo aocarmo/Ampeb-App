@@ -50,7 +50,8 @@ angular.module('app.routes', [])
   .state('detalheDoEvento', {
     url: '/detalheEvento',
     templateUrl: 'templates/detalheDoEvento.html',
-    controller: 'detalheDoEventoCtrl'
+    controller: 'detalheDoEventoCtrl',
+    params: { id: null, },
   })
 
   .state('detalheDoConvNio', {

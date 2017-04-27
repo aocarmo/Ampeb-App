@@ -103,45 +103,62 @@ function ($scope, $stateParams,$state, $cordovaCamera, $ionicPopup, LOCAL_STORAG
 
 
 }])   
-.controller('aMPEBAPPCtrl', ['$scope', '$stateParams', '$state', '$http', '$ionicPopup', '$ionicLoading', 'LoginService','LOCAL_STORAGE',// The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+.controller('aMPEBAPPCtrl', ['$scope', '$stateParams', '$state', '$http', '$ionicPopup', '$ionicLoading', 'LoginService','LOCAL_STORAGE','$cordovaNetwork',// The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $stateParams, $state, $http, $ionicPopup, $ionicLoading, LoginService,LOCAL_STORAGE) {
+function ($scope, $stateParams, $state, $http, $ionicPopup, $ionicLoading, LoginService,LOCAL_STORAGE,$cordovaNetwork) {
 
-    $scope.data = {};
-   
-    $scope.login = function (data) {
-         //Pega dados do banco
-        $ionicLoading.show({
-            template: 'Autenticando...'
-        }).then(function () { 
-            LoginService.logar(data).then(function (dados) {
-            
-            if (dados.data.result == true) {
-                //Guardando as informações do usuario logado na sessão.
-                window.localStorage.setItem(LOCAL_STORAGE.local_dados_key, JSON.stringify(dados.data.data));
-                if (data.manterConectado == true) {
-                    window.localStorage.setItem(LOCAL_STORAGE.manter_logado, true);
-                } else {
-                    window.localStorage.setItem(LOCAL_STORAGE.manter_logado, false);
-                }                
-                //Direciona para a tela inicial              
-                $state.go('aMPEB');
-            } else {
-                var alertPopup = $ionicPopup.alert({
-                    title: 'Usuário ou senha inválidos!',
-                    okText: 'Ok', // String (default: 'OK'). The text of the OK button.
-                    okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
-                });
-            }
-            }).finally(function () {
-                //em qualquer caso remove o spinner de loading
-                $ionicLoading.hide();            
-            });
-        });
-       
+    $scope.data = {};    
+    var manteLogado =  window.localStorage.getItem(LOCAL_STORAGE.manter_logado);
     
-    };
+    if(manteLogado){
+        $state.go('aMPEB');
+    }
+    $scope.login = function (data) {
+
+        if ($cordovaNetwork.isOnline()) {
+
+            $ionicLoading.show({
+            template: 'Autenticando...'
+            }).then(function (){LoginService.logar(data).then(function (dados){
+                
+                if (dados.data.result == true) {
+                
+                    //Guardando as informações do usuario logado na sessão.
+                    window.localStorage.setItem(LOCAL_STORAGE.local_dados_key, JSON.stringify(dados.data.data));
+                    if (data.manterConectado == true) {
+                        window.localStorage.setItem(LOCAL_STORAGE.manter_logado, true);
+                    } else {
+                        window.localStorage.setItem(LOCAL_STORAGE.manter_logado, false);
+                    }                
+                    //Direciona para a tela inicial              
+                    $state.go('aMPEB');
+                } else {
+                    var alertPopup = $ionicPopup.alert({
+                        title: 'Usuário ou senha inválidos!',
+                        okText: 'Ok', // String (default: 'OK'). The text of the OK button.
+                        okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+                    });
+                }
+                }).finally(function () {
+                    //em qualquer caso remove o spinner de loading
+                    $ionicLoading.hide();            
+                });
+            });
+        }else{
+
+        var alertPopup = $ionicPopup.alert({
+            title: 'Não foi possível realizar login.',
+            template: 'Verifique sua conexão com ineternet.',
+            okText: 'Ok', // String (default: 'OK'). The text of the OK button.
+            okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+        });
+    }
+            
+        
+        
+        };
+    
 }])
    
 .controller('notCiasCtrl', ['$scope', '$stateParams', 'obterNoticiasService','obterNoticiasBD', '$ionicPopup', 'LOCAL_STORAGE', '$ionicLoading','$cordovaNetwork','$ionicHistory', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
@@ -209,11 +226,66 @@ function ($scope, $stateParams, obterNoticiasService, obterNoticiasBD, $ionicPop
    
 }])
    
-.controller('prXimosEventosCtrl', ['$scope', '$stateParams', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+.controller('prXimosEventosCtrl', ['$scope', '$stateParams', 'obterEventosService','obterEventosBD', '$ionicPopup', 'LOCAL_STORAGE', '$ionicLoading','$cordovaNetwork','$ionicHistory', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $stateParams) {
+function ($scope, $stateParams,obterEventosService, obterEventosBD, $ionicPopup, LOCAL_STORAGE, $ionicLoading, $cordovaNetwork, $ionicHistory) {
 
+ //Verifica se estivar online pega dados via serviço 
+    if ($cordovaNetwork.isOnline()) {
+        $ionicLoading.show({
+            template: 'Buscando...'
+        }).then(function () {
+            obterEventosService.obterEventosOnline().then(function (dados) {
+
+                $scope.listaEventos = dados;
+
+
+            }).finally(function () {
+                //em qualquer caso remove o spinner de loading
+                $ionicLoading.hide();
+            });
+
+        });
+    } else {
+        //Pega dados do banco
+        $ionicLoading.show({
+            template: 'Buscando...'
+        }).then(function () {
+            obterEventosBD.obterListaEventosBD().then(function (dados) {
+             
+                if (dados[0] == null) {
+                    var alertPopup = $ionicPopup.alert({
+                        title: 'Sem dados offline',
+                        template: 'Por favor, conecte seu dispositivo a internet',
+                        okText: 'Ok', // String (default: 'OK'). The text of the OK button.
+                        okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+                    });
+
+                    alertPopup.then(function (res) {
+
+
+                        $backView = $ionicHistory.backView();
+                        $backView.go();
+
+                    });
+
+                } else {
+                    $scope.listaEventos = dados;
+                }
+               
+
+            }).finally(function () {
+                //em qualquer caso remove o spinner de loading
+                $ionicLoading.hide();
+            });
+
+        });
+    }
+
+   
+   // Pegando dados do usuário da sessão
+    $scope.dadosUsuario = JSON.parse(window.localStorage.getItem(LOCAL_STORAGE.local_dados_key));
 
 }])
    
@@ -247,10 +319,26 @@ function ($scope, $stateParams, $ionicLoading, obterDetalheNoticiaBD) {
     
 }])
    
-.controller('detalheDoEventoCtrl', ['$scope', '$stateParams', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+.controller('detalheDoEventoCtrl', ['$scope', '$stateParams', '$ionicLoading','obterDetalheEventosBD', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $stateParams) {
+function ($scope, $stateParams,$ionicLoading, obterDetalheEventosBD) {
+
+    $scope.evento = {};
+    //Pega dados do banco
+    $ionicLoading.show({
+        template: 'Buscando...'
+    }).then(function () {
+        obterDetalheEventosBD.detalheEventoBD($stateParams.id).then(function (dados) {
+         
+            $scope.evento = dados;
+
+        }).finally(function () {
+            //em qualquer caso remove o spinner de loading
+            $ionicLoading.hide();
+        });
+
+    });
 
 
 }])

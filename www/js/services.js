@@ -3,14 +3,14 @@ angular.module('app.services', [])
 
 }])
 .service('LoginService', ['$http', '$q', 'WEB_METODOS', '$httpParamSerializerJQLike', function ($http, $q, WEB_METODOS, $httpParamSerializerJQLike) {
-    //Metodo para realizar autenticação no sistema Ampeb retornando os dados do usuário   
+    //Metodo para realizar autenticaï¿½ï¿½o no sistema Ampeb retornando os dados do usuï¿½rio   
 
     return {
 
         logar: function (data) {
            
             var dados = { cpf: data.usuario, senha: data.senha };
-            //Usado em requisições POSR ($httpParamSerializerJQLike)
+            //Usado em requisiï¿½ï¿½es POSR ($httpParamSerializerJQLike)
             $http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
             return $http.post(WEB_METODOS.urlServicosSistema + "?m=loginAssociado", $httpParamSerializerJQLike(dados)).then(function (response) {
                 return response;
@@ -22,7 +22,7 @@ angular.module('app.services', [])
 
 }])
 .service('RecuperarSenhaService', ['$http', '$q', 'WEB_METODOS', '$httpParamSerializerJQLike', function ($http, $q, WEB_METODOS, $httpParamSerializerJQLike) {
-    //Metodo para realizar autenticação no sistema Ampeb retornando os dados do usuário   
+    //Metodo para realizar autenticaï¿½ï¿½o no sistema Ampeb retornando os dados do usuï¿½rio   
 
     return {
         enviarEmailRecuperarSenha: function (data) {
@@ -42,8 +42,8 @@ angular.module('app.services', [])
         obterNoticiasOnline: function () {
             
 
-            // sempre dispara o serviço pra checar dados mais recentes
-         var teste =   $http.get(WEB_METODOS.urlServicosPortal + "?taxonomies=noticias").then(function (response) {
+            // sempre dispara o serviï¿½o pra checar dados mais recentes
+         var listaPost =   $http.get(WEB_METODOS.urlServicosPortal + "?taxonomies=noticias").then(function (response) {
                
                 //Lendo todas as noticias
                 var noticia = [];
@@ -55,71 +55,100 @@ angular.module('app.services', [])
                     var dsTitulo = "";
                     var dtNoticiaBD = "";
                     var dtNoticia = "";
-                    //Validação de categoria
+                    var categorias = [];
+                    
+                         //Validaï¿½ï¿½o de categoria
                     if (response.data[i].terms != null) {
+
                         if (response.data[i].terms.category != null) {
-                            if (response.data[i].terms.category[0].name != null) {
-                                dsCategoria = response.data[i].terms.category[0].name;
+
+                            if(response.data[i].terms.category.length == 1){
+
+                                if (response.data[i].terms.category[0].name != null) {
+                                    dsCategoria = response.data[i].terms.category[0].name;
+                                }
+
+                            }else if(response.data[i].terms.category.length > 1){
+
+                                for (var j = 0; j < response.data[i].terms.category.length; j++) {
+
+                                    if (response.data[i].terms.category[j].name != null) {
+                                        categorias.push(response.data[i].terms.category[j].name);
+                                    }
+                                }
+
+                                var evento = categorias.indexOf("PrÃ³ximos Eventos");
+
+                                if(evento > -1){
+                                    dsCategoria = categorias[evento];
+                                }else{
+                                    dsCategoria = categorias[0];
+                                }
+
                             }
                         }
                     }
-                    //Validação de titulo
+                    
+                   
+                    //Validaï¿½ï¿½o de titulo
                     if (response.data[i].title != null) {
                         dsTitulo = response.data[i].title;
                     }
 
-                    //Validação da descrição
+                    //Validaï¿½ï¿½o da descriï¿½ï¿½o
                     if (response.data[i].content != null) {
                         dsNoticia = response.data[i].content.replace(/(<([^>]+)>)/ig, "");
                     }
 
-                    //Validação da data
+                    //Validaï¿½ï¿½o da data
                     if (response.data[i].date != null) {
                         dtNoticiaBD = response.data[i].date;
-                        //Feito para retorna no serviço online a data ja no formato correto
+                        //Feito para retorna no serviï¿½o online a data ja no formato correto
                         var dataNoticiaArray = response.data[i].date.split("T");
                         var dataNoticia  = dataNoticiaArray[0].split("-");
                         dtNoticia = dataNoticia[2] + "-" + dataNoticia[1] + "-" + dataNoticia[0] + " " + dataNoticiaArray[1];
                         
                     }
-                    //Validação da url da imagem
+                    //Validaï¿½ï¿½o da url da imagem
                     if (response.data[i].featured_image != null) {
                         if (response.data[i].featured_image.attachment_meta != null) {
                             if (response.data[i].featured_image.attachment_meta.sizes != null) {
-                                if (response.data[i].featured_image.attachment_meta.sizes.large != null) {
-                                    if (response.data[i].featured_image.attachment_meta.sizes.large.url != null) {
-                                        dsUrlImagem = response.data[i].featured_image.attachment_meta.sizes.large.url;
+                                if (response.data[i].featured_image.attachment_meta.sizes.medium != null) {
+                                    if (response.data[i].featured_image.attachment_meta.sizes.medium.url != null) {
+                                        dsUrlImagem = response.data[i].featured_image.attachment_meta.sizes.medium.url;
                                     }
                                 }
                             }
                         }
                     }
 
+                    //Tratamento para nÃ£o exibir eventos em noticias
+                    if(dsCategoria != "PrÃ³ximos Eventos"){
+                        noticiasFactory.insert(response.data[i].ID, dsCategoria, dsTitulo, dsNoticia, dtNoticiaBD, dsUrlImagem, '0');
+                        noticia.push({
+                            id: response.data[i].ID,
+                            dsCategoria: dsCategoria,
+                            dsTitulo: dsTitulo,
+                            dsNoticia: dsNoticia,
+                            dtNoticia: dtNoticia,
+                            dsUrlImagem: dsUrlImagem
+                        });
 
-
-                    noticiasFactory.insert(response.data[i].ID, dsCategoria, dsTitulo, dsNoticia, dtNoticiaBD, dsUrlImagem, '0');
-                    noticia.push({
-                        id: response.data[i].ID,
-                        dsCategoria: dsCategoria,
-                        dsTitulo: dsTitulo,
-                        dsNoticia: dsNoticia,
-                        dtNoticia: dtNoticia,
-                        dsUrlImagem: dsUrlImagem
-                    });
-
+                    }
+                   
                 }
 
 
                 return noticia;
             });
 
-         return teste;
+         return listaPost;
 
         }
     };
         
 }]).service('obterNoticiasBD', ['$http', '$q', 'noticiasFactory',   function ($http, $q, noticiasFactory) {
-    //Metodo para realizar autenticação no sistema Ampeb retornando os dados do usuário   
+    //Metodo para realizar autenticaï¿½ï¿½o no sistema Ampeb retornando os dados do usuï¿½rio   
 
     return {
         obterListaNoticiasBD: function () {
@@ -144,12 +173,171 @@ angular.module('app.services', [])
     };
 
 }]).service('obterDetalheNoticiaBD', ['$http', '$q', 'noticiasFactory',   function ($http, $q, noticiasFactory) {
-    //Metodo para realizar autenticação no sistema Ampeb retornando os dados do usuário   
+    //Metodo para realizar autenticaï¿½ï¿½o no sistema Ampeb retornando os dados do usuï¿½rio   
 
     return {
        detalheNoticiaBD: function (id) {
          
             var noticias = noticiasFactory.selectNoticia(id).then(function (noticiaArmazenada) {
+                
+                var noticiaBD;
+                if (noticiaArmazenada[0] != null) {
+                   
+                    noticiaBD = $q(function (resolve, reject) {
+                        resolve(noticiaArmazenada);
+                    });
+
+                }
+                return noticiaBD;
+
+            });
+
+            return noticias;
+
+        }
+    };
+
+}]).service('obterEventosService', ['$http', '$q', 'WEB_METODOS', 'eventosFactory',  function ($http, $q, WEB_METODOS, eventosFactory) {
+
+
+    return {
+        obterEventosOnline: function () {
+            
+
+            // sempre dispara o serviï¿½o pra checar dados mais recentes
+         var listaPost =   $http.get(WEB_METODOS.urlServicosPortal + "?taxonomies=noticias").then(function (response) {
+               
+                //Lendo todas as noticias
+                var noticia = [];
+                for (var i = 0; i < response.data.length; i++) {
+
+                    var dsNoticia = "";
+                    var dsCategoria = "";
+                    var dsUrlImagem = "";
+                    var dsTitulo = "";
+                    var dtNoticiaBD = "";
+                    var dtNoticia = "";
+                    var categorias = [];
+                    
+                         //Validaï¿½ï¿½o de categoria
+                    if (response.data[i].terms != null) {
+
+                        if (response.data[i].terms.category != null) {
+
+                            if(response.data[i].terms.category.length == 1){
+
+                                if (response.data[i].terms.category[0].name != null) {
+                                    dsCategoria = response.data[i].terms.category[0].name;
+                                }
+
+                            }else if(response.data[i].terms.category.length > 1){
+
+                                for (var j = 0; j < response.data[i].terms.category.length; j++) {
+
+                                    if (response.data[i].terms.category[j].name != null) {
+                                        categorias.push(response.data[i].terms.category[j].name);
+                                    }
+                                }
+
+                                var evento = categorias.indexOf("PrÃ³ximos Eventos");
+
+                                if(evento > -1){
+                                    dsCategoria = categorias[evento];
+                                }else{
+                                    dsCategoria = categorias[0];
+                                }
+
+                            }
+                        }
+                    }
+                    
+                   
+                    //Validaï¿½ï¿½o de titulo
+                    if (response.data[i].title != null) {
+                        dsTitulo = response.data[i].title;
+                    }
+
+                    //Validaï¿½ï¿½o da descriï¿½ï¿½o
+                    if (response.data[i].content != null) {
+                        dsNoticia = response.data[i].content.replace(/(<([^>]+)>)/ig, "");
+                    }
+
+                    //Validaï¿½ï¿½o da data
+                    if (response.data[i].date != null) {
+                        dtNoticiaBD = response.data[i].date;
+                        //Feito para retorna no serviï¿½o online a data ja no formato correto
+                        var dataNoticiaArray = response.data[i].date.split("T");
+                        var dataNoticia  = dataNoticiaArray[0].split("-");
+                        dtNoticia = dataNoticia[2] + "-" + dataNoticia[1] + "-" + dataNoticia[0] + " " + dataNoticiaArray[1];
+                        
+                    }
+                    //Validaï¿½ï¿½o da url da imagem
+                    if (response.data[i].featured_image != null) {
+                        if (response.data[i].featured_image.attachment_meta != null) {
+                            if (response.data[i].featured_image.attachment_meta.sizes != null) {
+                                if (response.data[i].featured_image.attachment_meta.sizes.medium != null) {
+                                    if (response.data[i].featured_image.attachment_meta.sizes.medium.url != null) {
+                                        dsUrlImagem = response.data[i].featured_image.attachment_meta.sizes.medium.url;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    //Tratamento para nÃ£o exibir eventos em noticias
+                    if(dsCategoria == "PrÃ³ximos Eventos"){
+                        eventosFactory.insert(response.data[i].ID, dsCategoria, dsTitulo, dsNoticia, dtNoticiaBD, dsUrlImagem, '0');
+                        noticia.push({
+                            id: response.data[i].ID,
+                            dsCategoria: dsCategoria,
+                            dsTitulo: dsTitulo,
+                            dsNoticia: dsNoticia,
+                            dtNoticia: dtNoticia,
+                            dsUrlImagem: dsUrlImagem
+                        });
+
+                    }
+                   
+                }
+
+
+                return noticia;
+            });
+
+         return listaPost;
+
+        }
+    };
+        
+}]).service('obterEventosBD', ['$http', '$q', 'eventosFactory',   function ($http, $q, eventosFactory) {
+    //Metodo para realizar autenticaï¿½ï¿½o no sistema Ampeb retornando os dados do usuï¿½rio   
+
+    return {
+        obterListaEventosBD: function () {
+
+            var noticias = eventosFactory.selectListaNoticias().then(function (dadosArmazenados) {
+            
+                var noticiaBD;
+                noticiaBD = $q(function (resolve, reject) {
+                    resolve(dadosArmazenados);
+                });
+             
+                return noticiaBD;
+
+            });
+
+            return noticias;
+
+        }
+    };
+
+}]).service('obterDetalheEventosBD', ['$http', '$q', 'eventosFactory',   function ($http, $q, eventosFactory) {
+    //Metodo para realizar autenticaï¿½ï¿½o no sistema Ampeb retornando os dados do usuï¿½rio   
+
+    return {
+       detalheEventoBD: function (id) {
+         
+            var noticias = eventosFactory.selectNoticia(id).then(function (noticiaArmazenada) {
                 
                 var noticiaBD;
                 if (noticiaArmazenada[0] != null) {
