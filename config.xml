@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <widget id="com.ionicframework.ampebapp914475" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-  <name>AmpebApp</name>
+  <name>Ampeb</name>
   <description>
         An Ionic Framework and Cordova project.
     </description>
@@ -9,6 +9,9 @@
     </author>
   <content src="index.html"/>
   <access origin="*"/>
+  <access origin="cdvfile://*"/>
+  <allow-intent href="cdvfile://*"/>
+  <preference name="AndroidPersistentFileLocation" value="Compatibility" />
   <preference name="webviewbounce" value="false"/>
   <preference name="UIWebViewBounce" value="false"/>
   <preference name="DisallowOverscroll" value="true"/>
@@ -17,10 +20,12 @@
   <preference name="android-minSdkVersion" value="16"/>
   <preference name="BackupWebStorage" value="none"/>
   <preference name="SplashScreen" value="screen"/>
+   <preference name="iosPersistentFileLocation" value="Library"/>
   <feature name="StatusBar">
     <param name="ios-package" value="CDVStatusBar" onload="true"/>
   </feature>
   <platform name="ios">
+   
     <icon src="resources/ios/icon/icon.png" width="57" height="57"/>
     <icon src="resources/ios/icon/icon@2x.png" width="114" height="114"/>
     <icon src="resources/ios/icon/icon-40.png" width="40" height="40"/>
@@ -53,6 +58,7 @@
     <splash src="resources/ios/splash/Default~iphone.png" height="480" width="320"/>
   </platform>
   <platform name="android">
+    
     <icon src="resources/android/icon/drawable-ldpi-icon.png" density="ldpi"/>
     <icon src="resources/android/icon/drawable-mdpi-icon.png" density="mdpi"/>
     <icon src="resources/android/icon/drawable-hdpi-icon.png" density="hdpi"/>

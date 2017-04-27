@@ -5,14 +5,23 @@
 // the 2nd parameter is an array of 'requires'
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
-angular.module('app', ['ionic', 'app.controllers', 'app.routes', 'app.directives', 'app.services', 'ngCordova', 'app.constants', 'ngMask', 'sqlite'])
+angular.module('app', ['ionic', 'app.controllers', 'app.routes', 'app.directives', 'app.services', 'ngCordova', 'app.constants', 'ngMask', 'sqlite','ionicImgCache'])
 
 .config(function($ionicConfigProvider, $sceDelegateProvider){
   
 
   $sceDelegateProvider.resourceUrlWhitelist([ 'self','*://www.youtube.com/**', '*://player.vimeo.com/video/**']);
 
-})
+}).config(function(ionicImgCacheProvider) {
+    // Enable imgCache debugging.
+    ionicImgCacheProvider.debug(true);
+
+    // Set storage size quota to 100 MB.
+    ionicImgCacheProvider.quota(500);
+    
+    // Set foleder for cached files.
+    //ionicImgCacheProvider.folder('my-cache');
+  })
 
 .run(function($ionicPlatform, $cordovaSQLite) {
   $ionicPlatform.ready(function() {

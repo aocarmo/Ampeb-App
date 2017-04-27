@@ -7,7 +7,7 @@
       <ion-list id="notCias-list6">         
               <ion-item ng-repeat="noticia in listaNoticias" class="item-thumbnail-left item-icon-right assertive" id="notCias-list-item5" ui-sref="notCia({id: noticia.id})">
                  
-                  <img ng-src="{{noticia.dsUrlImagem != '' && noticia.dsUrlImagem || 'img/img_not_found.jpg'}}" />
+                  <img ion-img-cache ionic ng-src="{{noticia.dsUrlImagem != '' && noticia.dsUrlImagem || 'img/img_not_found.jpg'}}" />
                   <h2assertive>
                      {{noticia.dsCategoria}}
                       <p style="white-space:normal;">{{noticia.dtNoticia}}</p>
