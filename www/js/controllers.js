@@ -114,50 +114,47 @@ function ($scope, $stateParams, $state, $http, $ionicPopup, $ionicLoading, Login
     if(manteLogado){
         $state.go('aMPEB');
     }
+   
     $scope.login = function (data) {
-
-        if ($cordovaNetwork.isOnline()) {
-
-            $ionicLoading.show({
-            template: 'Autenticando...'
-            }).then(function (){LoginService.logar(data).then(function (dados){
                 
-                if (dados.data.result == true) {
-                
-                    //Guardando as informações do usuario logado na sessão.
-                    window.localStorage.setItem(LOCAL_STORAGE.local_dados_key, JSON.stringify(dados.data.data));
-                    if (data.manterConectado == true) {
+            if ($cordovaNetwork.isOnline()) {
+
+                $ionicLoading.show({template: 'Autenticando...'}).then(function (){LoginService.logar(data).then(function (dados){
+
+                    if (dados.data.result == true) {
+
+                        //Guardando as informações do usuario logado na sessão.
+                        window.localStorage.setItem(LOCAL_STORAGE.local_dados_key, JSON.stringify(dados.data.data));
+                        if (data.manterConectado == true) {
                         window.localStorage.setItem(LOCAL_STORAGE.manter_logado, true);
-                    } else {
+                        } else {
                         window.localStorage.setItem(LOCAL_STORAGE.manter_logado, false);
-                    }                
-                    //Direciona para a tela inicial              
-                    $state.go('aMPEB');
-                } else {
-                    var alertPopup = $ionicPopup.alert({
+                        }                
+                        //Direciona para a tela inicial              
+                        $state.go('aMPEB');
+                    }else {
+                        var alertPopup = $ionicPopup.alert({
                         title: 'Usuário ou senha inválidos!',
                         okText: 'Ok', // String (default: 'OK'). The text of the OK button.
                         okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
-                    });
-                }
-                }).finally(function () {
+                        });
+                    }
+                    }).finally(function () {
                     //em qualquer caso remove o spinner de loading
                     $ionicLoading.hide();            
+                    });
                 });
-            });
-        }else{
+            }else{
 
-        var alertPopup = $ionicPopup.alert({
-            title: 'Não foi possível realizar login.',
-            template: 'Verifique sua conexão com ineternet.',
-            okText: 'Ok', // String (default: 'OK'). The text of the OK button.
-            okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
-        });
-    }
-            
+                var alertPopup = $ionicPopup.alert({
+                    title: 'Não foi possível realizar login.',
+                    template: 'Verifique sua conexão com ineternet.',
+                    okText: 'Ok', // String (default: 'OK'). The text of the OK button.
+                    okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+                });
+            }
         
-        
-        };
+    };
     
 }])
    
