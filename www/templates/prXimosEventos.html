@@ -7,7 +7,7 @@
       <ion-list id="prXimosEventos-list10">
         <ion-item ng-repeat="evento in listaEventos" class="item-thumbnail-left item-icon-right assertive" id="prXimosEventos-list-item17" ui-sref="detalheDoEvento({id: evento.id})">
                  
-            <img ng-src="{{evento.dsUrlImagem != '' && evento.dsUrlImagem || 'img/img_not_found.jpg'}}" />
+            <img ion-img-cache ng-src="{{evento.dsUrlImagem != '' && evento.dsUrlImagem || 'img/img_not_found.jpg'}}" />
             <h2assertive>
                 {{evento.dsCategoria}}
                 <p style="white-space:normal;">{{evento.dtevento}}</p>
