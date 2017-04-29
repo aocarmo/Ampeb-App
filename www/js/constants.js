@@ -12,7 +12,9 @@ angular.module('app.constants', [])
 .constant('WEB_METODOS', {
     urlServicosSistema: 'http://ampebteste.web2319.uni5.net/homologacao_sistema/index.php/ws/initWS',
     urlRecuperarSenha: 'http://ampebteste.web2319.uni5.net/homologacao_sistema/index.php/login/enviaEmail',
-    urlServicosPortal: 'http://www.ampeb.org.br/homologacao/wp-json/posts'
+    urlServicosPortal: 'http://www.ampeb.org.br/homologacao/wp-json/posts',
+    urlImagemTipoConvenio: 'http://ampebteste.web2319.uni5.net/homologacao_sistema/anexos/imagens_tipo_convenio/',
+    urlImagemConvenio: 'http://ampebteste.web2319.uni5.net/homologacao_sistema/anexos/imagens_convenio/'
 
 }).constant('LOCAL_STORAGE', {
     local_dados_key: 'dadosUsuario',

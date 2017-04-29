@@ -340,10 +340,27 @@ function ($scope, $stateParams,$ionicLoading, obterDetalheEventosBD) {
 
 }])
    
-.controller('detalheDoConvNioCtrl', ['$scope', '$stateParams', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+.controller('detalheDoConvNioCtrl', ['$scope', '$stateParams', '$ionicLoading','obterListaConvenioBD', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $stateParams) {
+function ($scope, $stateParams, $ionicLoading, obterListaConvenioBD) {
+
+     $scope.convenios = {};
+
+     //Pega dados do banco
+    $ionicLoading.show({
+        template: 'Buscando...'
+    }).then(function () {
+        obterListaConvenioBD.ListaConvenioBD(null,null,null,$stateParams.id).then(function (dados) {
+         
+            $scope.convenios = dados;
+           
+        }).finally(function () {
+            //em qualquer caso remove o spinner de loading
+            $ionicLoading.hide();
+        });
+
+    });
 
 
 }])
@@ -396,10 +413,58 @@ function ($scope, $stateParams) {
 
 }])
    
-.controller('listaDeConvNiosCtrl', ['$scope', '$stateParams', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+.controller('listaDeConvNiosCtrl', ['$scope', '$stateParams','$ionicLoading','obterListaConvenioBD','$ionicHistory','$ionicPopup', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $stateParams) {
+function ($scope, $stateParams,$ionicLoading,obterListaConvenioBD,$ionicHistory,$ionicPopup) {
+
+    $scope.listaConvenios = {};
+    var idTipoConvenio = null; 
+    var nmConvenio = null;
+    var nmMunicipio = null;
+ 
+    if($stateParams.idTipoConvenio != ""){
+        idTipoConvenio = $stateParams.idTipoConvenio;
+    }
+
+    if($stateParams.nmConvenio != ""){
+        nmConvenio = $stateParams.nmConvenio;
+    }
+
+     if($stateParams.nmMunicipio != ""){
+        nmMunicipio = $stateParams.nmMunicipio;
+    }
+
+     //Pega dados do banco
+    $ionicLoading.show({
+        template: 'Buscando...'
+    }).then(function () {
+        obterListaConvenioBD.ListaConvenioBD(idTipoConvenio, nmConvenio, nmMunicipio, null).then(function (dados) {
+             
+             if (dados[0] == null) {
+                    var alertPopup = $ionicPopup.alert({
+                        title: 'Não existem dados cadastrados para a pesquisa informada.',                      
+                        okText: 'Ok', // String (default: 'OK'). The text of the OK button.
+                        okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+                    });
+
+                    alertPopup.then(function (res) {
+
+                        $backView = $ionicHistory.backView();
+                        $backView.go();
+
+                    });
+
+                } else {
+                     $scope.listaConvenios = dados;
+                }
+           
+        }).finally(function () {
+            //em qualquer caso remove o spinner de loading
+            $ionicLoading.hide();
+        });
+
+    });
 
 
 }])
@@ -484,10 +549,89 @@ function ($scope, $stateParams) {
 
 }])
    
-.controller('buscarConvNiosCtrl', ['$scope', '$stateParams', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+.controller('buscarConvNiosCtrl', ['$scope', '$stateParams','getTipoConvenioService','$ionicLoading','getMunicipiosConvenioService','getConvenioService','$cordovaNetwork','ObterMunicipiosConvenioBD','ObterTipoConvenioBD','$ionicPopup','$ionicHistory', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $stateParams) {
+function ($scope, $stateParams,getTipoConvenioService,$ionicLoading,getMunicipiosConvenioService,getConvenioService,$cordovaNetwork,ObterMunicipiosConvenioBD,ObterTipoConvenioBD,$ionicPopup,$ionicHistory) {
+
+    $scope.municipiosConvenio = {};
+    $scope.tiposConvenio = {};
+    
+    if ($cordovaNetwork.isOnline()) {
+        
+        $ionicLoading.show({
+            template: 'Buscando...'
+        }).then(function () {
+            getMunicipiosConvenioService.getMunicipiosConvenio().then(function (dadosMunicipio) {
+                
+                $scope.municipiosConvenio = dadosMunicipio;
+            
+            }).finally(function () {
+            //Apos carregar os municipios carregar os tipo de convenios
+                getTipoConvenioService.getTipoConvenio().then(function (dadosTipoConvenio) {
+                    
+                    $scope.tiposConvenio = dadosTipoConvenio;
+                
+                }).finally(function () {
+
+                    getConvenioService.getConvenio().then(function (dadosConvenio) {
+                        var retorno = dadosConvenio;
+                    }).finally(function () {
+                        $ionicLoading.hide();
+                    });               
+                
+                });
+            });
+
+        });
+    }else{
+
+         $ionicLoading.show({
+            template: 'Buscando...'
+        }).then(function () {
+            ObterMunicipiosConvenioBD.ListaMunicipiosConvenioBD().then(function (dadosMunicipio) {
+                
+                $scope.municipiosConvenio = dadosMunicipio;
+            
+            }).finally(function () {
+
+                ObterTipoConvenioBD.ListaTipoConvenioBD().then(function (dadosTipoConvenio) {
+                    if (dadosTipoConvenio[0] == null) {
+                        var alertPopup = $ionicPopup.alert({
+                            title: 'Sem dados offiline',    
+                            template: 'Por favor, conecte seu dispositivo a internet',                  
+                            okText: 'Ok', // String (default: 'OK'). The text of the OK button.
+                            okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+                        });
+
+                        alertPopup.then(function (res) {
+
+                            $backView = $ionicHistory.backView();
+                            $backView.go();
+
+                        });
+
+                    }else {
+                        $scope.tiposConvenio = dadosTipoConvenio;
+                    }
+                        
+                    
+                    }).finally(function () {
+
+                        
+                            $ionicLoading.hide();
+                           
+                    
+                    });
+            });
+
+        });
+
+    }
+    
+
+    
+
 
 
 }])

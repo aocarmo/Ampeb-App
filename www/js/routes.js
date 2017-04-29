@@ -57,7 +57,8 @@ angular.module('app.routes', [])
   .state('detalheDoConvNio', {
     url: '/detalheConvenio',
     templateUrl: 'templates/detalheDoConvNio.html',
-    controller: 'detalheDoConvNioCtrl'
+    controller: 'detalheDoConvNioCtrl',
+    params: { id: null,},
   })
 
   .state('mural', {
@@ -99,7 +100,8 @@ angular.module('app.routes', [])
   .state('listaDeConvNios', {
     url: '/listaConvenios',
     templateUrl: 'templates/listaDeConvNios.html',
-    controller: 'listaDeConvNiosCtrl'
+    controller: 'listaDeConvNiosCtrl',
+    params: { idTipoConvenio: null, nmConvenio: null, nmMunicipio: null },
   })
 
   .state('enquete', {

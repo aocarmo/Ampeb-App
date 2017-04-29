@@ -14,7 +14,7 @@ angular.module('app', ['ionic', 'app.controllers', 'app.routes', 'app.directives
 
 }).config(function(ionicImgCacheProvider) {
     // Enable imgCache debugging.
-    ionicImgCacheProvider.debug(true);
+    ionicImgCacheProvider.debug(false);
 
     // Set storage size quota to 100 MB.
     ionicImgCacheProvider.quota(500);
@@ -44,8 +44,13 @@ angular.module('app', ['ionic', 'app.controllers', 'app.routes', 'app.directives
         db = window.openDatabase("my.db", "1.0", "AmpebApp", -1);
     }
 
-    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS noticias (id integer primary key, dsCategoria varchar(50), dsTitulo varchar(250), dsNoticia text, dtNoticia text, dsUrlImagem varchar(200), flLido integer)");
-    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS eventos (id integer primary key, dsCategoria varchar(50), dsTitulo varchar(250), dsNoticia text, dtNoticia text, dsUrlImagem varchar(200), flLido integer)");
+    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS noticia (id integer primary key, dsCategoria varchar(50), dsTitulo varchar(250), dsNoticia text, dtNoticia text, dsUrlImagem text, flLido integer)");
+    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS evento (id integer primary key, dsCategoria varchar(50), dsTitulo varchar(250), dsNoticia text, dtNoticia text, dsUrlImagem text, flLido integer)");
+    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS municipio_convenio (id integer primary key, nmMunicipioConvenio varchar(100))");
+    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS tipo_convenio (id integer primary key, nmTipoConvenio varchar(50), flPrivado integer, dsUrlImagem text)");
+    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS convenio (id integer primary key, nmConvenio varchar(100), dsUrlImagem text, dsConvenio text, nmContato varchar(100), dsTelefone text, dsEmail varchar(100), urlSite varchar(100), dsEndereco varchar(200), dtInicioVigencia text, dtTerminoVigencia text NULL, dsDesconto varchar(100),flPublicar integer, idTipoConvenio integer, nmMunicipio varchar(100), nmEstado varchar(50), flPrivado integer)");
+  
+
   });
 })
 
