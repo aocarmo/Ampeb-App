@@ -25,21 +25,29 @@
     <div style="margin-left: -10px; width: calc(100% + 20px);">
       <img src="img/R08BZblgTDuVWPqcCh2J_logo-ampeb.png" style="display: block; width: 100%; height: auto; margin-left: auto; margin-right: auto;">
     </div>
-    <form id="aMPEBAPP-form2" class="list">
+    <form name="loginForm" id="aMPEBAPP-form2" novalidate="" class="list" ng-submit="login(loginForm,data)">
       <div class="spacer" style="width: 300px; height: 15px;"></div>
       <ion-list id="aMPEBAPP-list2">
-        <label class="item item-input" id="aMPEBAPP-input3" name="txtLogin">
-          <input type="text" placeholder="Informe seu CPF" mask="999.999.999-99" clean="true" ng-model="data.usuario">
+        <label class="item item-input" ng-class="{ 'has-error' : loginForm.usuario.$invalid, 'has-no-error' : loginForm.usuario.$valid}">
+
+        <!--<label class="item item-input" id="aMPEBAPP-input3" name="txtLogin">-->
+          <input type="text" name="usuario" placeholder="Informe seu CPF" mask="999.999.999-99" clean="true" ng-model="data.usuario" required>
         </label>
-        <label class="item item-input" id="aMPEBAPP-input4" name="txtSenha">
-          <input type="password" placeholder="Senha" ng-model="data.senha">
+        <div class="form-errors" ng-messages="loginForm.usuario.$error" ng-messages-include="templates/form-errors.html"></div> 
+
+        <label class="item item-input" ng-class="{ 'has-error' : loginForm.senha.$invalid, 'has-no-error' : loginForm.senha.$valid}">
+        <!--<<label class="item item-input" id="aMPEBAPP-input4" name="txtSenha">-->
+          <input name="senha" type="password" placeholder="Senha" ng-model="data.senha" required>
         </label>
+          <div class="form-errors" ng-messages="loginForm.senha.$error" ng-messages-include="templates/form-errors.html"></div> 
       </ion-list>
-      <a ng-click="login(data)" id="aMPEBAPP-button2" style="border-radius:0px 0px 0px 0px;" class="button button-assertive  button-block">Entrar</a>
+      <button class="button button-assertive  button-block" type="submit">Entrar</button>
+      <!--<a ng-click="login(data)" id="aMPEBAPP-button2" style="border-radius:0px 0px 0px 0px;" class="button button-assertive  button-block">Entrar</a>-->
       <div align="center">      
             <input type="checkbox" name="ckbMantenha" value="1" ng-model="data.manterConectado"> Mantenha-me conectado
       </div>
         <a ui-sref="esqueceuASenha" id="aMPEBAPP-button5" class="button button-positive  button-block button-clear">Esqueceu a senha?</a>
 </form>
   </ion-content>
+ 
 </ion-view>

@@ -115,8 +115,10 @@ function ($scope, $stateParams, $state, $http, $ionicPopup, $ionicLoading, Login
         $state.go('aMPEB');
     }
    
-    $scope.login = function (data) {
-                
+    $scope.login = function (form,data) {
+
+        if(form.$valid) {                    
+                      
             if ($cordovaNetwork.isOnline()) {
 
                 $ionicLoading.show({template: 'Autenticando...'}).then(function (){LoginService.logar(data).then(function (dados){
@@ -153,7 +155,7 @@ function ($scope, $stateParams, $state, $http, $ionicPopup, $ionicLoading, Login
                     okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
                 });
             }
-        
+        }
     };
     
 }])
@@ -493,41 +495,54 @@ function ($scope, $stateParams) {
 
 }])
    
-.controller('esqueceuASenhaCtrl', ['$scope', '$stateParams', '$state', 'RecuperarSenhaService', '$ionicPopup', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+.controller('esqueceuASenhaCtrl', ['$scope', '$stateParams', '$state', 'RecuperarSenhaService', '$ionicPopup','$cordovaNetwork', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $stateParams, $state, RecuperarSenhaService, $ionicPopup) {
+function ($scope, $stateParams, $state, RecuperarSenhaService, $ionicPopup,$cordovaNetwork) {
 
     $scope.data = {};
 
-    $scope.recuperar = function (data) {
+    $scope.recuperar = function (form,data) {
+        if(form.$valid) {
+            if ($cordovaNetwork.isOnline()) {
 
-        RecuperarSenhaService.enviarEmailRecuperarSenha(data).then(function (dados) {
-           
-            if (dados.data == "Confirmação executada com sucesso.") {
-                var alertPopup = $ionicPopup.alert({
-                    title: 'Solicitação enviada com sucesso.',
-                    template: 'Foi enviado um e-mail para redefinição de senha',
-                    okText: 'OK', // String (default: 'OK'). The text of the OK button.
+                RecuperarSenhaService.enviarEmailRecuperarSenha(data).then(function (dados) {
+            
+                if (dados.data == "Confirmação executada com sucesso.") {
+                    var alertPopup = $ionicPopup.alert({
+                        title: 'Solicitação enviada com sucesso.',
+                        template: 'Foi enviado um e-mail para redefinição de senha',
+                        okText: 'OK', // String (default: 'OK'). The text of the OK button.
+                        okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+                    });
+
+                    alertPopup.then(function (res) {
+
+                        $state.go('aMPEBAPP');
+
+                    });             
+                
+                }else if(dados.data == "Seu email não existe na base de dados."){
+                    var alertPopup = $ionicPopup.alert({
+                        title: dados.data,
+                        template: 'Verifique o CPF informado.',
+                        okText: 'OK', // String (default: 'OK'). The text of the OK button.
+                        okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+                    });
+                }
+
+            });
+            }else{
+               var alertPopup = $ionicPopup.alert({
+                    title: 'Não foi possível enviar o e-mail de recuperação de senha.',
+                    template: 'Verifique sua conexão com ineternet.',
+                    okText: 'Ok', // String (default: 'OK'). The text of the OK button.
                     okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
                 });
-
-                alertPopup.then(function (res) {
-
-                    $state.go('aMPEBAPP');
-
-                });             
-               
-            }else if(dados.data == "Seu email não existe na base de dados."){
-                var alertPopup = $ionicPopup.alert({
-                    title: dados.data,
-                    template: 'Verifique o CPF informado.',
-                    okText: 'OK', // String (default: 'OK'). The text of the OK button.
-                    okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
-                });
-            }
-
-        });
+            }   
+       
+        }
+        
 
     };
 

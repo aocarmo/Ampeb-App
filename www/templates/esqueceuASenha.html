@@ -2,12 +2,13 @@
   <ion-content padding="true" class="has-header">
     <h2 id="esqueceuASenha-heading26" style="color:#821723;font-weight:300;">Esqueceu a senha?</h2>
     <hr class="hr-topoPagina">
-    <form id="esqueceuASenha-form9" class="list">
+    <form  name="esqueceuSenhaForm" id="esqueceuASenha-form9" class="list" novalidate="" ng-submit="recuperar(esqueceuSenhaForm,data)">
       <h5 id="esqueceuASenha-heading27" style="color:#821723;">Insira as informações</h5>
-      <label class="item item-input" id="esqueceuASenha-input12" name="txtSenhaAtual">
-          <input type="text" placeholder="Informe seu CPF" mask="999.999.999-99" clean="true" ng-model="data.usuario">
+    <label class="item item-input" ng-class="{ 'has-error' : esqueceuSenhaForm.usuario.$invalid, 'has-no-error' : esqueceuSenhaForm.usuario.$valid}">
+          <input name="usuario" type="text" placeholder="Informe seu CPF" mask="999.999.999-99" clean="true" ng-model="data.usuario" required>
       </label>
-      <button id="esqueceuASenha-button13" class="button button-assertive  button-block" ng-click="recuperar(data)">Recuperar a senha</button>
+       <div class="form-errors" ng-messages="esqueceuSenhaForm.usuario.$error" ng-messages-include="templates/form-errors.html"></div> 
+      <button id="esqueceuASenha-button13" class="button button-assertive  button-block" type="submit">Recuperar a senha</button>
     </form>
     <div id="esqueceuASenha-markdown12" class="show-list-numbers-and-dots">
       <p style="color:#000000;font-size:18px;">Caro associado, será enviado um e-mail com o endereço eletrônico para redefinição da senha.</p>
