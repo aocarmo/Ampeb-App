@@ -355,6 +355,120 @@ angular.module('app.services', [])
         }
     };
         
+}]).service('obterNoticiasServiceRefresh', ['$http', '$q', 'WEB_METODOS', 'noticiasFactory',  function ($http, $q, WEB_METODOS, noticiasFactory) {
+
+    return {
+        obterNoticiasOnlineRefresh: function () {
+          
+         return  $http.get(WEB_METODOS.urlServicosPortal + "?taxonomies=noticias").then(function (response) {
+               
+                //Lendo todas as noticias
+                //var noticia = [];
+                for (var i = 0; i < response.data.length; i++) {
+
+                    var dsNoticia = "";
+                    var dsCategoria = "";
+                    var dsUrlImagem = "";
+                    var dsTitulo = "";
+                    var dtNoticiaBD = "";
+                    var dtNoticia = "";
+                    var categorias = [];
+                    
+                         //Valida��o de categoria
+                    if (response.data[i].terms != null) {
+
+                        if (response.data[i].terms.category != null) {
+
+                            if(response.data[i].terms.category.length == 1){
+
+                                if (response.data[i].terms.category[0].name != null) {
+                                    dsCategoria = response.data[i].terms.category[0].name;
+                                }
+
+                            }else if(response.data[i].terms.category.length > 1){
+
+                                for (var j = 0; j < response.data[i].terms.category.length; j++) {
+
+                                    if (response.data[i].terms.category[j].name != null) {
+                                        categorias.push(response.data[i].terms.category[j].name);
+                                    }
+                                }
+
+                                var evento = categorias.indexOf("Próximos Eventos");
+
+                                if(evento > -1){
+                                    dsCategoria = categorias[evento];
+                                }else{
+                                    dsCategoria = categorias[0];
+                                }
+
+                            }
+                        }
+                    }
+                    
+                   
+                    //Valida��o de titulo
+                    if (response.data[i].title != null) {
+                        dsTitulo = response.data[i].title;
+                    }
+
+                    //Valida��o da descri��o
+                    if (response.data[i].content != null) {
+                        dsNoticia = response.data[i].content.replace(/(<([^>]+)>)/ig, "");
+                    }
+
+                    //Valida��o da data
+                    if (response.data[i].date != null) {
+                        dtNoticiaBD = response.data[i].date;
+                        //Feito para retorna no servi�o online a data ja no formato correto
+                        var dataNoticiaArray = response.data[i].date.split("T");
+                        var dataNoticia  = dataNoticiaArray[0].split("-");
+                        dtNoticia = dataNoticia[2] + "-" + dataNoticia[1] + "-" + dataNoticia[0] + " " + dataNoticiaArray[1];
+                        
+                    }
+                    //Valida��o da url da imagem
+                    if (response.data[i].featured_image != null) {
+                        if (response.data[i].featured_image.attachment_meta != null) {
+                            if (response.data[i].featured_image.attachment_meta.sizes != null) {
+                                if (response.data[i].featured_image.attachment_meta.sizes.medium != null) {
+                                    if (response.data[i].featured_image.attachment_meta.sizes.medium.url != null) {
+                                        dsUrlImagem = response.data[i].featured_image.attachment_meta.sizes.medium.url;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    //Tratamento para não exibir eventos em noticias
+                    if(dsCategoria != "Próximos Eventos"){
+                        noticiasFactory.insert(response.data[i].ID, dsCategoria, dsTitulo, dsNoticia, dtNoticiaBD, dsUrlImagem, 0);
+                        /*noticia.push({
+                            id: response.data[i].ID,
+                            dsCategoria: dsCategoria,
+                            dsTitulo: dsTitulo,
+                            dsNoticia: dsNoticia,
+                            dtNoticia: dtNoticia,
+                            dsUrlImagem: dsUrlImagem
+                        });*/
+
+                    }
+                   
+                }
+               
+                //Verificar a melhor forma na tela bloqueada
+                var deferred = $q.defer();
+                noticiasFactory.selectListaNoticias().then(function (dadosOnline) {
+            
+                    deferred.resolve(dadosOnline);
+                });
+
+                //return noticia;
+                return deferred.promise;
+            });
+
+        }
+    };
+        
 }]).service('obterNoticiasBD', ['$http', '$q', 'noticiasFactory',   function ($http, $q, noticiasFactory) {
     //Metodo para realizar autentica��o no sistema Ampeb retornando os dados do usu�rio   
 
@@ -572,6 +686,113 @@ angular.module('app.services', [])
         obterEventosOnline: function () {
           
          return listaPost;
+
+        }
+    };
+        
+}]).service('obterEventosServiceRefresh', ['$http', '$q', 'WEB_METODOS', 'eventosFactory',  function ($http, $q, WEB_METODOS, eventosFactory) {
+
+    return {
+        obterEventosOnlineRefresh: function () {
+          
+         return $http.get(WEB_METODOS.urlServicosPortal + "?taxonomies=noticias").then(function (response) {
+               
+                //Lendo todas as noticias
+                //var noticia = [];
+                for (var i = 0; i < response.data.length; i++) {
+
+                    var dsNoticia = "";
+                    var dsCategoria = "";
+                    var dsUrlImagem = "";
+                    var dsTitulo = "";
+                    var dtNoticiaBD = "";
+                    var dtNoticia = "";
+                    var categorias = [];
+                    
+                         //Valida��o de categoria
+                    if (response.data[i].terms != null) {
+
+                        if (response.data[i].terms.category != null) {
+
+                            if(response.data[i].terms.category.length == 1){
+
+                                if (response.data[i].terms.category[0].name != null) {
+                                    dsCategoria = response.data[i].terms.category[0].name;
+                                }
+
+                            }else if(response.data[i].terms.category.length > 1){
+
+                                for (var j = 0; j < response.data[i].terms.category.length; j++) {
+
+                                    if (response.data[i].terms.category[j].name != null) {
+                                        categorias.push(response.data[i].terms.category[j].name);
+                                    }
+                                }
+
+                                var evento = categorias.indexOf("Próximos Eventos");
+
+                                if(evento > -1){
+                                    dsCategoria = categorias[evento];
+                                }else{
+                                    dsCategoria = categorias[0];
+                                }
+
+                            }
+                        }
+                    }
+                    
+                   
+                    //Valida��o de titulo
+                    if (response.data[i].title != null) {
+                        dsTitulo = response.data[i].title;
+                    }
+
+                    //Valida��o da descri��o
+                    if (response.data[i].content != null) {
+                        dsNoticia = response.data[i].content.replace(/(<([^>]+)>)/ig, "");
+                    }
+
+                    //Valida��o da data
+                    if (response.data[i].date != null) {
+                        dtNoticiaBD = response.data[i].date;
+                        //Feito para retorna no servi�o online a data ja no formato correto
+                        var dataNoticiaArray = response.data[i].date.split("T");
+                        var dataNoticia  = dataNoticiaArray[0].split("-");
+                        dtNoticia = dataNoticia[2] + "-" + dataNoticia[1] + "-" + dataNoticia[0] + " " + dataNoticiaArray[1];
+                        
+                    }
+                    //Valida��o da url da imagem
+                    if (response.data[i].featured_image != null) {
+                        if (response.data[i].featured_image.attachment_meta != null) {
+                            if (response.data[i].featured_image.attachment_meta.sizes != null) {
+                                if (response.data[i].featured_image.attachment_meta.sizes.medium != null) {
+                                    if (response.data[i].featured_image.attachment_meta.sizes.medium.url != null) {
+                                        dsUrlImagem = response.data[i].featured_image.attachment_meta.sizes.medium.url;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    //Tratamento para não exibir eventos em noticias
+                    if(dsCategoria == "Próximos Eventos"){
+                        eventosFactory.insert(response.data[i].ID, dsCategoria, dsTitulo, dsNoticia, dtNoticiaBD, dsUrlImagem, 0);
+                   
+                    }
+                   
+                }
+
+
+                //return noticia;
+                var deferred = $q.defer();
+                eventosFactory.selectListaNoticias().then(function (dadosOnline) {
+            
+                    deferred.resolve(dadosOnline);
+                });
+
+                //return noticia;
+                return deferred.promise;
+            });
 
         }
     };

@@ -1,9 +1,9 @@
 ﻿angular.module('app.controllers', [])
   
-.controller('aMPEBCtrl', ['$scope', '$stateParams','$state','$q', '$cordovaCamera','$ionicPopup','LOCAL_STORAGE','$timeout','obterQtdNoticiaNaoLida','obterQtdEventosNaoLido','obterNoticiasService','obterEventosService', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+.controller('aMPEBCtrl', ['$scope', '$stateParams','$state','$q', '$cordovaCamera','$ionicPopup','LOCAL_STORAGE','$timeout','obterQtdNoticiaNaoLida','obterQtdEventosNaoLido','obterNoticiasService','obterEventosService','obterEventosServiceRefresh','obterNoticiasServiceRefresh', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $stateParams,$state, $q,$cordovaCamera, $ionicPopup, LOCAL_STORAGE,$timeout,obterQtdNoticiaNaoLida,obterQtdEventosNaoLido,obterNoticiasService,obterEventosService) {
+function ($scope, $stateParams,$state, $q,$cordovaCamera, $ionicPopup, LOCAL_STORAGE,$timeout,obterQtdNoticiaNaoLida,obterQtdEventosNaoLido,obterNoticiasService,obterEventosService,obterEventosServiceRefresh,obterNoticiasServiceRefresh) {
     
   
    /***************** Bloco para atualizações de notificações ********************/
@@ -29,12 +29,13 @@ function ($scope, $stateParams,$state, $q,$cordovaCamera, $ionicPopup, LOCAL_STO
         });   
         
         var retornoNotificacoes = [];
+
           //Pega o retorno de forma sincrona do ajax.
          $q.all([qtdNoticias, qtdEventos]).then(function(result){
             for (var i = 0; i < result.length; i++){
                 retornoNotificacoes.push(result[i]);
             }
-
+          
             if(retornoNotificacoes[0] != null && retornoNotificacoes[1] != null){
                 //Testa caso o a quantidade seja maior que 0 exibe os itens não lidos.
 
@@ -61,8 +62,30 @@ function ($scope, $stateParams,$state, $q,$cordovaCamera, $ionicPopup, LOCAL_STO
         $scope.refresh = function() {
 
             $timeout( function() {
-                //simulate async response
-                $scope.atualizarDados();
+                var noticias =  obterNoticiasServiceRefresh.obterNoticiasOnlineRefresh().then(function (dadosNoticia) {    
+                    return dadosNoticia;
+                });  
+
+                var eventos =  obterEventosServiceRefresh.obterEventosOnlineRefresh().then(function (dadosEvento) {
+
+                    return dadosEvento;
+                });     
+
+                var retornos = [];
+
+                $q.all([eventos,noticias]).then(function(result){
+                   
+                    for (var i = 0; i < result.length; i++){
+                        retornos.push(result[i]);
+                    }
+                   console.log(JSON.stringify(retornos));
+                    if(retornos[0] != null && retornos[1] != null){
+                        //Setando a variavel de sessão para informar ao controller de cada tela para buscar a informação atualizada do banco.
+                         window.localStorage.setItem("eventos", true);
+                         window.localStorage.setItem("noticias", true);
+                        $scope.obterNotificacoes();
+                    }
+                });
 
                 //Stop the ion-refresher from spinning
                 $scope.$broadcast('scroll.refreshComplete');
@@ -115,8 +138,12 @@ function ($scope, $stateParams,$state, $q,$cordovaCamera, $ionicPopup, LOCAL_STO
 
     //Função para deslogar
     $scope.logout = function () {
+        //Removendo dados da sessão
         window.localStorage.removeItem(LOCAL_STORAGE.local_dados_key);
-        window.localStorage.removeItem(LOCAL_STORAGE.manter_logado);
+        window.localStorage.removeItem(LOCAL_STORAGE.manter_logado);        
+        window.localStorage.removeItem("noticias");
+        window.localStorage.removeItem("eventos");
+        
         $state.go('aMPEBAPP');
     }
         
@@ -271,18 +298,40 @@ function ($scope, $stateParams, obterNoticiasService, obterNoticiasBD, $ionicPop
         $ionicLoading.show({
             template: 'Buscando...'
         }).then(function () {
-            obterNoticiasService.obterNoticiasOnline().then(function (dados) {
+            //Verifica se e pra buscar a informação que foi atualizada recente.
+            var atualizado = window.localStorage.getItem("noticias");
 
-                $scope.listaNoticias = dados;
+            //Remove a session
+            //window.localStorage.removeItem("eventos");
 
-                marcarNoticiasLidas.marcar().then(function (marcados) {
-                    
+            //Caso verdadeiro busca a nova informação do contrario continua em cache
+            if(atualizado){
+                obterNoticiasBD.obterListaNoticiasBD().then(function (dados) {
+                         
+                    $scope.listaNoticias = dados;
+                    marcarNoticiasLidas.marcar().then(function (marcados) {
+                       
+                    });
+                        
+                }).finally(function () {
+                    //em qualquer caso remove o spinner de loading
+                    $ionicLoading.hide();
                 });
 
-            }).finally(function () {
-                //em qualquer caso remove o spinner de loading
-                $ionicLoading.hide();
-            });
+            }else{
+                obterNoticiasService.obterNoticiasOnline().then(function (dados) {
+
+                    $scope.listaNoticias = dados;
+
+                    marcarNoticiasLidas.marcar().then(function (marcados) {
+                        
+                    });
+
+                }).finally(function () {
+                    //em qualquer caso remove o spinner de loading
+                    $ionicLoading.hide();
+                });
+            }
 
         });
     } else {
@@ -342,19 +391,46 @@ function ($scope, $stateParams,obterEventosService, obterEventosBD, $ionicPopup,
         $ionicLoading.show({
             template: 'Buscando...'
         }).then(function () {
-            obterEventosService.obterEventosOnline().then(function (dados) {
 
-                $scope.listaEventos = dados;
+            //Verifica se e pra buscar a informação que foi atualizada recente.
+            var atualizado = window.localStorage.getItem("eventos");
+
+            //Remove a session
+            //window.localStorage.removeItem("eventos");
+
+            //Caso verdadeiro busca a nova informação do contrario continua em cache
+            if(atualizado){
+                obterEventosBD.obterListaEventosBD().then(function (dados) {
+             
+                    $scope.listaEventos = dados;
+                    
+                    marcarEventosLidos.marcar().then(function (marcados) {
+                        
+                    });
                 
-                marcarEventosLidos.marcar().then(function (marcados) {
-                  
+               
+
+                }).finally(function () {
+                    //em qualquer caso remove o spinner de loading
+                    $ionicLoading.hide();
                 });
 
+            }else{
+                obterEventosService.obterEventosOnline().then(function (dados) {
 
-            }).finally(function () {
-                //em qualquer caso remove o spinner de loading
-                $ionicLoading.hide();
-            });
+                    $scope.listaEventos = dados;
+                
+                    marcarEventosLidos.marcar().then(function (marcados) {
+                  
+                    });
+
+
+                }).finally(function () {
+                    //em qualquer caso remove o spinner de loading
+                    $ionicLoading.hide();
+                });
+            }
+            
 
         });
     } else {

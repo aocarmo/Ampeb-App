@@ -179,11 +179,11 @@ sqlite.factory('eventosFactory', function ($q, $cordovaSQLite) {
                   
                   outputs.push({ "retorno": res.insertId });
                   deferred.resolve(outputs);
-                  //console.log('INSERTED ID: ' + res.insertId);
+                  console.log('INSERTED ID: ' + res.insertId);
               },
               function (err) {
                   deferred.reject(err);
-                  //console.log("Insert Erro: " + JSON.stringify(err));
+                 console.log("Insert Erro: " + JSON.stringify(err));
                   //console.log('ERROR: ' + err);
                  
               }
