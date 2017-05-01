@@ -31,13 +31,13 @@
         <label class="item item-input" ng-class="{ 'has-error' : loginForm.usuario.$invalid, 'has-no-error' : loginForm.usuario.$valid}">
 
         <!--<label class="item item-input" id="aMPEBAPP-input3" name="txtLogin">-->
-          <input type="text" name="usuario" placeholder="Informe seu CPF" mask="999.999.999-99" clean="true" ng-model="data.usuario" required>
+          <input type="text" name="usuario" placeholder="Informe seu CPF" mask="999.999.999-99" clean="true" ng-model="data.usuario" data-ng-init="data.usuario = '07659362593'"  required>
         </label>
         <div class="form-errors" ng-messages="loginForm.usuario.$error" ng-messages-include="templates/form-errors.html"></div> 
 
         <label class="item item-input" ng-class="{ 'has-error' : loginForm.senha.$invalid, 'has-no-error' : loginForm.senha.$valid}">
         <!--<<label class="item item-input" id="aMPEBAPP-input4" name="txtSenha">-->
-          <input name="senha" type="password" placeholder="Senha" ng-model="data.senha" required>
+          <input name="senha" type="password" placeholder="Senha" ng-model="data.senha" data-ng-init="data.senha = 'Ampeb2017!'" required>
         </label>
           <div class="form-errors" ng-messages="loginForm.senha.$error" ng-messages-include="templates/form-errors.html"></div> 
       </ion-list>

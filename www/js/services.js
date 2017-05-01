@@ -322,7 +322,7 @@ angular.module('app.services', [])
 
                     //Tratamento para não exibir eventos em noticias
                     if(dsCategoria != "Próximos Eventos"){
-                        noticiasFactory.insert(response.data[i].ID, dsCategoria, dsTitulo, dsNoticia, dtNoticiaBD, dsUrlImagem, '0');
+                        noticiasFactory.insert(response.data[i].ID, dsCategoria, dsTitulo, dsNoticia, dtNoticiaBD, dsUrlImagem, 0);
                         /*noticia.push({
                             id: response.data[i].ID,
                             dsCategoria: dsCategoria,
@@ -335,7 +335,7 @@ angular.module('app.services', [])
                     }
                    
                 }
-
+               
                 //Verificar a melhor forma na tela bloqueada
                 var deferred = $q.defer();
                 noticiasFactory.selectListaNoticias().then(function (dadosOnline) {
@@ -401,6 +401,56 @@ angular.module('app.services', [])
             });
 
             return noticias;
+
+        }
+    };
+
+}])
+.service('obterQtdNoticiaNaoLida', ['$http', '$q', 'noticiasFactory',   function ($http, $q, noticiasFactory) {
+    //Metodo para realizar autentica��o no sistema Ampeb retornando os dados do usu�rio   
+
+    return {
+
+       obter: function () {
+         
+            var retorno = noticiasFactory.obterQtdNoticiaNaoLida().then(function (qtd) {
+                
+                var qtdNaoLidas;               
+                   
+                    qtdNaoLidas = $q(function (resolve, reject) {
+                        resolve(qtd);
+                    });
+
+                return qtdNaoLidas;
+
+            });
+
+            return retorno;
+
+        }
+    };
+
+}])
+.service('marcarNoticiasLidas', ['$http', '$q', 'noticiasFactory',   function ($http, $q, noticiasFactory) {
+    //Metodo para realizar autentica��o no sistema Ampeb retornando os dados do usu�rio   
+
+    return {
+
+       marcar: function () {
+         
+            var retorno = noticiasFactory.marcarNoticiasLidas().then(function (qtd) {
+                
+                var qtdNaoLidas;               
+                   
+                    qtdNaoLidas = $q(function (resolve, reject) {
+                        resolve(qtd);
+                    });
+
+                return qtdNaoLidas;
+
+            });
+
+            return retorno;
 
         }
     };
@@ -491,7 +541,7 @@ angular.module('app.services', [])
 
                     //Tratamento para não exibir eventos em noticias
                     if(dsCategoria == "Próximos Eventos"){
-                        eventosFactory.insert(response.data[i].ID, dsCategoria, dsTitulo, dsNoticia, dtNoticiaBD, dsUrlImagem, '0');
+                        eventosFactory.insert(response.data[i].ID, dsCategoria, dsTitulo, dsNoticia, dtNoticiaBD, dsUrlImagem, 0);
                        /* noticia.push({
                             id: response.data[i].ID,
                             dsCategoria: dsCategoria,
@@ -569,6 +619,54 @@ angular.module('app.services', [])
             });
 
             return noticias;
+
+        }
+    };
+
+}]).service('obterQtdEventosNaoLido', ['$http', '$q', 'eventosFactory',   function ($http, $q, eventosFactory) {
+    //Metodo para realizar autentica��o no sistema Ampeb retornando os dados do usu�rio   
+
+    return {
+
+       obter: function () {
+         
+            var retorno = eventosFactory.obterQtdEventosNaoLido().then(function (qtd) {
+                
+                var qtdNaoLidas;               
+                   
+                    qtdNaoLidas = $q(function (resolve, reject) {
+                        resolve(qtd);
+                    });
+
+                return qtdNaoLidas;
+
+            });
+
+            return retorno;
+
+        }
+    };
+
+}]).service('marcarEventosLidos', ['$http', '$q', 'eventosFactory',   function ($http, $q, eventosFactory) {
+    //Metodo para realizar autentica��o no sistema Ampeb retornando os dados do usu�rio   
+
+    return {
+
+       marcar: function () {
+         
+            var retorno = eventosFactory.marcarEventosLidos().then(function (qtd) {
+                
+                var qtdNaoLidas;               
+                   
+                    qtdNaoLidas = $q(function (resolve, reject) {
+                        resolve(qtd);
+                    });
+
+                return qtdNaoLidas;
+
+            });
+
+            return retorno;
 
         }
     };

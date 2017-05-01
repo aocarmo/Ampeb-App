@@ -3,6 +3,7 @@
     <button ng-click="logout()" class="button button-icon icon ion-log-out"> Sair</button>
   </ion-nav-buttons>
   <ion-content padding="true" class="has-header">
+     <ion-refresher on-refresh="refresh()"></ion-refresher>
     <div id="aMPEB-container10">
       <div>
         <div class="row containerTopo padding-topo">
@@ -51,16 +52,14 @@
         <div align="center" class="row">
           <div class="col col-50  botaoMenu">
             <a ui-sref="buscarConvNios" class="button icon button-icon">
-              <i class="icon ion-ios-pricetags"></i>
-              <span style="position: absolute" class="badge badge-royal">3</span>
-              <br>
+              <i class="icon ion-ios-pricetags"></i><br>
               <span class="nome-icone">Convênios</span>
             </a>
           </div>
           <div class="col col-50  botaoMenu">
             <a ui-sref="notCias" class="button icon button-icon">
               <i class="icon ion-social-rss"></i>
-              <span style="position: absolute" class="badge badge-royal">5</span>
+              <span id="noticiasBadge" style="position: absolute" class="badge badge-royal"></span>
               <br>
               <span class="nome-icone">Notícias</span>
             </a>
@@ -70,7 +69,7 @@
           <div class="col col-50 botaoMenu">
             <a ui-sref="prXimosEventos" class="button icon button-icon">
               <i class="icon ion-calendar"></i>
-              <span style="position: absolute" class="badge badge-royal">1</span>
+              <span id="eventosBadge" style="position: absolute" class="badge badge-royal"></span>
               <br>
               <span class="nome-icone">Eventos</span>
             </a>
@@ -119,5 +118,8 @@
         </div>
       </div>
     </div>
+     <ion-list>
+        <ion-item ng-repeat="item in items">{{item}}</ion-item>
+      </ion-list>
   </ion-content>
 </ion-view>

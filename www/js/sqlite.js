@@ -28,15 +28,15 @@ sqlite.factory('noticiasFactory', function ($q, $cordovaSQLite) {
 
             $cordovaSQLite.execute(db, query, values).then(
               function (res) {
-                  
+                
                   outputs.push({ "retorno": res.insertId });
                   deferred.resolve(outputs);
-                  //console.log('INSERTED ID: ' + res.insertId);
+                  
               },
               function (err) {
                   deferred.reject(err);
                   //console.log("Insert Erro: " + JSON.stringify(err));
-                  //console.log('ERROR: ' + err);
+              
                  
               }
 
@@ -115,24 +115,44 @@ sqlite.factory('noticiasFactory', function ($q, $cordovaSQLite) {
 
            
         },
-        verificaNoticia: function (id) {
-            var query = "SELECT 1 as retorno FROM noticia WHERE id=?";
-            var values = [id];
+        obterQtdNoticiaNaoLida: function () {
+            var query = "SELECT count(*) as qtd FROM noticia WHERE flLido = 0";
+           
             var outputs = [];
 
             //Usada para fazer o retorno do banco aguardar esta completa
             var deferred = $q.defer();
-            $cordovaSQLite.execute(db, query, values).then(function (data) {
+            $cordovaSQLite.execute(db, query).then(function (data) {
                 if (data.rows.length > 0) {
 
-                    outputs.push({ "retorno": data.rows.item(i).retorno });
+                    outputs.push({ "qtdNoticiasNaoLidas": data.rows.item(0).qtd});
                     deferred.resolve(outputs);
 
                 } else {
                     
-                    outputs.push({ "retorno": 0 });
+                    var retorno = null;
+                    outputs.push(retorno);
                     deferred.resolve(outputs);
                 }
+            }, function (error) {
+
+                outputs.push({ "retorno": error });
+                deferred.reject(error);
+            });
+
+            return deferred.promise;
+        },
+        marcarNoticiasLidas: function () {
+            var query = "UPDATE noticia SET flLido = 1 WHERE flLido = 0";
+           
+            var outputs = [];
+
+            //Usada para fazer o retorno do banco aguardar esta completa
+            var deferred = $q.defer();
+            $cordovaSQLite.execute(db, query).then(function (data) {
+                    outputs.push({ "atualizado": data});
+                    deferred.resolve(outputs);
+               
             }, function (error) {
 
                 outputs.push({ "retorno": error });
@@ -243,22 +263,23 @@ sqlite.factory('eventosFactory', function ($q, $cordovaSQLite) {
 
            
         },
-        verificaNoticia: function (id) {
-            var query = "SELECT 1 as retorno FROM evento WHERE id=?";
-            var values = [id];
+        obterQtdEventosNaoLido: function () {
+            var query = "SELECT count(*) as qtd FROM evento WHERE flLido = 0";
+           
             var outputs = [];
 
             //Usada para fazer o retorno do banco aguardar esta completa
             var deferred = $q.defer();
-            $cordovaSQLite.execute(db, query, values).then(function (data) {
+            $cordovaSQLite.execute(db, query).then(function (data) {
                 if (data.rows.length > 0) {
 
-                    outputs.push({ "retorno": data.rows.item(i).retorno });
+                    outputs.push({ "qtdEventosNaoLidos": data.rows.item(0).qtd});
                     deferred.resolve(outputs);
 
                 } else {
                     
-                    outputs.push({ "retorno": 0 });
+                    var retorno = null;
+                    outputs.push(retorno);
                     deferred.resolve(outputs);
                 }
             }, function (error) {
@@ -268,7 +289,27 @@ sqlite.factory('eventosFactory', function ($q, $cordovaSQLite) {
             });
 
             return deferred.promise;
+        },
+        marcarEventosLidos: function () {
+            var query = "UPDATE evento SET flLido = 1 WHERE flLido = 0";
+           
+            var outputs = [];
+
+            //Usada para fazer o retorno do banco aguardar esta completa
+            var deferred = $q.defer();
+            $cordovaSQLite.execute(db, query).then(function (data) {
+                    outputs.push({ "atualizado": data});
+                    deferred.resolve(outputs);
+               
+            }, function (error) {
+
+                outputs.push({ "retorno": error });
+                deferred.reject(error);
+            });
+
+            return deferred.promise;
         }
+       
        
     }
 });

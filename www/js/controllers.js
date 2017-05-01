@@ -1,10 +1,108 @@
 ﻿angular.module('app.controllers', [])
   
-.controller('aMPEBCtrl', ['$scope', '$stateParams','$state', '$cordovaCamera','$ionicPopup','LOCAL_STORAGE', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+.controller('aMPEBCtrl', ['$scope', '$stateParams','$state','$q', '$cordovaCamera','$ionicPopup','LOCAL_STORAGE','$timeout','obterQtdNoticiaNaoLida','obterQtdEventosNaoLido','obterNoticiasService','obterEventosService', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $stateParams,$state, $cordovaCamera, $ionicPopup, LOCAL_STORAGE) {
+function ($scope, $stateParams,$state, $q,$cordovaCamera, $ionicPopup, LOCAL_STORAGE,$timeout,obterQtdNoticiaNaoLida,obterQtdEventosNaoLido,obterNoticiasService,obterEventosService) {
     
+  
+   /***************** Bloco para atualizações de notificações ********************/
+     /* $scope.$on('$ionicView.beforeLeave', function() {
+           //do your stuff after leaving
+           Função para sempre fazer algo apos sair da pagina.
+
+    });*/
+    //Função para sempre fazer algo apos entrar na pagina.
+    $scope.$on('$ionicView.beforeEnter', function() {
+       $scope.obterNotificacoes(); 
+    });
+    
+    //Funcao para obter as notificacoes de noticias
+    $scope.obterNotificacoes = function() {  
+            //Pega a quantidade de noticias não lidas
+          var qtdNoticias =    obterQtdNoticiaNaoLida.obter().then(function (qtdNoticiaNaoLida) {    
+            return qtdNoticiaNaoLida;
+        });     
+        //Pega a quantidade de eventos não lidos
+          var qtdEventos =  obterQtdEventosNaoLido.obter().then(function (qtdEventoNaoLido) {    
+            return qtdEventoNaoLido;
+        });   
+        
+        var retornoNotificacoes = [];
+          //Pega o retorno de forma sincrona do ajax.
+         $q.all([qtdNoticias, qtdEventos]).then(function(result){
+            for (var i = 0; i < result.length; i++){
+                retornoNotificacoes.push(result[i]);
+            }
+
+            if(retornoNotificacoes[0] != null && retornoNotificacoes[1] != null){
+                //Testa caso o a quantidade seja maior que 0 exibe os itens não lidos.
+
+                if(retornoNotificacoes[0][0].qtdNoticiasNaoLidas > 0){
+                    //Seta o span com a quantodade notificaoes
+                     document.getElementById("noticiasBadge").textContent=retornoNotificacoes[0][0].qtdNoticiasNaoLidas;
+                }else{
+                    document.getElementById("noticiasBadge").textContent="";
+                }
+
+               if(retornoNotificacoes[1][0].qtdEventosNaoLidos > 0){
+                    document.getElementById("eventosBadge").textContent=retornoNotificacoes[1][0].qtdEventosNaoLidos;
+                }else{
+                    document.getElementById("eventosBadge").textContent="";
+                }
+                
+             }
+
+        });     
+
+       
+    };  
+        //Função para buscar novos dados.
+        $scope.refresh = function() {
+
+            $timeout( function() {
+                //simulate async response
+                $scope.atualizarDados();
+
+                //Stop the ion-refresher from spinning
+                $scope.$broadcast('scroll.refreshComplete');
+            
+            }, 3000);
+            
+        };
+        
+        
+   //Atualizando os dados para exibir notificaçoess
+    $scope.atualizarDados = function() {           
+
+         var noticias =  obterNoticiasService.obterNoticiasOnline().then(function (dadosNoticia) {    
+            return dadosNoticia;
+        });     
+
+          var eventos =  obterEventosService.obterEventosOnline().then(function (dadosEvento) {    
+            return dadosEvento;
+        });     
+
+        var retornos = [];
+
+        $q.all([noticias, eventos]).then(function(result){
+            for (var i = 0; i < result.length; i++){
+                retornos.push(result[i]);
+            }
+             if(retornos[0] != null && retornos[1] != null){
+               $scope.obterNotificacoes();
+             }
+        });
+
+    }
+
+    //Sempre que entrar na tela inicial busca novos dados.
+    $scope.atualizarDados();
+
+    /***************** Fim do Bloco para atualizações de notificações ********************/
+
+
+    /*****************  Bloco para login e logout ********************/
     //Pegando dados do usuário da sessão
     $scope.dadosUsuario = JSON.parse(window.localStorage.getItem(LOCAL_STORAGE.local_dados_key));
    
@@ -21,7 +119,10 @@ function ($scope, $stateParams,$state, $cordovaCamera, $ionicPopup, LOCAL_STORAG
         window.localStorage.removeItem(LOCAL_STORAGE.manter_logado);
         $state.go('aMPEBAPP');
     }
+        
+    /*****************  Fim do Bloco para login e logout ********************/
        
+    /*****************  Bloco para alteração de foto do perfil ********************/   
 	$scope.alterarFoto  = function(){
 
         var options = {
@@ -77,7 +178,7 @@ function ($scope, $stateParams,$state, $cordovaCamera, $ionicPopup, LOCAL_STORAG
             // error
         });
     }
-
+/***************** Fim do  Bloco para alteração de foto do perfil ********************/   
     $scope.registarAssembleia = function () {
 
         $scope.data = {}
@@ -160,10 +261,10 @@ function ($scope, $stateParams, $state, $http, $ionicPopup, $ionicLoading, Login
     
 }])
    
-.controller('notCiasCtrl', ['$scope', '$stateParams', 'obterNoticiasService','obterNoticiasBD', '$ionicPopup', 'LOCAL_STORAGE', '$ionicLoading','$cordovaNetwork','$ionicHistory', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+.controller('notCiasCtrl', ['$scope', '$stateParams', 'obterNoticiasService','obterNoticiasBD', '$ionicPopup', 'LOCAL_STORAGE', '$ionicLoading','$cordovaNetwork','$ionicHistory','marcarNoticiasLidas', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $stateParams, obterNoticiasService, obterNoticiasBD, $ionicPopup, LOCAL_STORAGE, $ionicLoading, $cordovaNetwork, $ionicHistory) {
+function ($scope, $stateParams, obterNoticiasService, obterNoticiasBD, $ionicPopup, LOCAL_STORAGE, $ionicLoading, $cordovaNetwork, $ionicHistory,marcarNoticiasLidas) {
    
     //Verifica se estivar online pega dados via serviço 
     if ($cordovaNetwork.isOnline()) {
@@ -174,6 +275,9 @@ function ($scope, $stateParams, obterNoticiasService, obterNoticiasBD, $ionicPop
 
                 $scope.listaNoticias = dados;
 
+                marcarNoticiasLidas.marcar().then(function (marcados) {
+                    
+                });
 
             }).finally(function () {
                 //em qualquer caso remove o spinner de loading
@@ -206,6 +310,9 @@ function ($scope, $stateParams, obterNoticiasService, obterNoticiasBD, $ionicPop
 
                 } else {
                     $scope.listaNoticias = dados;
+                    marcarNoticiasLidas.marcar().then(function (marcados) {
+                       
+                    });
                 }
                
 
@@ -225,10 +332,10 @@ function ($scope, $stateParams, obterNoticiasService, obterNoticiasBD, $ionicPop
    
 }])
    
-.controller('prXimosEventosCtrl', ['$scope', '$stateParams', 'obterEventosService','obterEventosBD', '$ionicPopup', 'LOCAL_STORAGE', '$ionicLoading','$cordovaNetwork','$ionicHistory', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+.controller('prXimosEventosCtrl', ['$scope', '$stateParams', 'obterEventosService','obterEventosBD', '$ionicPopup', 'LOCAL_STORAGE', '$ionicLoading','$cordovaNetwork','$ionicHistory','marcarEventosLidos', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $stateParams,obterEventosService, obterEventosBD, $ionicPopup, LOCAL_STORAGE, $ionicLoading, $cordovaNetwork, $ionicHistory) {
+function ($scope, $stateParams,obterEventosService, obterEventosBD, $ionicPopup, LOCAL_STORAGE, $ionicLoading, $cordovaNetwork, $ionicHistory,marcarEventosLidos) {
 
  //Verifica se estivar online pega dados via serviço 
     if ($cordovaNetwork.isOnline()) {
@@ -238,6 +345,10 @@ function ($scope, $stateParams,obterEventosService, obterEventosBD, $ionicPopup,
             obterEventosService.obterEventosOnline().then(function (dados) {
 
                 $scope.listaEventos = dados;
+                
+                marcarEventosLidos.marcar().then(function (marcados) {
+                  
+                });
 
 
             }).finally(function () {
@@ -271,6 +382,10 @@ function ($scope, $stateParams,obterEventosService, obterEventosBD, $ionicPopup,
 
                 } else {
                     $scope.listaEventos = dados;
+                    
+                    marcarEventosLidos.marcar().then(function (marcados) {
+                        
+                    });
                 }
                
 
