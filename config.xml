@@ -10,7 +10,11 @@
     <content src="index.html" />
     <access origin="*" />
     <access origin="cdvfile://*" />
+    <access origin="tel:*" launch-external="yes" />
+    <access origin="mailto:*" launch-external="yes" />
     <allow-intent href="cdvfile://*" />
+    <allow-intent href="tel:*" />
+    <allow-intent href="mailto:*" />
     <preference name="AndroidPersistentFileLocation" value="Compatibility" />
     <preference name="webviewbounce" value="false" />
     <preference name="UIWebViewBounce" value="false" />
