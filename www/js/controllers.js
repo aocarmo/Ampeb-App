@@ -566,11 +566,29 @@ function ($scope, $stateParams) {
 
 }])
    
-.controller('meuCadastroNaAMPEBCtrl', ['$scope', '$stateParams', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+.controller('meuCadastroNaAMPEBCtrl', ['$scope', '$stateParams','$cordovaNetwork', '$ionicPopup','$ionicHistory', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $stateParams) {
+function ($scope, $stateParams,$cordovaNetwork,$ionicPopup,$ionicHistory) {
+    //Caso não tenha conexção com a internet solicita ao usuario que conect antes de entrar
+     if ($cordovaNetwork.isOffline()) {
 
+         var alertPopup = $ionicPopup.alert({
+                title: 'Não é possível visualizar seu cadastro na AMPEB.',    
+                template: 'Por favor, conecte seu dispositivo a internet.',                  
+                okText: 'Ok', // String (default: 'OK'). The text of the OK button.
+                okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+            });
+
+            alertPopup.then(function (res) {
+
+                $backView = $ionicHistory.backView();
+                $backView.go();
+
+            });
+
+     }
+        
 
 }])
    
@@ -850,10 +868,37 @@ function ($scope, $stateParams) {
 
 }])
    
-.controller('dadosPessoaisCtrl', ['$scope', '$stateParams', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+.controller('dadosPessoaisCtrl', ['$scope', '$stateParams','getDadosPessoaisAssociadoService','$ionicLoading','$ionicPopup','$cordovaNetwork','LOCAL_STORAGE', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $stateParams) {
+function ($scope, $stateParams,getDadosPessoaisAssociadoService,$ionicLoading,ionicPopup,$cordovaNetwork,LOCAL_STORAGE) {
+
+    $scope.dadosUsuario = JSON.parse(window.localStorage.getItem(LOCAL_STORAGE.local_dados_key));
+
+    $scope.dadosPessoais = {};     
+              
+            $ionicLoading.show({
+                template: 'Buscando...'
+            }).then(function () {
+                getDadosPessoaisAssociadoService.obter($scope.dadosUsuario.cpf).then(function (dadosPessoais) {
+                    
+                    $scope.dadosPessoais = dadosPessoais.data.data[0];
+                    
+                    //Transformando a data em objeto
+                    var dataNacimentoHora = $scope.dadosPessoais.dt_nascimento.split(" ");                   
+                    var dt = new Date(dataNacimentoHora[0]);    
+                    //Colocando o gmt pois a data estava ficando com um dia a menos         
+                    $scope.dadosPessoais.dt_nascimento = new Date( dt.getTime() + Math.abs(dt.getTimezoneOffset()*60000));
+                   
+                
+                }).finally(function () {
+            
+                    $ionicLoading.hide();
+                    
+                });
+
+            });
+        
 
 
 }])

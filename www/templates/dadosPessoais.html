@@ -1,33 +1,36 @@
 <ion-view title="Dados Pessoais" id="page20">
   <ion-content padding="true" class="has-header">
-    <form id="dadosPessoais-form12" class="list">
-      <label class="item item-input" id="dadosPessoais-input14" name="txtNome">
-        <span class="input-label">Nome*</span>
-        <input type="text" placeholder="">
+    <form name="dadosPessoaisForm" ng-submit="atualizaDadosPessoais(dadosPessoaisForm,dadosPessoais)" id="dadosPessoais-form12" class="list">
+      <label class="item item-input" id="dadosPessoais-input14">
+        <span class="input-label">Nome</span>
+        <input name="txtNome" ng-disabled="true" type="text" placeholder="" ng-model="dadosPessoais.nome_associado">
       </label>
-      <label class="item item-input" id="dadosPessoais-input15" name="txtCpf">
-        <span class="input-label">CPF*</span>
-        <input type="text" placeholder="">
+      <label class="item item-input" id="dadosPessoais-input15">
+        <span class="input-label">CPF</span>
+        <input name="txtCpf" ng-disabled="true" type="text" placeholder="" ng-model="dadosPessoais.cpf">
       </label>
-      <label class="item item-input" id="dadosPessoais-input10" name="txtRg">
-        <span class="input-label">RG*</span>
-        <input type="text" placeholder="">
+      
+      <label class="item item-input" id="dadosPessoais-input10" ng-class="{ 'has-error' : dadosPessoaisForm.txtRg.$invalid, 'has-no-error' : dadosPessoaisForm.txtRg.$valid}">
+        <span class="input-label">RG</span>
+        <input name="txtRg" type="text" placeholder="" ng-model="dadosPessoais.identidade" required>
       </label>
-      <label class="item item-input" id="dadosPessoais-input25" name="txtDtNascimento">
-        <span class="input-label">Data de Nascimento*</span>
-        <input type="date" placeholder="">
+       <div class="form-errors" ng-messages="dadosPessoaisForm.txtRg.$error" ng-messages-include="templates/form-errors.html"></div> 
+      <label class="item item-input" id="dadosPessoais-input25" ng-class="{ 'has-error' : dadosPessoaisForm.txtDtNascimento.$invalid, 'has-no-error' : dadosPessoaisForm.txtDtNascimento.$valid}">
+        <span class="input-label">Data de Nascimento</span>
+        <input name="txtDtNascimento" type="date"  ng-model="dadosPessoais.dt_nascimento" placeholder="" required>
       </label>
-      <label class="item item-input" id="dadosPessoais-input11" name="txtMatricula">
+       <div class="form-errors" ng-messages="dadosPessoaisForm.txtDtNascimento.$error" ng-messages-include="templates/form-errors.html"></div> 
+      <label class="item item-input" id="dadosPessoais-input11">
         <span class="input-label">Matrícula MP</span>
-        <input type="text" placeholder="">
+        <input name="txtMatricula" type="text" placeholder="" ng-model="dadosPessoais.matricula">
       </label>
-      <label class="item item-input" id="dadosPessoais-input16" name="txtEmailPrincipal">
+      <label class="item item-input" id="dadosPessoais-input16">
         <span class="input-label">E-mail principal</span>
-        <input type="email" placeholder="">
+        <input name="txtEmailPrincipal" type="email" placeholder="" ng-model="dadosPessoais.email_associado">
       </label>
-      <label class="item item-input" id="dadosPessoais-input19" name="txtEmailAlternativo">
+      <label class="item item-input" id="dadosPessoais-input19">
         <span class="input-label">E-mail alternativo</span>
-        <input type="email" placeholder="">
+        <input name="txtEmailAlternativo" type="email" placeholder="" ng-model="dadosPessoais.email_alternativo_associado">
       </label>
       <button id="dadosPessoais-button12" class="button button-assertive  button-block">Salvar</button>
     </form>

@@ -892,4 +892,22 @@ angular.module('app.services', [])
         }
     };
 
+}])
+/***** Serviços para o modulo de meu cadastro *****/
+.service('getDadosPessoaisAssociadoService', ['$http', '$q', 'WEB_METODOS', '$httpParamSerializerJQLike', function ($http, $q, WEB_METODOS, $httpParamSerializerJQLike) {
+
+
+    return {
+        obter: function (data) {
+
+            var dados = { cpf: data };
+            $http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
+
+            return $http.post(WEB_METODOS.urlServicosSistema + "?m=getDadosPessoaisAssociado", $httpParamSerializerJQLike(dados)).then(function (response) {
+                return response;
+            });
+
+        }
+    };
+
 }]);
