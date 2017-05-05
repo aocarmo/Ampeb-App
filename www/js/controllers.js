@@ -760,11 +760,31 @@ function ($scope, $stateParams) {
 
 }])
    
-.controller('contatoCtrl', ['$scope', '$stateParams', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+.controller('contatoCtrl', ['$scope', '$stateParams','getTipoContatoTelefonicoService','getOperadorasTelefoneService','$q', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $stateParams) {
+function ($scope, $stateParams,getTipoContatoTelefonicoService,getOperadorasTelefoneService,$q) {
 
+       var tiposContatos =    getTipoContatoTelefonicoService.getTipoContato().then(function (data) {    
+            return data;
+        });    
+
+        var operadoras =    getOperadorasTelefoneService.getOperadoras().then(function (data) {    
+            return data;
+        });   
+         
+        
+        var retornoCombos = [];
+
+          //Pega o retorno de forma sincrona do ajax.
+         $q.all([tiposContatos, operadoras]).then(function(result){
+            for (var i = 0; i < result.length; i++){
+                retornoCombos.push(result[i]);
+            }
+          
+            
+
+        });     
 
 }])
    

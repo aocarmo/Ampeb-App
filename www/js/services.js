@@ -1,4 +1,37 @@
 angular.module('app.services', [])
+/***** Serviços para o modulo de contatos *****/
+.service('getTipoContatoTelefonicoService', ['$http', '$q', 'WEB_METODOS', function ($http, $q, WEB_METODOS) {
+    
+    
+    return {
+        getTipoContato: function () {
+            
+            return $http.get(WEB_METODOS.urlServicosSistema + "?m=getTipoContatoTelefonico").then(function (response) {
+
+                        console.log(JSON.stringify(response));
+                        return response;                               
+                                
+                    });
+        }
+    };
+
+}])
+.service('getOperadorasTelefoneService', ['$http', '$q', 'WEB_METODOS', function ($http, $q, WEB_METODOS) {
+    
+    
+    return {
+        getOperadoras: function () {
+            
+            return $http.get(WEB_METODOS.urlServicosSistema + "?m=getOperadorasTelefone").then(function (response) {
+
+                        console.log(JSON.stringify(response));
+                        return response;                               
+                                
+                    });
+        }
+    };
+
+}])
 /***** Serviços para o modulo de convenios *****/
 .service('getTipoConvenioService', ['$http', '$q', 'WEB_METODOS','conveniosFactory', function ($http, $q, WEB_METODOS,conveniosFactory) {
     //Metodo para obter os tipos do convenio
