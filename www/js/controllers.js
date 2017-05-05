@@ -1,9 +1,9 @@
 ﻿angular.module('app.controllers', [])
   
-.controller('aMPEBCtrl', ['$scope', '$stateParams','$state','$q', '$cordovaCamera','$ionicPopup','LOCAL_STORAGE','$timeout','obterQtdNoticiaNaoLida','obterQtdEventosNaoLido','obterNoticiasService','obterEventosService','obterEventosServiceRefresh','obterNoticiasServiceRefresh', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+.controller('aMPEBCtrl', ['$scope', '$stateParams','$state','$q', '$cordovaCamera','$ionicPopup','LOCAL_STORAGE','$timeout','noticiasFactory','eventosFactory','obterNoticiasService','obterEventosService','obterEventosServiceRefresh','obterNoticiasServiceRefresh', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $stateParams,$state, $q,$cordovaCamera, $ionicPopup, LOCAL_STORAGE,$timeout,obterQtdNoticiaNaoLida,obterQtdEventosNaoLido,obterNoticiasService,obterEventosService,obterEventosServiceRefresh,obterNoticiasServiceRefresh) {
+function ($scope, $stateParams,$state, $q,$cordovaCamera, $ionicPopup, LOCAL_STORAGE,$timeout,noticiasFactory,eventosFactory,obterNoticiasService,obterEventosService,obterEventosServiceRefresh,obterNoticiasServiceRefresh) {
     
   
    /***************** Bloco para atualizações de notificações ********************/
@@ -20,11 +20,12 @@ function ($scope, $stateParams,$state, $q,$cordovaCamera, $ionicPopup, LOCAL_STO
     //Funcao para obter as notificacoes de noticias
     $scope.obterNotificacoes = function() {  
             //Pega a quantidade de noticias não lidas
-          var qtdNoticias =    obterQtdNoticiaNaoLida.obter().then(function (qtdNoticiaNaoLida) {    
+          var qtdNoticias =    noticiasFactory.obterQtdNoticiaNaoLida().then(function (qtdNoticiaNaoLida) {    
             return qtdNoticiaNaoLida;
         });     
         //Pega a quantidade de eventos não lidos
-          var qtdEventos =  obterQtdEventosNaoLido.obter().then(function (qtdEventoNaoLido) {    
+        
+          var qtdEventos = eventosFactory.obterQtdEventosNaoLido().then(function (qtdEventoNaoLido) {    
             return qtdEventoNaoLido;
         });   
         
@@ -288,10 +289,10 @@ function ($scope, $stateParams, $state, $http, $ionicPopup, $ionicLoading, Login
     
 }])
    
-.controller('notCiasCtrl', ['$scope', '$stateParams', 'obterNoticiasService','obterNoticiasBD', '$ionicPopup', 'LOCAL_STORAGE', '$ionicLoading','$cordovaNetwork','$ionicHistory','marcarNoticiasLidas', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+.controller('notCiasCtrl', ['$scope', '$stateParams', 'obterNoticiasService','noticiasFactory', '$ionicPopup', 'LOCAL_STORAGE', '$ionicLoading','$cordovaNetwork','$ionicHistory', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $stateParams, obterNoticiasService, obterNoticiasBD, $ionicPopup, LOCAL_STORAGE, $ionicLoading, $cordovaNetwork, $ionicHistory,marcarNoticiasLidas) {
+function ($scope, $stateParams, obterNoticiasService, noticiasFactory, $ionicPopup, LOCAL_STORAGE, $ionicLoading, $cordovaNetwork, $ionicHistory) {
    
     //Verifica se estivar online pega dados via serviço 
     if ($cordovaNetwork.isOnline()) {
@@ -301,15 +302,13 @@ function ($scope, $stateParams, obterNoticiasService, obterNoticiasBD, $ionicPop
             //Verifica se e pra buscar a informação que foi atualizada recente.
             var atualizado = window.localStorage.getItem("noticias");
 
-            //Remove a session
-            //window.localStorage.removeItem("eventos");
-
             //Caso verdadeiro busca a nova informação do contrario continua em cache
             if(atualizado){
-                obterNoticiasBD.obterListaNoticiasBD().then(function (dados) {
+                noticiasFactory.selectListaNoticias().then(function (dados) {
                          
                     $scope.listaNoticias = dados;
-                    marcarNoticiasLidas.marcar().then(function (marcados) {
+                    //Marcando noticias ja lidas
+                    noticiasFactory.marcarNoticiasLidas().then(function (marcados) {
                        
                     });
                         
@@ -323,8 +322,8 @@ function ($scope, $stateParams, obterNoticiasService, obterNoticiasBD, $ionicPop
 
                     $scope.listaNoticias = dados;
 
-                    marcarNoticiasLidas.marcar().then(function (marcados) {
-                        
+                    noticiasFactory.marcarNoticiasLidas().then(function (marcados) {
+                       
                     });
 
                 }).finally(function () {
@@ -339,7 +338,7 @@ function ($scope, $stateParams, obterNoticiasService, obterNoticiasBD, $ionicPop
         $ionicLoading.show({
             template: 'Buscando...'
         }).then(function () {
-            obterNoticiasBD.obterListaNoticiasBD().then(function (dados) {
+             noticiasFactory.selectListaNoticias().then(function (dados) {
              
                 if (dados[0] == null) {
                     var alertPopup = $ionicPopup.alert({
@@ -359,7 +358,7 @@ function ($scope, $stateParams, obterNoticiasService, obterNoticiasBD, $ionicPop
 
                 } else {
                     $scope.listaNoticias = dados;
-                    marcarNoticiasLidas.marcar().then(function (marcados) {
+                    noticiasFactory.marcarNoticiasLidas().then(function (marcados) {
                        
                     });
                 }
@@ -381,10 +380,10 @@ function ($scope, $stateParams, obterNoticiasService, obterNoticiasBD, $ionicPop
    
 }])
    
-.controller('prXimosEventosCtrl', ['$scope', '$stateParams', 'obterEventosService','obterEventosBD', '$ionicPopup', 'LOCAL_STORAGE', '$ionicLoading','$cordovaNetwork','$ionicHistory','marcarEventosLidos', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+.controller('prXimosEventosCtrl', ['$scope', '$stateParams', 'obterEventosService', '$ionicPopup', 'LOCAL_STORAGE', '$ionicLoading','$cordovaNetwork','$ionicHistory','eventosFactory', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $stateParams,obterEventosService, obterEventosBD, $ionicPopup, LOCAL_STORAGE, $ionicLoading, $cordovaNetwork, $ionicHistory,marcarEventosLidos) {
+function ($scope, $stateParams,obterEventosService, $ionicPopup, LOCAL_STORAGE, $ionicLoading, $cordovaNetwork, $ionicHistory,eventosFactory) {
 
  //Verifica se estivar online pega dados via serviço 
     if ($cordovaNetwork.isOnline()) {
@@ -394,21 +393,17 @@ function ($scope, $stateParams,obterEventosService, obterEventosBD, $ionicPopup,
 
             //Verifica se e pra buscar a informação que foi atualizada recente.
             var atualizado = window.localStorage.getItem("eventos");
-
-            //Remove a session
-            //window.localStorage.removeItem("eventos");
-
+            
             //Caso verdadeiro busca a nova informação do contrario continua em cache
             if(atualizado){
-                obterEventosBD.obterListaEventosBD().then(function (dados) {
-             
-                    $scope.listaEventos = dados;
+
+                eventosFactory.selectListaNoticias().then(function (dadosArmazenados) {
+            
+                    $scope.listaEventos = dadosArmazenados;
                     
-                    marcarEventosLidos.marcar().then(function (marcados) {
+                    eventosFactory.marcarEventosLidos().then(function (marcados) {
                         
-                    });
-                
-               
+                    });           
 
                 }).finally(function () {
                     //em qualquer caso remove o spinner de loading
@@ -420,10 +415,9 @@ function ($scope, $stateParams,obterEventosService, obterEventosBD, $ionicPopup,
 
                     $scope.listaEventos = dados;
                 
-                    marcarEventosLidos.marcar().then(function (marcados) {
-                  
-                    });
-
+                    eventosFactory.marcarEventosLidos().then(function (marcados) {
+                        
+                    });     
 
                 }).finally(function () {
                     //em qualquer caso remove o spinner de loading
@@ -438,9 +432,9 @@ function ($scope, $stateParams,obterEventosService, obterEventosBD, $ionicPopup,
         $ionicLoading.show({
             template: 'Buscando...'
         }).then(function () {
-            obterEventosBD.obterListaEventosBD().then(function (dados) {
+            eventosFactory.selectListaNoticias().then(function (dadosArmazenados) {
              
-                if (dados[0] == null) {
+                if (dadosArmazenados[0] == null) {
                     var alertPopup = $ionicPopup.alert({
                         title: 'Sem dados offline',
                         template: 'Por favor, conecte seu dispositivo a internet',
@@ -450,14 +444,13 @@ function ($scope, $stateParams,obterEventosService, obterEventosBD, $ionicPopup,
 
                     alertPopup.then(function (res) {
 
-
                         $backView = $ionicHistory.backView();
                         $backView.go();
 
                     });
 
                 } else {
-                    $scope.listaEventos = dados;
+                    $scope.listaEventos = dadosArmazenados;
                     
                     marcarEventosLidos.marcar().then(function (marcados) {
                         
@@ -487,16 +480,17 @@ function ($scope, $stateParams) {
 
 }])
    
-.controller('notCiaCtrl', ['$scope', '$stateParams','$ionicLoading','obterDetalheNoticiaBD', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+.controller('notCiaCtrl', ['$scope', '$stateParams','$ionicLoading','noticiasFactory', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $stateParams, $ionicLoading, obterDetalheNoticiaBD) {
+function ($scope, $stateParams, $ionicLoading, noticiasFactory) {
     $scope.noticia = {};
     //Pega dados do banco
     $ionicLoading.show({
         template: 'Buscando...'
     }).then(function () {
-        obterDetalheNoticiaBD.detalheNoticiaBD($stateParams.id).then(function (dados) {
+
+        noticiasFactory.selectNoticia($stateParams.id).then(function (dados) {        
          
             $scope.noticia = dados;
 
@@ -509,19 +503,19 @@ function ($scope, $stateParams, $ionicLoading, obterDetalheNoticiaBD) {
     
 }])
    
-.controller('detalheDoEventoCtrl', ['$scope', '$stateParams', '$ionicLoading','obterDetalheEventosBD', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+.controller('detalheDoEventoCtrl', ['$scope', '$stateParams', '$ionicLoading','eventosFactory', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $stateParams,$ionicLoading, obterDetalheEventosBD) {
+function ($scope, $stateParams,$ionicLoading, eventosFactory) {
 
     $scope.evento = {};
     //Pega dados do banco
     $ionicLoading.show({
         template: 'Buscando...'
     }).then(function () {
-        obterDetalheEventosBD.detalheEventoBD($stateParams.id).then(function (dados) {
-         
-            $scope.evento = dados;
+        eventosFactory.selectNoticia($stateParams.id).then(function (eventoBD) {
+                 
+            $scope.evento = eventoBD;
 
         }).finally(function () {
             //em qualquer caso remove o spinner de loading
@@ -533,10 +527,10 @@ function ($scope, $stateParams,$ionicLoading, obterDetalheEventosBD) {
 
 }])
    
-.controller('detalheDoConvNioCtrl', ['$scope', '$stateParams', '$ionicLoading','obterListaConvenioBD', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+.controller('detalheDoConvNioCtrl', ['$scope', '$stateParams', '$ionicLoading','conveniosFactory', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $stateParams, $ionicLoading, obterListaConvenioBD) {
+function ($scope, $stateParams, $ionicLoading, conveniosFactory) {
 
      $scope.convenios = {};
 
@@ -544,8 +538,8 @@ function ($scope, $stateParams, $ionicLoading, obterListaConvenioBD) {
     $ionicLoading.show({
         template: 'Buscando...'
     }).then(function () {
-        obterListaConvenioBD.ListaConvenioBD(null,null,null,$stateParams.id).then(function (dados) {
-         
+        conveniosFactory.selectConvenio(null,null,null,$stateParams.id).then(function (dados) {
+                
             $scope.convenios = dados;
            
         }).finally(function () {
@@ -624,10 +618,10 @@ function ($scope, $stateParams) {
 
 }])
    
-.controller('listaDeConvNiosCtrl', ['$scope', '$stateParams','$ionicLoading','obterListaConvenioBD','$ionicHistory','$ionicPopup', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+.controller('listaDeConvNiosCtrl', ['$scope', '$stateParams','$ionicLoading','conveniosFactory','$ionicHistory','$ionicPopup', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $stateParams,$ionicLoading,obterListaConvenioBD,$ionicHistory,$ionicPopup) {
+function ($scope, $stateParams,$ionicLoading,conveniosFactory,$ionicHistory,$ionicPopup) {
 
     $scope.listaConvenios = {};
     var idTipoConvenio = null; 
@@ -650,7 +644,8 @@ function ($scope, $stateParams,$ionicLoading,obterListaConvenioBD,$ionicHistory,
     $ionicLoading.show({
         template: 'Buscando...'
     }).then(function () {
-        obterListaConvenioBD.ListaConvenioBD(idTipoConvenio, nmConvenio, nmMunicipio, null).then(function (dados) {
+
+        conveniosFactory.selectConvenio(idTipoConvenio, nmConvenio, nmMunicipio, null).then(function (dados) {      
              
              if (dados[0] == null) {
                     var alertPopup = $ionicPopup.alert({
@@ -773,10 +768,10 @@ function ($scope, $stateParams) {
 
 }])
    
-.controller('buscarConvNiosCtrl', ['$scope', '$stateParams','getTipoConvenioService','$ionicLoading','getMunicipiosConvenioService','getConvenioService','$cordovaNetwork','ObterMunicipiosConvenioBD','ObterTipoConvenioBD','$ionicPopup','$ionicHistory', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+.controller('buscarConvNiosCtrl', ['$scope', '$stateParams','getTipoConvenioService','$ionicLoading','getMunicipiosConvenioService','getConvenioService','$cordovaNetwork','conveniosFactory','$ionicPopup','$ionicHistory', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $stateParams,getTipoConvenioService,$ionicLoading,getMunicipiosConvenioService,getConvenioService,$cordovaNetwork,ObterMunicipiosConvenioBD,ObterTipoConvenioBD,$ionicPopup,$ionicHistory) {
+function ($scope, $stateParams,getTipoConvenioService,$ionicLoading,getMunicipiosConvenioService,getConvenioService,$cordovaNetwork,conveniosFactory,$ionicPopup,$ionicHistory) {
 
     $scope.municipiosConvenio = {};
     $scope.tiposConvenio = {};
@@ -813,13 +808,14 @@ function ($scope, $stateParams,getTipoConvenioService,$ionicLoading,getMunicipio
          $ionicLoading.show({
             template: 'Buscando...'
         }).then(function () {
-            ObterMunicipiosConvenioBD.ListaMunicipiosConvenioBD().then(function (dadosMunicipio) {
-                
+
+            conveniosFactory.selectMunicipioConvenio().then(function  (dadosMunicipio) {
+                           
                 $scope.municipiosConvenio = dadosMunicipio;
             
             }).finally(function () {
-
-                ObterTipoConvenioBD.ListaTipoConvenioBD().then(function (dadosTipoConvenio) {
+                conveniosFactory.selectTipoConvenio().then(function  (dadosTipoConvenio) {
+               
                     if (dadosTipoConvenio[0] == null) {
                         var alertPopup = $ionicPopup.alert({
                             title: 'Sem dados offiline',    
@@ -841,11 +837,9 @@ function ($scope, $stateParams,getTipoConvenioService,$ionicLoading,getMunicipio
                         
                     
                     }).finally(function () {
-
                         
                             $ionicLoading.hide();
-                           
-                    
+                                               
                     });
             });
 
