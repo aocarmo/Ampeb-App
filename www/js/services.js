@@ -674,4 +674,40 @@ angular.module('app.services', [])
         }
     };
 
+}])/***** Serviço para atualizar a foto do perfil *****/
+.service('atualizarFotoAssociado', ['$http', '$q', 'WEB_METODOS', '$httpParamSerializerJQLike', function ($http, $q, WEB_METODOS, $httpParamSerializerJQLike) {
+
+
+    return {
+        atualizar: function (data) {
+
+            var dados = { cpf: data.cpf, imagem: data.imagem , tipo_imagem: ""};
+            $http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
+
+            return $http.post(WEB_METODOS.urlServicosSistema + "?m=atualizarFotoAssociado", $httpParamSerializerJQLike(dados)).then(function (response) {
+                return response;
+            });
+
+        }
+    };
+
+}])/***** Serviços para o modulo de login *****/
+.service('getLoginAssociado', ['$http', '$q', 'WEB_METODOS', '$httpParamSerializerJQLike', function ($http, $q, WEB_METODOS, $httpParamSerializerJQLike) {
+
+
+    return {
+
+        obter: function (data) {
+           
+            var dados = { cpf: data};
+            //Usado em requisi��es POSR ($httpParamSerializerJQLike)
+            $http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
+            return $http.post(WEB_METODOS.urlServicosSistema + "?m=getLoginAssociado", $httpParamSerializerJQLike(dados)).then(function (response) {
+                return response;
+            });
+
+        }
+    };
+
+
 }]);

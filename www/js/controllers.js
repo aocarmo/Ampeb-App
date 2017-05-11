@@ -1,9 +1,9 @@
 ﻿angular.module('app.controllers', [])
   
-.controller('aMPEBCtrl', ['$scope', '$stateParams','$state','$q', '$cordovaCamera','$ionicPopup','LOCAL_STORAGE','$timeout','noticiasFactory','eventosFactory','obterNoticiasService','obterEventosService','obterEventosServiceRefresh','obterNoticiasServiceRefresh', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+.controller('aMPEBCtrl', ['$scope', '$stateParams','$state','$q', '$cordovaCamera','$ionicPopup','LOCAL_STORAGE','$timeout','noticiasFactory','eventosFactory','obterNoticiasService','obterEventosService','obterEventosServiceRefresh','obterNoticiasServiceRefresh','atualizarFotoAssociado','$cordovaNetwork','$ionicLoading','$ionicHistory', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $stateParams,$state, $q,$cordovaCamera, $ionicPopup, LOCAL_STORAGE,$timeout,noticiasFactory,eventosFactory,obterNoticiasService,obterEventosService,obterEventosServiceRefresh,obterNoticiasServiceRefresh) {
+function ($scope, $stateParams,$state, $q,$cordovaCamera, $ionicPopup, LOCAL_STORAGE,$timeout,noticiasFactory,eventosFactory,obterNoticiasService,obterEventosService,obterEventosServiceRefresh,obterNoticiasServiceRefresh,atualizarFotoAssociado,$cordovaNetwork,$ionicLoading,$ionicHistory) {
     
   
    /***************** Bloco para atualizações de notificações ********************/
@@ -15,7 +15,10 @@ function ($scope, $stateParams,$state, $q,$cordovaCamera, $ionicPopup, LOCAL_STO
     //Função para sempre fazer algo apos entrar na pagina.
     $scope.$on('$ionicView.beforeEnter', function() {
        $scope.obterNotificacoes(); 
+      
     });
+
+    
     
     //Funcao para obter as notificacoes de noticias
     $scope.obterNotificacoes = function() {  
@@ -61,7 +64,7 @@ function ($scope, $stateParams,$state, $q,$cordovaCamera, $ionicPopup, LOCAL_STO
     };  
         //Função para buscar novos dados.
         $scope.refresh = function() {
-
+           
             $timeout( function() {
                 var noticias =  obterNoticiasServiceRefresh.obterNoticiasOnlineRefresh().then(function (dadosNoticia) {    
                     return dadosNoticia;
@@ -79,7 +82,7 @@ function ($scope, $stateParams,$state, $q,$cordovaCamera, $ionicPopup, LOCAL_STO
                     for (var i = 0; i < result.length; i++){
                         retornos.push(result[i]);
                     }
-                   console.log(JSON.stringify(retornos));
+                 
                     if(retornos[0] != null && retornos[1] != null){
                         //Setando a variavel de sessão para informar ao controller de cada tela para buscar a informação atualizada do banco.
                          window.localStorage.setItem("eventos", true);
@@ -132,7 +135,9 @@ function ($scope, $stateParams,$state, $q,$cordovaCamera, $ionicPopup, LOCAL_STO
    
     //Verifica se existe foto, caso não exista exbir icone de camera
     if ($scope.dadosUsuario.foto_associado != "") {
-        $scope.fotoUsuario = LOCAL_STORAGE.url_foto + $scope.dadosUsuario.foto_associado;
+      //Colocado para burlar o cache da imagem
+        $scope.fotoUsuario = LOCAL_STORAGE.url_foto + $scope.dadosUsuario.foto_associado+ '?decache=' + Math.random();
+      
     } else {
         $scope.fotoUsuario = "img/icone_foto.png";
     }
@@ -152,18 +157,28 @@ function ($scope, $stateParams,$state, $q,$cordovaCamera, $ionicPopup, LOCAL_STO
        
     /*****************  Bloco para alteração de foto do perfil ********************/   
 	$scope.alterarFoto  = function(){
+        //Caso exista conexão com a internet atualiza a foto
+        if ($cordovaNetwork.isOnline()) {
 
-        var options = {
-            'buttonLabels': ['Tirar Foto', 'Escolher da Galeria'],
-            'addCancelButtonWithLabel': 'Cancelar'
-        };
-        window.plugins.actionsheet.show(options, function (_btnIndex) {
-            if (_btnIndex === 1) {
-                $scope.tirarFoto();
-            } else if (_btnIndex === 2) {
-                $scope.escolherFoto();
-            }
-        });
+            var options = {
+                'buttonLabels': ['Tirar Foto', 'Escolher da Galeria'],
+                'addCancelButtonWithLabel': 'Cancelar'
+            };
+            window.plugins.actionsheet.show(options, function (_btnIndex) {
+                if (_btnIndex === 1) {
+                    $scope.tirarFoto();
+                } else if (_btnIndex === 2) {
+                    $scope.escolherFoto();
+                }
+            });
+
+        }else{
+              var alertPopup = $ionicPopup.alert({
+                    title: 'Sem conexão com a internet.',
+                    okText: 'Ok', // String (default: 'OK'). The text of the OK button.
+                    okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+                    });
+        }
     }
 
 
@@ -181,7 +196,25 @@ function ($scope, $stateParams,$state, $q,$cordovaCamera, $ionicPopup, LOCAL_STO
         };
 
         $cordovaCamera.getPicture(options).then(function (imageData) {
-            $scope.srcImage = "data:image/jpeg;base64," + imageData;
+        //Caso precise exibir a imagem na tela imagem:  "data:image/jpeg;base64," + imageData}
+        //Pegando o cpf do associado e a foto.
+            var data = {cpf: $scope.dadosUsuario.cpf, imagem: imageData};            
+                 
+                $ionicLoading.show({template: 'Atualizando sua foto...'}).then(function (){
+                    
+                    atualizarFotoAssociado.atualizar(data).then(function (dados){ 
+                                          
+                       if(dados.data.result == true){
+                            //Colocado para burlar o cache da imagem
+                             $scope.fotoUsuario = LOCAL_STORAGE.url_foto + $scope.dadosUsuario.foto_associado+ '?decache=' + Math.random();
+                        }         
+                       
+                    }).finally(function () {
+                    //em qualquer caso remove o spinner de loading   
+                        $ionicLoading.hide();         
+                    });
+                });       
+
         }, function (err) {
             // error
         });
@@ -200,8 +233,28 @@ function ($scope, $stateParams,$state, $q,$cordovaCamera, $ionicPopup, LOCAL_STO
             saveToPhotoAlbum: false
         };
 
-        $cordovaCamera.getPicture(options).then(function (imageData) {
-            $scope.srcImage = "data:image/jpeg;base64," + imageData;
+        $cordovaCamera.getPicture(options).then(function (imageData) {           
+            //Caso precise exibir a imagem na tela imagem:  "data:image/jpeg;base64," + imageData}
+            //Pegando o cpf do associado e a foto.
+            var data = {cpf: $scope.dadosUsuario.cpf, imagem: imageData};            
+                 
+                $ionicLoading.show({template: 'Atualizando sua foto...'}).then(function (){
+                    
+                    atualizarFotoAssociado.atualizar(data).then(function (dados){ 
+                                          
+                       if(dados.data.result == true){
+                            //Colocado para burlar o cache da imagem
+                             $scope.fotoUsuario = LOCAL_STORAGE.url_foto + $scope.dadosUsuario.foto_associado+ '?decache=' + Math.random();
+                        }         
+                       
+                    }).finally(function () {
+                    //em qualquer caso remove o spinner de loading   
+                        $ionicLoading.hide();         
+                    });
+                });       
+
+                  
+              
         }, function (err) {
             // error
         });
