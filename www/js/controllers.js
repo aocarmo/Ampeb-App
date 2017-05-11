@@ -647,11 +647,35 @@ function ($scope, $stateParams) {
 
 }])
    
-.controller('dependentesAtivosCtrl', ['$scope', '$stateParams', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+.controller('dependentesAtivosCtrl', ['$scope', '$stateParams', '$ionicLoading','$ionicPopup','$cordovaNetwork','LOCAL_STORAGE','getDadosDependentesAssociado', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $stateParams) {
+function ($scope, $stateParams, $ionicLoading, $ionicPopup, $cordovaNetwork, LOCAL_STORAGE, getDadosDependentesAssociado) {
 
+  
+
+    $scope.dadosUsuario = JSON.parse(window.localStorage.getItem(LOCAL_STORAGE.local_dados_key));
+
+    var data = {cpf : $scope.dadosUsuario.cpf};
+
+    $scope.dependentes = {}; 
+              
+            $ionicLoading.show({
+                template: 'Buscando...'
+            }).then(function () {
+
+                getDadosDependentesAssociado.obter(data).then(function (dadosDependentes) {
+
+                 
+                    $scope.dependentes = dadosDependentes.data.data;
+                
+                }).finally(function () {
+            
+                    $ionicLoading.hide();
+                    
+                });
+
+            });
 
 }])
    
@@ -920,11 +944,6 @@ function ($scope, $stateParams,getTipoConvenioService,$ionicLoading,getMunicipio
 
     }
     
-
-    
-
-
-
 }])
    
 .controller('endereOCtrl', ['$scope', '$stateParams', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
@@ -935,11 +954,12 @@ function ($scope, $stateParams) {
 
 }])
    
-.controller('dadosPessoaisCtrl', ['$scope', '$stateParams','getDadosPessoaisAssociadoService','$ionicLoading','$ionicPopup','$cordovaNetwork','LOCAL_STORAGE', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+.controller('dadosPessoaisCtrl', ['$scope', '$stateParams','getDadosPessoaisAssociadoService','$ionicLoading','$ionicPopup','$cordovaNetwork','LOCAL_STORAGE','atualizarDadosPessoaisAssociado','$ionicHistory', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $stateParams,getDadosPessoaisAssociadoService,$ionicLoading,ionicPopup,$cordovaNetwork,LOCAL_STORAGE) {
+function ($scope, $stateParams,getDadosPessoaisAssociadoService,$ionicLoading,$ionicPopup,$cordovaNetwork,LOCAL_STORAGE,atualizarDadosPessoaisAssociado,$ionicHistory) {
 
+    //Pegando dados do usuário logado
     $scope.dadosUsuario = JSON.parse(window.localStorage.getItem(LOCAL_STORAGE.local_dados_key));
 
     $scope.dadosPessoais = {};     
@@ -950,7 +970,7 @@ function ($scope, $stateParams,getDadosPessoaisAssociadoService,$ionicLoading,io
                 getDadosPessoaisAssociadoService.obter($scope.dadosUsuario.cpf).then(function (dadosPessoais) {
                     
                     $scope.dadosPessoais = dadosPessoais.data.data[0];
-                    
+                 
                     //Transformando a data em objeto
                     var dataNacimentoHora = $scope.dadosPessoais.dt_nascimento.split(" ");                   
                     var dt = new Date(dataNacimentoHora[0]);    
@@ -965,6 +985,52 @@ function ($scope, $stateParams,getDadosPessoaisAssociadoService,$ionicLoading,io
                 });
 
             });
+
+        //Função paa ataulizar os dados pessoais.
+      $scope.atualizaDadosPessoais = function(form,dadosPessoais) {
+           
+            var dados = { cpf: $scope.dadosUsuario.cpf, nome_associado: dadosPessoais.nome_associado, identidade: dadosPessoais.identidade, dt_nascimento: dadosPessoais.dt_nascimento, email_associado: dadosPessoais.email_associado, email_alternativo_associado: dadosPessoais.email_alternativo_associado, matricula: dadosPessoais.matricula, id_usuario: $scope.dadosUsuario.id_usuario}; 
+
+            if(form.$valid) {   
+                $ionicLoading.show({
+                    template: 'Atualizando...'
+                    }).then(function () {
+
+                        atualizarDadosPessoaisAssociado.atualizar(dados).then(function (retorno) {
+                            
+                            if(retorno.data.result == true){
+
+                                var alertPopup = $ionicPopup.alert({
+                                    title: 'Dados pessoais atualizados com sucesso.',    
+                                    okText: 'Ok', // String (default: 'OK'). The text of the OK button.
+                                    okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+                                });      
+
+                                alertPopup.then(function (res) {
+
+                                    $backView = $ionicHistory.backView();
+                                    $backView.go();
+
+                                });         
+
+                            }else{
+
+                                var alertPopup = $ionicPopup.alert({
+                                    title: 'Não foi possível atualizar as informações.',    
+                                    okText: 'Ok', // String (default: 'OK'). The text of the OK button.
+                                    okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+                                });           
+                            }
+
+                        }).finally(function () {
+                            $ionicLoading.hide();
+                        });
+                });
+            }
+            
+        };
+        
+            
         
 
 

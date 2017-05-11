@@ -4,8 +4,11 @@
     <hr class="hr-topoPagina">
     <div class="item item-body" id="dependentesAtivos-list-item-container9">
       <ion-list id="dependentesAtivos-list13">
-        <ion-item class="dark  item-text-wrap" id="dependentesAtivos-list-item31">Felipe Gonçalves Costa</ion-item>
-        <ion-item class="dark  item-text-wrap" id="dependentesAtivos-list-item35">Mariana Gonçalves Costa</ion-item>
+        <ion-item ng-repeat="dependente in dependentes" class="dark  item-text-wrap" id="dependentesAtivos-list-item31">
+            {{dependente.nome_dependente}}
+            <p style="white-space:normal;">Idade: {{dependente.idade}} ano(s)</p> 
+        </ion-item>
+        
       </ion-list>
     </div>
   </ion-content>

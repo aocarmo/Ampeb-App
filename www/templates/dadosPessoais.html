@@ -7,7 +7,7 @@
       </label>
       <label class="item item-input" id="dadosPessoais-input15">
         <span class="input-label">CPF</span>
-        <input name="txtCpf" ng-disabled="true" type="text" placeholder="" ng-model="dadosPessoais.cpf">
+        <input name="txtCpf" ng-disabled="true" type="text" placeholder="" ng-model="dadosPessoais.cpf" mask="999.999.999-99" clean="true">
       </label>
       
       <label class="item item-input" id="dadosPessoais-input10" ng-class="{ 'has-error' : dadosPessoaisForm.txtRg.$invalid, 'has-no-error' : dadosPessoaisForm.txtRg.$valid}">
@@ -32,7 +32,7 @@
         <span class="input-label">E-mail alternativo</span>
         <input name="txtEmailAlternativo" type="email" placeholder="" ng-model="dadosPessoais.email_alternativo_associado">
       </label>
-      <button id="dadosPessoais-button12" class="button button-assertive  button-block">Salvar</button>
+      <button id="dadosPessoais-button12" class="button button-assertive  button-block" type="submit">Salvar</button>
     </form>
   </ion-content>
 </ion-view>

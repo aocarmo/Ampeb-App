@@ -710,4 +710,38 @@ angular.module('app.services', [])
     };
 
 
+}]).service('atualizarDadosPessoaisAssociado', ['$http', '$q', 'WEB_METODOS', '$httpParamSerializerJQLike', function ($http, $q, WEB_METODOS, $httpParamSerializerJQLike) {
+
+
+    return {
+
+        atualizar: function (data) {           
+            
+            $http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
+            
+            return $http.post(WEB_METODOS.urlServicosSistema + "?m=atualizarDadosPessoaisAssociado", $httpParamSerializerJQLike(data)).then(function (response) {
+                return response;
+            });
+
+        }
+    };
+
+
+}])/***** Serviços para o modulo de login *****/
+.service('getDadosDependentesAssociado', ['$http', '$q', 'WEB_METODOS', '$httpParamSerializerJQLike', function ($http, $q, WEB_METODOS, $httpParamSerializerJQLike) {
+
+
+    return {
+
+        obter: function (data) {
+                                 
+            $http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
+            return $http.post(WEB_METODOS.urlServicosSistema + "?m=getDadosDependentesAssociado", $httpParamSerializerJQLike(data)).then(function (response) {
+                return response;
+            });
+
+        }
+    };
+
+
 }]);
