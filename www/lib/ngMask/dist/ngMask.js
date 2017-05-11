@@ -139,6 +139,7 @@
                   if(value !== viewValueWithDivisors){
                     controller.$setViewValue(angular.copy(viewValueWithDivisors), 'input');
                     controller.$render();
+                    setSelectionRange(viewValueWithDivisors.length); 
                   }
                 } catch (e) {
                   $log.error('[mask - parseViewValue]');
