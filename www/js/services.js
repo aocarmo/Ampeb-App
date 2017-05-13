@@ -727,7 +727,7 @@ angular.module('app.services', [])
     };
 
 
-}])/***** Serviços para o modulo de login *****/
+}])/***** Serviços para o modulo de dados pessoais *****/
 .service('getDadosDependentesAssociado', ['$http', '$q', 'WEB_METODOS', '$httpParamSerializerJQLike', function ($http, $q, WEB_METODOS, $httpParamSerializerJQLike) {
 
 
@@ -737,6 +737,80 @@ angular.module('app.services', [])
                                  
             $http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
             return $http.post(WEB_METODOS.urlServicosSistema + "?m=getDadosDependentesAssociado", $httpParamSerializerJQLike(data)).then(function (response) {
+                return response;
+            });
+
+        }
+    };
+
+
+}])/***** Serviços para o modulo de endereços *****/
+.service('getDadosEnderecoAssociado', ['$http', '$q', 'WEB_METODOS',  function ($http, $q, WEB_METODOS) {
+
+    return {
+
+        obter: function (data) {    
+
+            return $http.get(WEB_METODOS.urlServicosSistema + "?m=getDadosEnderecoAssociado", {params: data}).then(function (response) {
+                return response;
+            });
+
+        }
+    };
+
+
+}]).service('getTipoEndereco', ['$http', '$q', 'WEB_METODOS',  function ($http, $q, WEB_METODOS) {
+
+    return {
+
+        obter: function () {    
+
+            return $http.get(WEB_METODOS.urlServicosSistema + "?m=getTipoEndereco").then(function (response) {
+                return response;
+            });
+
+        }
+    };
+
+
+}]).service('getEstado', ['$http', '$q', 'WEB_METODOS',  function ($http, $q, WEB_METODOS) {
+
+    return {
+
+        obter: function () {    
+
+            return $http.get(WEB_METODOS.urlServicosSistema + "?m=getEstado").then(function (response) {
+                return response;
+            });
+
+        }
+    };
+
+
+}]).service('getMunicipios', ['$http', '$q', 'WEB_METODOS',  function ($http, $q, WEB_METODOS) {
+
+    return {
+
+        obter: function (data) {    
+
+            return $http.get(WEB_METODOS.urlServicosSistema + "?m=getMunicipios", {params: data}).then(function (response) {
+                return response;
+            });
+
+        }
+    };
+
+
+}])
+.service('salvarDadosEnderecoAssociado', ['$http', '$q', 'WEB_METODOS', '$httpParamSerializerJQLike', function ($http, $q, WEB_METODOS, $httpParamSerializerJQLike) {
+
+
+    return {
+
+        salvar: function (data) {
+                                 
+            $http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
+            return $http.post(WEB_METODOS.urlServicosSistema + "?m=salvarDadosEnderecoAssociado", $httpParamSerializerJQLike(data)).then(function (response) {
                 return response;
             });
 

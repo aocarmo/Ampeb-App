@@ -1,36 +1,39 @@
 <ion-view title="Endereço" id="page15">
   <ion-content padding="true" class="has-header">
-    <form id="endereO-form8" class="list">
-      <label class="item item-select" id="endereO-select3" name="sctTipoEndereco">
+    <form name="enderecoForm" ng-submit="salvarEndereco(enderecoForm,dadosEndereco)" id="endereO-form8" class="list">
+      <label class="item item-select" id="endereO-select3" ng-class="{ 'has-error' : enderecoForm.sctTipoEndereco.$invalid, 'has-no-error' : enderecoForm.sctTipoEndereco.$valid}">
         <span class="input-label">Tipo de Endereço</span>
-        <select>
-          <option>Recado</option>
-          <option>Residencial</option>
-          <option>Trabalho</option>
-        </select>
+        <select name="sctTipoEndereco" ng-model="dadosEndereco.id_tipo_endereco"  ng-options="tipoEndereco.id_tipo_endereco as tipoEndereco.descricao_tipo_endereco for tipoEndereco in tiposEndereco" required>
+            <option value="">SELECIONE</option>
+        </select>   
       </label>
-      <label class="item item-input" id="endereO-input21" name="txtEnderecoCep">
+      <div class="form-errors" ng-messages="enderecoForm.sctTipoEndereco.$error" ng-messages-include="templates/form-errors.html"></div> 
+      <label class="item item-input" id="endereO-input21" ng-class="{ 'has-error' : enderecoForm.txtEnderecoCep.$invalid, 'has-no-error' : enderecoForm.txtEnderecoCep.$valid}">
         <span class="input-label">Endereço - CEP</span>
-        <input type="text" placeholder="">
+        <input name="txtEnderecoCep" type="text" placeholder="" ng-model="dadosEndereco.descricao_endereco" required>
       </label>
-      <label class="item item-select" id="endereO-select5" name="sctEstado">
+       <div class="form-errors" ng-messages="enderecoForm.txtEnderecoCep.$error" ng-messages-include="templates/form-errors.html"></div> 
+      <label class="item item-select" id="endereO-select5" ng-class="{ 'has-error' : enderecoForm.sctEstado.$invalid, 'has-no-error' : enderecoForm.sctEstado.$valid}">
         <span class="input-label">Estado</span>
-        <select>
-          <option>Bahia</option>
-        </select>
+        <select name="sctEstado" ng-model="dadosEndereco.id_estado"  ng-change="obterCombos()" ng-options="estado.id_estado as estado.nome_estado for estado in estados" required>
+          <option value="">SELECIONE</option>
+        </select>         
       </label>
-      <label class="item item-select" id="endereO-select6" name="sctCidade">
+       <div class="form-errors" ng-messages="enderecoForm.sctEstado.$error" ng-messages-include="templates/form-errors.html"></div>    
+      <label class="item item-select" id="endereO-select6" ng-class="{ 'has-error' : enderecoForm.sctCidade.$invalid, 'has-no-error' : enderecoForm.sctCidade.$valid}">
         <span class="input-label">Cidade</span>
-        <select>
-          <option>Salvador</option>
-        </select>
+         <select name="sctCidade" ng-model="dadosEndereco.id_municipio"  ng-options="municipio.id_municipio as municipio.nome_municipio for municipio in municipios" required>
+           <option value="">SELECIONE</option>
+          </select>                         
       </label>
+      <div class="form-errors" ng-messages="enderecoForm.sctCidade.$error" ng-messages-include="templates/form-errors.html"></div>   
       <label class="item item-input" id="endereO-input20" name="txtPontoReferencia">
         <span class="input-label">Ponto de Referência</span>
-        <input type="text" placeholder="">
+        <input type="text" placeholder="" ng-model="dadosEndereco.ponto_de_referencia">
       </label>
-      <ion-toggle toggle-class="toggle-assertive" id="endereO-toggle9" name="tglEnderecoPrincipal">Endereço Principal</ion-toggle>
-      <button id="endereO-button10" class="button button-assertive  button-block">Salvar</button>
+      <ion-toggle toggle-class="toggle-assertive" id="endereO-toggle9" name="tglEnderecoPrincipal" ng-model="dadosEndereco.principal">Endereço Principal</ion-toggle>
+  
+      <button id="endereO-button10" class="button button-assertive  button-block" type="submit">Salvar</button>
     </form>
   </ion-content>
 </ion-view>

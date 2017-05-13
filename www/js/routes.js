@@ -149,7 +149,8 @@ angular.module('app.routes', [])
   .state('endereO', {
     url: '/endereco',
     templateUrl: 'templates/endereO.html',
-    controller: 'endereOCtrl'
+    controller: 'endereOCtrl',
+    params: { id_associados_enderecos: null, id_tipo_endereco: null, principal: null, descricao_endereco: null, id_estado: null, id_municipio: null, ponto_de_referencia: null, observacoes: null, chave_externa: null }
   })
 
   .state('dadosPessoais', {

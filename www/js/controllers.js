@@ -277,7 +277,7 @@ function ($scope, $stateParams,$state, $q,$cordovaCamera, $ionicPopup, LOCAL_STO
 
         alertPopup.then(function (res) {
 
-            console.log('Thanks');
+         
 
         });
         
@@ -687,11 +687,66 @@ function ($scope, $stateParams) {
 
 }])
    
-.controller('listaDeEndereOsCtrl', ['$scope', '$stateParams', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+.controller('listaDeEndereOsCtrl', ['$scope', '$stateParams', '$ionicLoading','$ionicPopup','$cordovaNetwork','LOCAL_STORAGE','getDadosEnderecoAssociado', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $stateParams) {
+function ($scope, $stateParams, $ionicLoading,$ionicPopup,$cordovaNetwork,LOCAL_STORAGE,getDadosEnderecoAssociado) {
 
+     $scope.dadosUsuario = JSON.parse(window.localStorage.getItem(LOCAL_STORAGE.local_dados_key));
+
+     $scope.$on('$ionicView.beforeEnter', function() {
+
+       $scope.obterListaEnderecos(); 
+      
+    });
+
+    $scope.obterListaEnderecos = function () {
+
+         var data = {cpf : $scope.dadosUsuario.cpf};
+
+        $scope.enderecos = {};
+              
+            $ionicLoading.show({
+                template: 'Carregando...'
+            }).then(function () {
+
+                getDadosEnderecoAssociado.obter(data).then(function (dadosEnderecos) {
+                 
+                    $scope.enderecos = dadosEnderecos.data.data;
+
+                   //Definindo os icones que serão apresentados de acordo com o tipo de endereço 
+                    for (var i = 0; i < $scope.enderecos.length; i++) {
+
+                        if ($scope.enderecos[i].id_tipo_endereco == 1){
+
+                            $scope.enderecos[i].icone_tipo_endereco = "ion-ios-home";
+                            $scope.enderecos[i].ds_tipo_endereco = "RESIDENCIAL";
+
+                        }else if($scope.enderecos[i].id_tipo_endereco == 2){
+
+                            $scope.enderecos[i].icone_tipo_endereco = "ion-briefcase";
+                            $scope.enderecos[i].ds_tipo_endereco = "TRABALHO";
+                        }else{
+
+                            $scope.enderecos[i].icone_tipo_endereco = "ion-compose";
+                            $scope.enderecos[i].ds_tipo_endereco = "RECADO";
+                        }
+                    }
+
+                  
+                  
+                }).finally(function () {
+            
+                    $ionicLoading.hide();
+                    
+                });
+
+            });
+    };
+
+  
+
+   
 
 }])
    
@@ -946,10 +1001,157 @@ function ($scope, $stateParams,getTipoConvenioService,$ionicLoading,getMunicipio
     
 }])
    
-.controller('endereOCtrl', ['$scope', '$stateParams', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+.controller('endereOCtrl', ['$scope', '$stateParams','getTipoEndereco','getEstado','getMunicipios','$ionicLoading','$q','$state','LOCAL_STORAGE','salvarDadosEnderecoAssociado','$ionicHistory','$ionicPopup', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $stateParams) {
+function ($scope, $stateParams, getTipoEndereco, getEstado, getMunicipios,$ionicLoading,$q,$state,LOCAL_STORAGE,salvarDadosEnderecoAssociado,$ionicHistory,$ionicPopup) {
+    $scope.dadosUsuario = JSON.parse(window.localStorage.getItem(LOCAL_STORAGE.local_dados_key));
+
+    $scope.tiposEndereco = {};
+    $scope.estados = {};
+    $scope.municipios = {};
+
+    //Verifica se o endereço é principal para setar o toggle como true
+    var togglePrincipal = false;
+    if($stateParams.principal == "S"){
+        togglePrincipal = true;
+    }
+
+    //Verifica se é um novo endereço através do id
+  
+
+    $scope.dadosEndereco = { 
+        cpf: $scope.dadosUsuario.cpf,
+        id_usuario: $scope.dadosUsuario.id_usuario,
+        id_associados_enderecos: $stateParams.id_associados_enderecos, 
+        id_tipo_endereco: $stateParams.id_tipo_endereco, 
+        principal: togglePrincipal, 
+        descricao_endereco: $stateParams.descricao_endereco, 
+        id_estado: $stateParams.id_estado, 
+        id_municipio: $stateParams.id_municipio, 
+        ponto_de_referencia: $stateParams.ponto_de_referencia, 
+        observacoes: "", 
+        chave_externa: $scope.dadosUsuario.chave_externa 
+    }
+
+    
+  
+      
+     //Funcao para obter os combos da tela 
+    $scope.obterCombos = function() {          
+      
+        //Pega os tipos de endereços.
+        var tiposEndereco = getTipoEndereco.obter().then(function (retornoTipoEndereco) {    
+            return retornoTipoEndereco;
+        }); 
+
+        //Pega os estados.
+        var estados = getEstado.obter().then(function (retornoEstados) {    
+            return retornoEstados;
+        }); 
+
+        //Pega os municipios.
+        var data = {id_estado: $scope.dadosEndereco.id_estado}; //Passando o estado como parametro.
+
+        var municipios = getMunicipios.obter(data).then(function (retornoMunicipios) {    
+            return retornoMunicipios;
+        });     
+          
+      
+        var retornoCombos = [];
+
+        $ionicLoading.show({template: 'Carregando...'
+        }).then(function () {
+
+            //Pega o retorno de forma sincrona do ajax.
+            $q.all([tiposEndereco, estados, municipios]).then(function(result){
+                for (var i = 0; i < result.length; i++){
+                    retornoCombos.push(result[i]);
+                }
+            
+            $scope.tiposEndereco = retornoCombos[0].data.data;
+            $scope.estados = retornoCombos[1].data.data;
+            $scope.municipios = retornoCombos[2].data.data;       
+
+            }).finally(function () {
+                            
+                $ionicLoading.hide();
+                                                
+            });   
+        });  
+
+       
+    }; 
+    //Chama a função para obter combos
+    $scope.obterCombos();
+
+       //Função paa ataulizar os dados pessoais.
+      $scope.salvarEndereco = function(form,dadosEndereco) {
+           
+      
+        var enderecoPrincipal = "N";
+
+        if(dadosEndereco.principal == true){
+            enderecoPrincipal = "S";
+        }
+
+          if(dadosEndereco.ponto_de_referencia == null){
+           dadosEndereco.ponto_de_referencia = "";
+        }
+
+       
+        //Testando se para inserir ou alterar
+        if(dadosEndereco.id_associados_enderecos != null){
+
+            var data = { cpf: $scope.dadosEndereco.cpf, id_associados_enderecos: dadosEndereco.id_associados_enderecos, id_usuario: dadosEndereco.id_usuario, id_tipo_endereco: dadosEndereco.id_tipo_endereco, principal: enderecoPrincipal, descricao_endereco: dadosEndereco.descricao_endereco, id_estado: dadosEndereco.id_estado, id_municipio: dadosEndereco.id_municipio, ponto_de_referencia: dadosEndereco.ponto_de_referencia, observacoes: dadosEndereco.observacoes, chave_externa: dadosEndereco.chave_externa}; 
+        }else{
+            var data = { cpf: $scope.dadosEndereco.cpf, id_usuario: dadosEndereco.id_usuario, id_tipo_endereco: dadosEndereco.id_tipo_endereco, principal: enderecoPrincipal, descricao_endereco: dadosEndereco.descricao_endereco, id_estado: dadosEndereco.id_estado, id_municipio: dadosEndereco.id_municipio, ponto_de_referencia: dadosEndereco.ponto_de_referencia, observacoes: dadosEndereco.observacoes, chave_externa: dadosEndereco.chave_externa}; 
+        }
+            
+               
+            if(form.$valid) {   
+                $ionicLoading.show({
+                    template: 'Atualizando...'
+                    }).then(function () {
+
+                        salvarDadosEnderecoAssociado.salvar(data).then(function (retorno) {
+                            
+                             
+                            if(retorno.data.result == true){
+
+                                var alertPopup = $ionicPopup.alert({
+                                    title: 'Endereço salvo com sucesso.',    
+                                    okText: 'Ok', // String (default: 'OK'). The text of the OK button.
+                                    okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+                                });      
+
+                                alertPopup.then(function (res) {
+
+                                    $backView = $ionicHistory.backView();
+                                    $backView.go();
+
+                                });         
+
+                            }else{
+
+                                var alertPopup = $ionicPopup.alert({
+                                    title: 'Não foi possível salvar as informações.',    
+                                    okText: 'Ok', // String (default: 'OK'). The text of the OK button.
+                                    okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+                                });           
+                            }
+
+                        }).finally(function () {
+                            $ionicLoading.hide();
+                        });
+                });
+            }
+            
+        };        
+   
+           
+
+
 
 
 }])
@@ -965,7 +1167,7 @@ function ($scope, $stateParams,getDadosPessoaisAssociadoService,$ionicLoading,$i
     $scope.dadosPessoais = {};     
               
             $ionicLoading.show({
-                template: 'Buscando...'
+                template: 'Carregando...'
             }).then(function () {
                 getDadosPessoaisAssociadoService.obter($scope.dadosUsuario.cpf).then(function (dadosPessoais) {
                     
