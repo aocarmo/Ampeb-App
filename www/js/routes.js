@@ -137,7 +137,8 @@ angular.module('app.routes', [])
   .state('contato', {
     url: '/contato',
     templateUrl: 'templates/contato.html',
-    controller: 'contatoCtrl'
+    controller: 'contatoCtrl',
+    params: { id_associados_contatos_telefonicos: null, id_tipo_contatos_telefonicos: null, principal: null, permitir_divulgar: null, numero_contato: null, id_operadora_telefones: null, observacao: null}
   })
 
   .state('buscarConvNios', {

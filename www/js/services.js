@@ -8,7 +8,7 @@ angular.module('app.services', [])
             
             return $http.get(WEB_METODOS.urlServicosSistema + "?m=getTipoContatoTelefonico").then(function (response) {
 
-                        console.log(JSON.stringify(response));
+                      
                         return response;                               
                                 
                     });
@@ -24,12 +24,62 @@ angular.module('app.services', [])
             
             return $http.get(WEB_METODOS.urlServicosSistema + "?m=getOperadorasTelefone").then(function (response) {
 
-                        console.log(JSON.stringify(response));
+                     
                         return response;                               
                                 
                     });
         }
     };
+
+}])
+.service('getDadosContatosAssociado', ['$http', '$q', 'WEB_METODOS','$httpParamSerializerJQLike',  function ($http, $q, WEB_METODOS,$httpParamSerializerJQLike) {
+
+    return {
+
+        obter: function (data) {    
+
+            $http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
+            return $http.post(WEB_METODOS.urlServicosSistema + "?m=getDadosContatosAssociado", $httpParamSerializerJQLike(data)).then(function (response) {
+                return response;
+            });
+
+        }
+    };
+
+
+}])
+.service('salvarDadosContatoAssociado', ['$http', '$q', 'WEB_METODOS', '$httpParamSerializerJQLike', function ($http, $q, WEB_METODOS, $httpParamSerializerJQLike) {
+
+
+    return {
+
+        salvar: function (data) {
+                                 
+            $http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
+            return $http.post(WEB_METODOS.urlServicosSistema + "?m=salvarDadosContatoAssociado", $httpParamSerializerJQLike(data)).then(function (response) {
+                return response;
+            });
+
+        }
+    };
+
+
+}])
+.service('excluirDadosContatoAssociado', ['$http', '$q', 'WEB_METODOS', '$httpParamSerializerJQLike', function ($http, $q, WEB_METODOS, $httpParamSerializerJQLike) {
+
+
+    return {
+
+        excluir: function (data) {
+                                 
+            $http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
+            return $http.post(WEB_METODOS.urlServicosSistema + "?m=excluirDadosContatoAssociado", $httpParamSerializerJQLike(data)).then(function (response) {
+                return response;
+            });
+
+        }
+    };
+
 
 }])
 /***** Serviços para o modulo de convenios *****/

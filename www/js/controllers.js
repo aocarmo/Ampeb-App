@@ -304,7 +304,7 @@ function ($scope, $stateParams, $state, $http, $ionicPopup, $ionicLoading, Login
             if ($cordovaNetwork.isOnline()) {
 
                 $ionicLoading.show({template: 'Autenticando...'}).then(function (){LoginService.logar(data).then(function (dados){
-
+                 
                     if (dados.data.result == true) {
 
                         //Guardando as informações do usuario logado na sessão.
@@ -639,11 +639,120 @@ function ($scope, $stateParams,$cordovaNetwork,$ionicPopup,$ionicHistory) {
 
 }])
    
-.controller('listaDeContatosCtrl', ['$scope', '$stateParams', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+.controller('listaDeContatosCtrl', ['$scope', '$stateParams','$ionicLoading','$ionicPopup','$cordovaNetwork','LOCAL_STORAGE','getDadosContatosAssociado','excluirDadosContatoAssociado', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $stateParams) {
+function ($scope, $stateParams, $ionicLoading,$ionicPopup,$cordovaNetwork,LOCAL_STORAGE,getDadosContatosAssociado,excluirDadosContatoAssociado) {
 
+    $scope.dadosUsuario = JSON.parse(window.localStorage.getItem(LOCAL_STORAGE.local_dados_key));
+
+        $scope.$on('$ionicView.beforeEnter', function() {
+
+        $scope.obterListaContatos(); 
+        
+        });
+
+        $scope.obterListaContatos = function () {
+
+            var data = {cpf : $scope.dadosUsuario.cpf};
+
+            $scope.contatos = {};
+                
+                $ionicLoading.show({
+                    template: 'Carregando...'
+                }).then(function () {
+
+                    getDadosContatosAssociado.obter(data).then(function (dadosContatos) {
+                    
+                        $scope.contatos = dadosContatos.data.data;
+
+                    //Definindo os icones que serão apresentados de acordo com o tipo de endereço 
+                        for (var i = 0; i < $scope.contatos.length; i++) {
+
+                            if ($scope.contatos[i].id_tipo_contatos_telefonicos == 1){
+
+                                $scope.contatos[i].icone_tipo_contato = "ion-iphone";
+                                $scope.contatos[i].descricao_tipo_contato = "Cel - ";
+                               
+                               //Colocando a mascara
+                                if($scope.contatos[i].numero_contato.length == 11){
+                                    var numero = "(" + $scope.contatos[i].numero_contato.substring(0,2) + ") " + $scope.contatos[i].numero_contato.substring(2,7) + "-" + $scope.contatos[i].numero_contato.substring(7,11);
+                                    $scope.contatos[i].numero_contato_mascara = numero;
+                                }else{
+                                     var numero = "(" + $scope.contatos[i].numero_contato.substring(0,2) + ") " + $scope.contatos[i].numero_contato.substring(2,6) + "-" + $scope.contatos[i].numero_contato.substring(6,10);
+                                    $scope.contatos[i].numero_contato_mascara = numero;
+                                }                               
+                             
+
+
+                            }else{
+                                //Colocando a mascara
+                                $scope.contatos[i].icone_tipo_contato  = "ion-ios-telephone";
+                                $scope.contatos[i].descricao_tipo_contato = "Fixo - ";
+
+                                if($scope.contatos[i].numero_contato.length == 11){
+                                    var numero = "(" + $scope.contatos[i].numero_contato.substring(0,2) + ") " + $scope.contatos[i].numero_contato.substring(2,7) + "-" + $scope.contatos[i].numero_contato.substring(7,11);
+                                    $scope.contatos[i].numero_contato_mascara = numero;
+                                }else{
+                                     var numero = "(" + $scope.contatos[i].numero_contato.substring(0,2) + ") " + $scope.contatos[i].numero_contato.substring(2,6) + "-" + $scope.contatos[i].numero_contato.substring(6,10);
+                                    $scope.contatos[i].numero_contato_mascara = numero;
+                                }
+                            }
+                        }
+
+                    
+                    
+                    }).finally(function () {
+                
+                        $ionicLoading.hide();
+                        
+                    });
+
+                });
+        };
+
+    //Função paa ataulizar os dados pessoais.
+    $scope.excluirContato = function(id_contato) { 
+
+        var data = { cpf: $scope.dadosUsuario.cpf, id: id_contato, id_usuario: $scope.dadosUsuario.id_usuario}; 
+    
+                $ionicLoading.show({
+                    template: 'Excluindo...'
+                    }).then(function () {
+
+                        excluirDadosContatoAssociado.excluir(data).then(function (retorno) {
+                            
+                             
+                            if(retorno.data.result == true){
+
+                                var alertPopup = $ionicPopup.alert({
+                                    title: 'Contato excluído com sucesso.',    
+                                    okText: 'Ok', // String (default: 'OK'). The text of the OK button.
+                                    okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+                                });      
+
+                                alertPopup.then(function (res) {
+
+                                    $scope.obterListaContatos(); 
+
+                                });         
+
+                            }else{
+
+                                var alertPopup = $ionicPopup.alert({
+                                    title: 'Não foi possível excluir o contato.',    
+                                    okText: 'Ok', // String (default: 'OK'). The text of the OK button.
+                                    okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+                                });           
+                            }
+
+                        }).finally(function () {
+                            $ionicLoading.hide();
+                        });
+                });
+            
+            
+        };    
 
 }])
    
@@ -892,12 +1001,59 @@ function ($scope, $stateParams) {
 
 }])
    
-.controller('contatoCtrl', ['$scope', '$stateParams','getTipoContatoTelefonicoService','getOperadorasTelefoneService','$q', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+.controller('contatoCtrl', ['$scope', '$stateParams','getTipoContatoTelefonicoService','getOperadorasTelefoneService','$q','LOCAL_STORAGE','$ionicLoading','$ionicHistory','$ionicPopup','salvarDadosContatoAssociado', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $stateParams,getTipoContatoTelefonicoService,getOperadorasTelefoneService,$q) {
+function ($scope, $stateParams,getTipoContatoTelefonicoService,getOperadorasTelefoneService,$q,LOCAL_STORAGE,$ionicLoading,$ionicHistory,$ionicPopup,salvarDadosContatoAssociado) {
 
-       var tiposContatos =    getTipoContatoTelefonicoService.getTipoContato().then(function (data) {    
+     
+
+    $scope.dadosUsuario = JSON.parse(window.localStorage.getItem(LOCAL_STORAGE.local_dados_key));
+
+    $scope.tiposContato = {};
+    $scope.operadoras = {};  
+
+    //Verifica se o numero é principal para setar o toggle como true
+    var togglePrincipal = false;
+    if($stateParams.principal == "S"){
+        togglePrincipal = true;
+    }
+
+     //Verifica se o permite divulgar para setar o toggle como true
+    var toggleDivulgar = false;
+    if($stateParams.permitir_divulgar == "S"){
+        toggleDivulgar = true;
+    }   
+
+    $scope.dadosContato = { 
+        cpf: $scope.dadosUsuario.cpf,       
+        id_associados_contatos_telefonicos: $stateParams.id_associados_contatos_telefonicos,   
+        id_tipo_contatos_telefonicos: $stateParams.id_tipo_contatos_telefonicos,     
+        principal: togglePrincipal, 
+        permitir_divulgar: toggleDivulgar,
+        numero_contato: $stateParams.numero_contato, 
+        id_operadora_telefones: $stateParams.id_operadora_telefones,        
+        id_usuario: $scope.dadosUsuario.id_usuario,
+        observacao: $stateParams.observacao, 
+        chave_externa: $scope.dadosUsuario.chave_externa
+    }
+    
+     //Funcao para obter os combos da tela 
+    $scope.mascaraNumero = function(tipoContato) {     
+    
+       
+        if(tipoContato == 1){
+            $scope.dadosContato.mascara = "(99) 99999-9999";
+        }else{
+            $scope.dadosContato.mascara = "(99) 9999-9999";
+        }
+    }     
+      
+    $scope.mascaraNumero($stateParams.id_tipo_contatos_telefonicos);
+     //Funcao para obter os combos da tela 
+    $scope.obterCombos = function() {          
+        
+        var tiposContatos =    getTipoContatoTelefonicoService.getTipoContato().then(function (data) {    
             return data;
         });    
 
@@ -907,17 +1063,100 @@ function ($scope, $stateParams,getTipoContatoTelefonicoService,getOperadorasTele
          
         
         var retornoCombos = [];
+        
+        $ionicLoading.show({template: 'Carregando...'
 
-          //Pega o retorno de forma sincrona do ajax.
-         $q.all([tiposContatos, operadoras]).then(function(result){
-            for (var i = 0; i < result.length; i++){
-                retornoCombos.push(result[i]);
+        }).then(function () {
+            //Pega o retorno de forma sincrona do ajax.
+            $q.all([tiposContatos, operadoras]).then(function(result){
+                for (var i = 0; i < result.length; i++){
+                    retornoCombos.push(result[i]);
+                }
+
+                $scope.tiposContato = retornoCombos[0].data.data;
+                $scope.operadoras = retornoCombos[1].data.data;
+                        
+
+            }).finally(function () {
+                                
+                $ionicLoading.hide();
+                                                    
+            });        
+
+        });
+    }
+    //Chama a função para obter combos
+    $scope.obterCombos();
+
+       //Função paa ataulizar os dados pessoais.
+      $scope.salvarContato = function(form,dadosContato) {
+           
+      
+        var contatoPrincipal = "N";
+
+        if(dadosContato.principal == true){
+            contatoPrincipal = "S";
+        }
+
+        var permiteDivulgar = "N";
+
+        if(dadosContato.permitir_divulgar == true){
+            permiteDivulgar = "S";
+        }
+
+        if(dadosContato.observacao == null){
+           dadosContato.observacao = "";
+        }
+
+       
+        //Testando se para inserir ou alterar
+        if(dadosContato.id_associados_contatos_telefonicos != null){
+
+            var data = { cpf: dadosContato.cpf, id_associados_contatos_telefonicos: dadosContato.id_associados_contatos_telefonicos, id_tipo_contatos_telefonicos: dadosContato.id_tipo_contatos_telefonicos, principal: contatoPrincipal, permitir_divulgar: permiteDivulgar, numero_contato: dadosContato.numero_contato, id_operadora_telefones: dadosContato.id_operadora_telefones, observacao: dadosContato.observacao, id_usuario: dadosContato.id_usuario}; 
+        }else{
+            var data = { cpf: dadosContato.cpf, id_tipo_contatos_telefonicos: dadosContato.id_tipo_contatos_telefonicos, principal: contatoPrincipal, permitir_divulgar: permiteDivulgar, numero_contato: dadosContato.numero_contato, id_operadora_telefones: dadosContato.id_operadora_telefones,  observacao: dadosContato.observacao, id_usuario: dadosContato.id_usuario, chave_externa:dadosContato.chave_externa};
+        }
+           
+               
+            if(form.$valid) {   
+                $ionicLoading.show({
+                    template: 'Salvando...'
+                    }).then(function () {
+
+                        salvarDadosContatoAssociado.salvar(data).then(function (retorno) {
+                            
+                             
+                            if(retorno.data.result == true){
+
+                                var alertPopup = $ionicPopup.alert({
+                                    title: 'Contato salvo com sucesso.',    
+                                    okText: 'Ok', // String (default: 'OK'). The text of the OK button.
+                                    okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+                                });      
+
+                                alertPopup.then(function (res) {
+
+                                    $backView = $ionicHistory.backView();
+                                    $backView.go();
+
+                                });         
+
+                            }else{
+
+                                var alertPopup = $ionicPopup.alert({
+                                    title: 'Não foi possível salvar as informações.',    
+                                    okText: 'Ok', // String (default: 'OK'). The text of the OK button.
+                                    okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+                                });           
+                            }
+
+                        }).finally(function () {
+                            $ionicLoading.hide();
+                        });
+                });
             }
-          
             
-
-        });     
-
+        };        
 }])
    
 .controller('buscarConvNiosCtrl', ['$scope', '$stateParams','getTipoConvenioService','$ionicLoading','getMunicipiosConvenioService','getConvenioService','$cordovaNetwork','conveniosFactory','$ionicPopup','$ionicHistory', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
@@ -1111,7 +1350,7 @@ function ($scope, $stateParams, getTipoEndereco, getEstado, getMunicipios,$ionic
                
             if(form.$valid) {   
                 $ionicLoading.show({
-                    template: 'Atualizando...'
+                    template: 'Salvando...'
                     }).then(function () {
 
                         salvarDadosEnderecoAssociado.salvar(data).then(function (retorno) {

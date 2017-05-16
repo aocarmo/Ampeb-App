@@ -7,26 +7,13 @@
     <hr class="hr-topoPagina">
     <div class="item item-body" id="listaDeContatos-list-item-container2">
       <ion-list id="listaDeContatos-list7">
-        <ion-item class="item-icon-left item-icon-right dark" id="listaDeContatos-list-item6" ui-sref="contato">
-          <i class="icon ion-iphone"></i>Cel - (71) 99566-6522
+        <ion-item ng-repeat="contato in contatos" class="item-icon-left item-icon-right dark" id="listaDeContatos-list-item6" ui-sref="contato({ id_associados_contatos_telefonicos: contato.id_associados_contatos_telefonicos, id_tipo_contatos_telefonicos: contato.id_tipo_contatos_telefonicos, principal: contato.principal, permitir_divulgar: contato.permitir_divulgar, numero_contato: contato.numero_contato, id_operadora_telefones: contato.id_operadora_telefones, observacao: contato.observacao})">
+        
+          <i class="icon {{contato.icone_tipo_contato}}"></i>{{contato.descricao_tipo_contato}}{{contato.numero_contato_mascara}}
           <i class="icon ion-ios-arrow-right icon-accessory"></i>
-          <ion-option-button class="button-assertive">Apagar</ion-option-button>
+          <ion-option-button class="button-assertive" ng-click="excluirContato(contato.id_associados_contatos_telefonicos)">Excluir</ion-option-button>
         </ion-item>
-        <ion-item class="item-icon-left item-icon-right dark" id="listaDeContatos-list-item20" ui-sref="contato">
-          <i class="icon ion-iphone"></i>Cel - (71) 98965-6635
-          <i class="icon ion-ios-arrow-right icon-accessory"></i>
-          <ion-option-button class="button-assertive">Apagar</ion-option-button>
-        </ion-item>
-        <ion-item class="item-icon-left item-icon-right dark" id="listaDeContatos-list-item9" ui-sref="contato">
-          <i class="icon ion-ios-telephone"></i>Fixo - (71) 3335-0012
-          <i class="icon ion-ios-arrow-right icon-accessory"></i>
-          <ion-option-button class="button-assertive">Apagar</ion-option-button>
-        </ion-item>
-        <ion-item class="item-icon-left item-icon-right dark" id="listaDeContatos-list-item21" ui-sref="contato">
-          <i class="icon ion-ios-telephone"></i>Fixo - (71) 3300-5558
-          <i class="icon ion-ios-arrow-right icon-accessory"></i>
-          <ion-option-button class="button-assertive">Apagar</ion-option-button>
-        </ion-item>
+     
       </ion-list>
     </div>
   </ion-content>

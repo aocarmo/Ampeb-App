@@ -1,32 +1,30 @@
 <ion-view title="Contato" id="page14">
   <ion-content padding="true" class="has-header">
-    <form id="contato-form7" class="list">
-      <label class="item item-select" id="contato-select1" name="sctTipoContato">
+    <form name="contatoForm" ng-submit="salvarContato(contatoForm,dadosContato)" id="contato-form7" class="list">
+      <label class="item item-select" id="contato-select1" ng-class="{ 'has-error' : contatoForm.sctTipoContato.$invalid, 'has-no-error' : contatoForm.sctTipoContato.$valid}">
         <span class="input-label">Tipo de Contato</span>
-        <select>
-          <option>Celular</option>
-          <option>Fixo</option>
-        </select>
+        <select name="sctTipoContato" ng-model="dadosContato.id_tipo_contatos_telefonicos"  ng-change="mascaraNumero(dadosContato.id_tipo_contatos_telefonicos)" ng-options="tipoContato.id_tipo_contatos_telefonicos as tipoContato.descricao_tipo_contatos_telefonicos for tipoContato in tiposContato" required>
+            <option value="">SELECIONE</option>
+        </select>       
       </label>
-      <ion-toggle toggle-class="toggle-assertive" id="contato-toggle3" name="tglContatoPrincipal">Contato Principal</ion-toggle>
-      <ion-toggle toggle-class="toggle-assertive" id="contato-toggle4" name="tglPermiteDivulgar">Permite Divulgar</ion-toggle>
-      <label class="item item-input" id="contato-input17" name="txtNumero">
+      <div class="form-errors" ng-messages="contatoForm.sctTipoContato.$error" ng-messages-include="templates/form-errors.html"></div> 
+      <ion-toggle toggle-class="toggle-assertive" id="contato-toggle3" name="tglContatoPrincipal" ng-model="dadosContato.principal">Contato Principal</ion-toggle>
+      <ion-toggle toggle-class="toggle-assertive" id="contato-toggle4" name="tglPermiteDivulgar" ng-model="dadosContato.permitir_divulgar">Permite Divulgar</ion-toggle>
+      <label class="item item-input" id="contato-input17" ng-class="{ 'has-error' : contatoForm.txtNumero.$invalid, 'has-no-error' : contatoForm.txtNumero.$valid}">
         <span class="input-label">Número</span>
-        <input type="tel" placeholder="(00) 0000-0000">
+        <input name="txtNumero" type="tel" placeholder="(00) 0000-0000" mask="{{dadosContato.mascara}}" clean="true" ng-model="dadosContato.numero_contato" required>
       </label>
-      <label class="item item-select" id="contato-select2" name="sctOperadora">
+      <div class="form-errors" ng-messages="contatoForm.txtNumero.$error" ng-messages-include="templates/form-errors.html"></div> 
+      <label class="item item-select" id="contato-select2" ng-class="{ 'has-error' : contatoForm.sctOperadora.$invalid, 'has-no-error' : contatoForm.sctOperadora.$valid}">
         <span class="input-label">Operadora</span>
-        <select>
-          <option>Claro</option>
-          <option>Não se aplica</option>
-          <option>Oi</option>
-          <option>Tim</option>
-          <option>Vivo</option>
-        </select>
+        <select name="sctOperadora" ng-model="dadosContato.id_operadora_telefones"  ng-options="operadora.id_operadora_telefones as operadora.descricao_operadora_telefones for operadora in operadoras" required>
+            <option value="">SELECIONE</option>
+        </select>        
       </label>
+        <div class="form-errors" ng-messages="contatoForm.sctOperadora.$error" ng-messages-include="templates/form-errors.html"></div> 
       <label class="item item-input" id="contato-input18" name="txtObservacao">
         <span class="input-label">Observação</span>
-        <input type="text" placeholder="">
+        <input type="text" placeholder="" ng-model="dadosContato.observacao">
       </label>
       <button id="contato-button9" class="button button-assertive  button-block">Salvar</button>
     </form>
