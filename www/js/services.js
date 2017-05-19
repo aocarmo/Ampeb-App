@@ -332,14 +332,7 @@ angular.module('app.services', [])
                     //Tratamento para não exibir eventos em noticias
                     if(dsCategoria != "Próximos Eventos"){
                         noticiasFactory.insert(response.data[i].ID, dsCategoria, dsTitulo, dsNoticia, dtNoticiaBD, dsUrlImagem, 0);
-                        /*noticia.push({
-                            id: response.data[i].ID,
-                            dsCategoria: dsCategoria,
-                            dsTitulo: dsTitulo,
-                            dsNoticia: dsNoticia,
-                            dtNoticia: dtNoticia,
-                            dsUrlImagem: dsUrlImagem
-                        });*/
+                     
 
                     }
                    
@@ -867,5 +860,19 @@ angular.module('app.services', [])
         }
     };
 
+
+}])//Serviços para o modulo de contatos Ampeb
+.service('getContatosAMPEB', ['$http', '$q', 'WEB_METODOS',  function ($http, $q, WEB_METODOS) {
+
+    return {
+
+        obter: function () {    
+
+            return $http.get(WEB_METODOS.urlServicosSistema + "?m=getContatosAMPEB").then(function (response) {
+                return response;
+            });
+
+        }
+    };
 
 }]);

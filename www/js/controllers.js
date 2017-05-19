@@ -788,10 +788,65 @@ function ($scope, $stateParams, $ionicLoading, $ionicPopup, $cordovaNetwork, LOC
 
 }])
    
-.controller('contatosAMPEBCtrl', ['$scope', '$stateParams', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+.controller('contatosAMPEBCtrl', ['$scope', '$stateParams','getContatosAMPEB','$cordovaNetwork','$ionicPopup','$ionicLoading', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $stateParams) {
+function ($scope, $stateParams,getContatosAMPEB,$cordovaNetwork,$ionicPopup,$ionicLoading) {
+
+    $scope.contatos = {};
+
+            
+
+    if ($cordovaNetwork.isOnline()) {
+        $ionicLoading.show({
+            template: 'Buscando...'
+        }).then(function () {
+            getContatosAMPEB.obter().then(function (dados) {
+
+                if (dados.data.result == true) {         
+
+                    $scope.contatos = dados.data.data; 
+
+                    for (var i = 0; i < $scope.contatos.length; i++) {
+                        
+                        if($scope.contatos[i].id_tipo_contato == 1 || $scope.contatos[i].id_tipo_contato == 2){
+                            $scope.contatos[i].link = "tel:";
+                        }else if($scope.contatos[i].id_tipo_contato == 3){
+                            $scope.contatos[i].link = "mailto:";
+                        }
+                    }
+                
+                
+
+                }else{
+
+                    var alertPopup = $ionicPopup.alert({
+                        title: dados.data,
+                        template: 'Não foi possível obter as informações de contatos.',
+                        okText: 'OK', // String (default: 'OK'). The text of the OK button.
+                        okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+                    });
+                }
+
+            }).finally(function () {
+            
+                    $ionicLoading.hide();
+                    
+            });
+        });
+
+    }else{
+
+        var alertPopup = $ionicPopup.alert({
+            title: 'Não foi possível obter as informações de contatos.',
+            template: 'Verifique sua conexão com ineternet.',
+            okText: 'Ok', // String (default: 'OK'). The text of the OK button.
+            okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+        });
+    }   
+       
+     
+
 
 
 }])
