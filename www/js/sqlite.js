@@ -340,14 +340,8 @@ sqlite.factory('conveniosFactory', function ($q, $cordovaSQLite) {
             
             return deferred.promise;
         },
-        selectTipoConvenio: function (tipo) {
-            var query = "SELECT * FROM tipo_convenio where flPrivado = 0";
-            
-            if(tipo == "privado"){
-                query = "SELECT * FROM tipo_convenio";
-            }
-             
-           
+        selectTipoConvenio: function () {
+            var query = "SELECT * FROM tipo_convenio";
             var outputs = [];
 
             //Usada para fazer o retorno do banco aguardar estar completa

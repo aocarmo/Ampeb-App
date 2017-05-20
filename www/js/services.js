@@ -102,7 +102,7 @@ angular.module('app.services', [])
 
                                 //Verificar a melhor forma na tela bloqueada
                                 var deferred = $q.defer();
-                                conveniosFactory.selectTipoConvenio("publico").then(function (dadosOnline) {
+                                conveniosFactory.selectTipoConvenio().then(function (dadosOnline) {
                             
                                     deferred.resolve(dadosOnline);
                                 });
@@ -205,8 +205,21 @@ angular.module('app.services', [])
 
         }
     };
+}])
+.service('getDadosConvenioCONAMP', ['$http', '$q', 'WEB_METODOS', '$httpParamSerializerJQLike', function ($http, $q, WEB_METODOS, $httpParamSerializerJQLike) {
 
-    
+
+    return {
+
+        obter: function (data) {
+                                 
+            $http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
+            return $http.post(WEB_METODOS.urlServicosSistema + "?m=getDadosConvenioCONAMP", $httpParamSerializerJQLike(data)).then(function (response) {
+                return response;
+            });
+
+        }
+    };
 
 
 }])

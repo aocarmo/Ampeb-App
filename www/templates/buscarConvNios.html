@@ -28,7 +28,7 @@
       <a  ui-sref="listaDeConvNios({idTipoConvenio: filtro.tipoConvenio, nmConvenio: filtro.nmConvenio, nmMunicipio: filtro.municipio})" id="buscarConvNios-button11" class="button button-assertive  button-block">Buscar</a>
       <div class="list">
 
-        <div ng-repeat="tipoConvenio in tiposConvenio" align="center" class="card">
+        <div ng-repeat="tipoConvenio in tiposConvenio" style="display: {{tipoConvenio.display}}" align="center" class="card">
           <div class="item item-image img-tipo-convenio">
             <img ion-img-cache ui-sref="listaDeConvNios({idTipoConvenio: tipoConvenio.id})" ng-src="{{tipoConvenio.dsUrlImagem}}">
           </div>

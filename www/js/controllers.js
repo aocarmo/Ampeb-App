@@ -289,7 +289,7 @@ function ($scope, $stateParams,$state, $q,$cordovaCamera, $ionicPopup, LOCAL_STO
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
 function ($scope, $stateParams, $state, $http, $ionicPopup, $ionicLoading, LoginService,LOCAL_STORAGE,$cordovaNetwork) {
-
+  
     $scope.data = {};    
     var manteLogado =  window.localStorage.getItem(LOCAL_STORAGE.manter_logado);
     
@@ -914,10 +914,11 @@ function ($scope, $stateParams, $ionicLoading,$ionicPopup,$cordovaNetwork,LOCAL_
 
 }])
    
-.controller('listaDeConvNiosCtrl', ['$scope', '$stateParams','$ionicLoading','conveniosFactory','$ionicHistory','$ionicPopup', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+.controller('listaDeConvNiosCtrl', ['$scope', '$stateParams','$ionicLoading','conveniosFactory','$ionicHistory','$ionicPopup','getDadosConvenioCONAMP','LOCAL_STORAGE','$cordovaNetwork','$cordovaInAppBrowser', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $stateParams,$ionicLoading,conveniosFactory,$ionicHistory,$ionicPopup) {
+function ($scope, $stateParams,$ionicLoading,conveniosFactory,$ionicHistory,$ionicPopup,getDadosConvenioCONAMP,LOCAL_STORAGE,$cordovaNetwork,$cordovaInAppBrowser) {
+    $scope.dadosUsuario = JSON.parse(window.localStorage.getItem(LOCAL_STORAGE.local_dados_key));
 
     $scope.listaConvenios = {};
     var idTipoConvenio = null; 
@@ -936,37 +937,120 @@ function ($scope, $stateParams,$ionicLoading,conveniosFactory,$ionicHistory,$ion
         nmMunicipio = $stateParams.nmMunicipio;
     }
 
-     //Pega dados do banco
-    $ionicLoading.show({
-        template: 'Buscando...'
-    }).then(function () {
+    if(idTipoConvenio != 22){
+        //Pega dados do banco
+        $ionicLoading.show({
+            template: 'Buscando...'
+        }).then(function () {
 
-        conveniosFactory.selectConvenio(idTipoConvenio, nmConvenio, nmMunicipio, null).then(function (dados) {      
-             
-             if (dados[0] == null) {
-                    var alertPopup = $ionicPopup.alert({
-                        title: 'Não existem dados cadastrados para a pesquisa informada.',                      
-                        okText: 'Ok', // String (default: 'OK'). The text of the OK button.
-                        okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
-                    });
+            conveniosFactory.selectConvenio(idTipoConvenio, nmConvenio, nmMunicipio, null).then(function (dados) {      
+                
+                if (dados[0] == null) {
+                        var alertPopup = $ionicPopup.alert({
+                            title: 'Não existem dados cadastrados para a pesquisa informada.',                      
+                            okText: 'Ok', // String (default: 'OK'). The text of the OK button.
+                            okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+                        });
 
-                    alertPopup.then(function (res) {
+                        alertPopup.then(function (res) {
 
-                        $backView = $ionicHistory.backView();
-                        $backView.go();
+                            $backView = $ionicHistory.backView();
+                            $backView.go();
 
-                    });
+                        });
 
-                } else {
-                     $scope.listaConvenios = dados;
-                }
-           
-        }).finally(function () {
-            //em qualquer caso remove o spinner de loading
-            $ionicLoading.hide();
+                    } else {
+                        $scope.listaConvenios = dados;
+                    }
+            
+            }).finally(function () {
+                //em qualquer caso remove o spinner de loading
+                $ionicLoading.hide();
+            });
+
         });
+    }else{
+            var alertPopup = $ionicPopup.alert({
+                title: 'Você será redirecionado para a página da CONAMP.',                      
+                okText: 'Ok', // String (default: 'OK'). The text of the OK button.
+                okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+            });
 
+            alertPopup.then(function (res) {
+
+                $scope.acessarConamp();
+                $backView = $ionicHistory.backView();
+                $backView.go();
+
+            });
+    }
+
+      $scope.acessarConamp = function () {
+       
+        var data = {cpf: $scope.dadosUsuario.cpf};
+
+            if ($cordovaNetwork.isOnline()) {
+                
+                $ionicLoading.show({template: 'Buscando...'}).then(function () {
+                
+                    getDadosConvenioCONAMP.obter(data).then(function (dados) {
+                                        
+                        $scope.redirecionarConamp(dados); 
+ 
+
+                    }).finally(function () {
+                        //em qualquer caso remove o spinner de loading
+                        $ionicLoading.hide();                       
+                       
+                    });
+                });
+
+            }else{
+               var alertPopup = $ionicPopup.alert({
+                    title: 'Não foi possível acessar os convênios CONAMP.',
+                    template: 'Verifique sua conexão com ineternet.',
+                    okText: 'Ok', // String (default: 'OK'). The text of the OK button.
+                    okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+                });
+
+                alertPopup.then(function (res) {
+
+                    $scope.redirecionarConamp();
+                    $backView = $ionicHistory.backView();
+                    $backView.go();
+
+                });
+            }   
+       
+
+    };
+
+    $scope.redirecionarConamp = function (dados) {
+    
+           
+    var script = 'document.body.innerHTML = \'<form class="clube" id="conampForm" action="'+dados.data.data[0].url_action+'" method="post" target="_blank">';
+    script += '<input type="hidden" name="dynamuskey" value="'+dados.data.data[0].dynamuskey+'"/>';
+    script += '<input type="hidden" name="dynamus_username" value="'+dados.data.data[0].dynamus_username+'"/>';
+    script += '<input type="hidden" name="dynamus_nome" value="'+dados.data.data[0].dynamus_nome+'"/>';
+    script += '<input type="hidden" name="dynamus_sobrenome" value=""/>';
+    script += '<input type="hidden" name="dynamus_email" value="'+dados.data.data[0].dynamus_email+'"/>';
+    script += '<input type="hidden" name="dynamus_uf_user" value="'+dados.data.data[0].dynamus_uf_user+'"/>'
+    script += '<input type="hidden" name="dynamus_token" value="'+dados.data.data[0].dynamus_token+'"/>';                        
+    script += '</form>\';';
+
+    script += 'document.getElementById("conampForm").submit();';                       
+ 
+    var ref = cordova.InAppBrowser.open("https://conamp.dynamus.club/template-autologin.php", '_blank', 'location=yes');
+
+    ref.addEventListener('loadstart', function() {
+        ref.executeScript({code: script});
     });
+
+    
+
+    };
+
+
 
 
 }])
@@ -1214,13 +1298,14 @@ function ($scope, $stateParams,getTipoContatoTelefonicoService,getOperadorasTele
         };        
 }])
    
-.controller('buscarConvNiosCtrl', ['$scope', '$stateParams','getTipoConvenioService','$ionicLoading','getMunicipiosConvenioService','getConvenioService','$cordovaNetwork','conveniosFactory','$ionicPopup','$ionicHistory', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+.controller('buscarConvNiosCtrl', ['$scope', '$stateParams','getTipoConvenioService','$ionicLoading','getMunicipiosConvenioService','getConvenioService','$cordovaNetwork','conveniosFactory','$ionicPopup','$ionicHistory','LOCAL_STORAGE', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $stateParams,getTipoConvenioService,$ionicLoading,getMunicipiosConvenioService,getConvenioService,$cordovaNetwork,conveniosFactory,$ionicPopup,$ionicHistory) {
-
+function ($scope, $stateParams,getTipoConvenioService,$ionicLoading,getMunicipiosConvenioService,getConvenioService,$cordovaNetwork,conveniosFactory,$ionicPopup,$ionicHistory,LOCAL_STORAGE) {
+   
     $scope.municipiosConvenio = {};
     $scope.tiposConvenio = {};
+    var dadosUsuario = JSON.parse(window.localStorage.getItem(LOCAL_STORAGE.local_dados_key));
     
     if ($cordovaNetwork.isOnline()) {
         
@@ -1236,7 +1321,30 @@ function ($scope, $stateParams,getTipoConvenioService,$ionicLoading,getMunicipio
                 getTipoConvenioService.getTipoConvenio().then(function (dadosTipoConvenio) {
                     
                     $scope.tiposConvenio = dadosTipoConvenio;
-                
+                    //Verificando a exibição de convenios privados (conamp)
+
+                    for (var i = 0; i < $scope.tiposConvenio.length; i++){
+                      
+                        if(dadosUsuario == null){
+
+                            if($scope.tiposConvenio[i].flPrivado == 1){
+
+                                $scope.tiposConvenio[i].display = "none";
+
+                            }else{
+                                $scope.tiposConvenio[i].display = "block";
+                   ;
+                            }
+
+                        }else{
+
+                            $scope.tiposConvenio[i].display = "block";
+                        }
+
+                   
+                    }
+              
+
                 }).finally(function () {
 
                     getConvenioService.getConvenio().then(function (dadosConvenio) {
