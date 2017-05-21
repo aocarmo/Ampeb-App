@@ -292,8 +292,8 @@ function ($scope, $stateParams, $state, $http, $ionicPopup, $ionicLoading, Login
   
     $scope.data = {};    
     var manteLogado =  window.localStorage.getItem(LOCAL_STORAGE.manter_logado);
-    
-    if(manteLogado){
+  
+    if(manteLogado == "true"){
         $state.go('aMPEB');
     }
    
@@ -309,11 +309,14 @@ function ($scope, $stateParams, $state, $http, $ionicPopup, $ionicLoading, Login
 
                         //Guardando as informações do usuario logado na sessão.
                         window.localStorage.setItem(LOCAL_STORAGE.local_dados_key, JSON.stringify(dados.data.data));
+                      
                         if (data.manterConectado == true) {
-                        window.localStorage.setItem(LOCAL_STORAGE.manter_logado, true);
-                        } else {
-                        window.localStorage.setItem(LOCAL_STORAGE.manter_logado, false);
-                        }                
+                            window.localStorage.setItem(LOCAL_STORAGE.manter_logado, "true");
+                              console.log(data.manterConectado);
+                        }else{
+                            window.localStorage.setItem(LOCAL_STORAGE.manter_logado, "false");
+                              console.log(data.manterConectado);
+                        }              
                         //Direciona para a tela inicial              
                         $state.go('aMPEB');
                     }else {
