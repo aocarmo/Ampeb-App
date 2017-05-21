@@ -266,7 +266,8 @@ angular.module('app.services', [])
          var listaPost =   $http.get(WEB_METODOS.urlServicosPortal + "?taxonomies=noticias").then(function (response) {
                
                 //Lendo todas as noticias
-                //var noticia = [];
+                
+                var idNoticias = [];
                 for (var i = 0; i < response.data.length; i++) {
 
                     var dsNoticia = "";
@@ -346,20 +347,42 @@ angular.module('app.services', [])
                     if(dsCategoria != "Próximos Eventos"){
                         noticiasFactory.insert(response.data[i].ID, dsCategoria, dsTitulo, dsNoticia, dtNoticiaBD, dsUrlImagem, 0);
                      
-
+                        //Pegando os id das noticias que não serão excluidas
+                        idNoticias.push(response.data[i].ID);
                     }
-                   
+                  
                 }
-               
-                //Verificar a melhor forma na tela bloqueada
-                var deferred = $q.defer();
-                noticiasFactory.selectListaNoticias().then(function (dadosOnline) {
-            
-                    deferred.resolve(dadosOnline);
-                });
+                     
+                    var deferred = $q.defer();
 
-                //return noticia;
+                    //Excluindo do banco noticias que não estão mais disponiveis no servico
+                    var noticiasExcluir =  noticiasFactory.deleteNoticias(idNoticias.join()).then(function (noticiasExcluirRetorno) {    
+                        return noticiasExcluirRetorno;
+                    });                                          
+
+                    var retornoNoticiasExibir = [];
+                    
+                    //Executando a exclusão das noticias
+                    $q.all([noticiasExcluir]).then(function(result){
+
+                        for (var i = 0; i < result.length; i++){
+                            retornoNoticiasExibir.push(result[i]);
+                        }
+
+                        if(retornoNoticiasExibir[0][0].retorno == 1){
+                            //Após excluídas as noticias, seleciona as noticias salvas no banco
+                            noticiasFactory.selectListaNoticias().then(function (dadosOnline) {
+            
+                                deferred.resolve(dadosOnline);
+                            });
+                    
+                        }
+                        
+                    });          
+
                 return deferred.promise;
+
+               
             });
              
           
@@ -378,7 +401,7 @@ angular.module('app.services', [])
          return  $http.get(WEB_METODOS.urlServicosPortal + "?taxonomies=noticias").then(function (response) {
                
                 //Lendo todas as noticias
-                //var noticia = [];
+                var idNoticias = [];
                 for (var i = 0; i < response.data.length; i++) {
 
                     var dsNoticia = "";
@@ -457,27 +480,41 @@ angular.module('app.services', [])
                     //Tratamento para não exibir eventos em noticias
                     if(dsCategoria != "Próximos Eventos"){
                         noticiasFactory.insert(response.data[i].ID, dsCategoria, dsTitulo, dsNoticia, dtNoticiaBD, dsUrlImagem, 0);
-                        /*noticia.push({
-                            id: response.data[i].ID,
-                            dsCategoria: dsCategoria,
-                            dsTitulo: dsTitulo,
-                            dsNoticia: dsNoticia,
-                            dtNoticia: dtNoticia,
-                            dsUrlImagem: dsUrlImagem
-                        });*/
+
+                        //Pegando os id das noticias que não serão excluidas
+                        idNoticias.push(response.data[i].ID);
 
                     }
                    
                 }
                
-                //Verificar a melhor forma na tela bloqueada
-                var deferred = $q.defer();
-                noticiasFactory.selectListaNoticias().then(function (dadosOnline) {
-            
-                    deferred.resolve(dadosOnline);
-                });
+                 var deferred = $q.defer();
 
-                //return noticia;
+                    //Excluindo do banco noticias que não estão mais disponiveis no servico
+                    var noticiasExcluir =  noticiasFactory.deleteNoticias(idNoticias.join()).then(function (noticiasExcluirRetorno) {    
+                        return noticiasExcluirRetorno;
+                    });                                          
+
+                    var retornoNoticiasExibir = [];
+                    
+                    //Executando a exclusão das noticias
+                    $q.all([noticiasExcluir]).then(function(result){
+
+                        for (var i = 0; i < result.length; i++){
+                            retornoNoticiasExibir.push(result[i]);
+                        }
+
+                        if(retornoNoticiasExibir[0][0].retorno == 1){
+                            //Após excluídas as noticias, seleciona as noticias salvas no banco
+                            noticiasFactory.selectListaNoticias().then(function (dadosOnline) {
+            
+                                deferred.resolve(dadosOnline);
+                            });
+                    
+                        }
+                        
+                    });          
+
                 return deferred.promise;
             });
 
@@ -492,7 +529,8 @@ angular.module('app.services', [])
          var listaPost =   $http.get(WEB_METODOS.urlServicosPortal + "?taxonomies=noticias").then(function (response) {
                
                 //Lendo todas as noticias
-                //var noticia = [];
+                var idEventos = [];                
+                    
                 for (var i = 0; i < response.data.length; i++) {
 
                     var dsNoticia = "";
@@ -570,29 +608,43 @@ angular.module('app.services', [])
 
                     //Tratamento para não exibir eventos em noticias
                     if(dsCategoria == "Próximos Eventos"){
-                        eventosFactory.insert(response.data[i].ID, dsCategoria, dsTitulo, dsNoticia, dtNoticiaBD, dsUrlImagem, 0);
-                       /* noticia.push({
-                            id: response.data[i].ID,
-                            dsCategoria: dsCategoria,
-                            dsTitulo: dsTitulo,
-                            dsNoticia: dsNoticia,
-                            dtNoticia: dtNoticia,
-                            dsUrlImagem: dsUrlImagem
-                        });*/
+                        eventosFactory.insert(response.data[i].ID, dsCategoria, dsTitulo, dsNoticia, dtNoticiaBD, dsUrlImagem, 0);     
+                        
+                        //Pegando os id dos eventos que não serão excluidas
+                        idEventos.push(response.data[i].ID);                 
 
                     }
-                   
+                        
                 }
 
 
-                //return noticia;
-                var deferred = $q.defer();
-                eventosFactory.selectListaNoticias().then(function (dadosOnline) {
-            
-                    deferred.resolve(dadosOnline);
-                });
+                 var deferred = $q.defer();
 
-                //return noticia;
+                    //Excluindo do banco eventos que não estão mais disponiveis no servico
+                    var eventosExcluir =  eventosFactory.deleteEventos(idEventos.join()).then(function (eventosExcluirRetorno) {    
+                        return eventosExcluirRetorno;
+                    });                                          
+
+                    var retornoEventosExibir = [];
+                    
+                    //Executando a exclusão das noticias
+                    $q.all([eventosExcluir]).then(function(result){
+
+                        for (var i = 0; i < result.length; i++){
+                            retornoEventosExibir.push(result[i]);
+                        }
+
+                        if(retornoEventosExibir[0][0].retorno == 1){
+                            //Após excluídas as noticias, seleciona as noticias salvas no banco
+                            eventosFactory.selectListaNoticias().then(function (dadosOnline) {
+            
+                                deferred.resolve(dadosOnline);
+                            });
+                    
+                        }
+                        
+                    });          
+                    
                 return deferred.promise;
             });
 
@@ -613,7 +665,7 @@ angular.module('app.services', [])
          return $http.get(WEB_METODOS.urlServicosPortal + "?taxonomies=noticias").then(function (response) {
                
                 //Lendo todas as noticias
-                //var noticia = [];
+                var idEventos = [];      
                 for (var i = 0; i < response.data.length; i++) {
 
                     var dsNoticia = "";
@@ -692,20 +744,40 @@ angular.module('app.services', [])
                     //Tratamento para não exibir eventos em noticias
                     if(dsCategoria == "Próximos Eventos"){
                         eventosFactory.insert(response.data[i].ID, dsCategoria, dsTitulo, dsNoticia, dtNoticiaBD, dsUrlImagem, 0);
+                        //Pegando os id dos eventos que não serão excluidas
+                        idEventos.push(response.data[i].ID);        
                    
                     }
                    
                 }
 
+                 var deferred = $q.defer();
 
-                //return noticia;
-                var deferred = $q.defer();
-                eventosFactory.selectListaNoticias().then(function (dadosOnline) {
+                    //Excluindo do banco eventos que não estão mais disponiveis no servico
+                    var eventosExcluir =  eventosFactory.deleteEventos(idEventos.join()).then(function (eventosExcluirRetorno) {    
+                        return eventosExcluirRetorno;
+                    });                                          
+
+                    var retornoEventosExibir = [];
+                    
+                    //Executando a exclusão das noticias
+                    $q.all([eventosExcluir]).then(function(result){
+
+                        for (var i = 0; i < result.length; i++){
+                            retornoEventosExibir.push(result[i]);
+                        }
+
+                        if(retornoEventosExibir[0][0].retorno == 1){
+                            //Após excluídas as noticias, seleciona as noticias salvas no banco
+                            eventosFactory.selectListaNoticias().then(function (dadosOnline) {
             
-                    deferred.resolve(dadosOnline);
-                });
-
-                //return noticia;
+                                deferred.resolve(dadosOnline);
+                            });
+                    
+                        }
+                        
+                    });          
+                    
                 return deferred.promise;
             });
 

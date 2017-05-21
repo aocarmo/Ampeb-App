@@ -160,6 +160,26 @@ sqlite.factory('noticiasFactory', function ($q, $cordovaSQLite) {
             });
 
             return deferred.promise;
+        },
+        deleteNoticias: function (id) {
+            var query = "DELETE FROM noticia WHERE id NOT IN ("+id+")";
+            var outputs = [];
+
+            //Usada para fazer o retorno do banco aguardar esta completa
+            var deferred = $q.defer();
+            $cordovaSQLite.execute(db, query).then(function (data) {
+
+                    outputs.push({ "retorno": 1});
+                    deferred.resolve(outputs);
+               
+            }, function (error) {
+
+                deferred.reject(error);
+            });
+
+            return deferred.promise;  //This line was missing
+
+           
         }
        
     }
@@ -308,6 +328,26 @@ sqlite.factory('eventosFactory', function ($q, $cordovaSQLite) {
             });
 
             return deferred.promise;
+        },
+        deleteEventos: function (id) {
+            var query = "DELETE FROM evento WHERE id NOT IN ("+id+")";
+            var outputs = [];
+
+            //Usada para fazer o retorno do banco aguardar esta completa
+            var deferred = $q.defer();
+            $cordovaSQLite.execute(db, query).then(function (data) {
+
+                    outputs.push({ "retorno": 1});
+                    deferred.resolve(outputs);
+               
+            }, function (error) {
+
+                deferred.reject(error);
+            });
+
+            return deferred.promise;  //This line was missing
+
+           
         }
        
        
