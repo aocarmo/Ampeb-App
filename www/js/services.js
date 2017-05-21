@@ -960,4 +960,18 @@ angular.module('app.services', [])
         }
     };
 
+}])//Serviços para o modulo de transmissão ao vivo
+.service('getConfiguracaoPresencaAssembleia', ['$http', '$q', 'WEB_METODOS',  function ($http, $q, WEB_METODOS) {
+
+    return {
+
+        obter: function () {    
+
+            return $http.get(WEB_METODOS.urlServicosSistema + "?m=getConfiguracaoPresencaAssembleia").then(function (response) {
+                return response;
+            });
+
+        }
+    };
+
 }]);

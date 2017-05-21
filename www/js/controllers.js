@@ -259,29 +259,7 @@ function ($scope, $stateParams,$state, $q,$cordovaCamera, $ionicPopup, LOCAL_STO
             // error
         });
     }
-/***************** Fim do  Bloco para alteração de foto do perfil ********************/   
-    $scope.registarAssembleia = function () {
 
-        $scope.data = {}
-
-        var alertPopup = $ionicPopup.alert({
-
-            title: 'Presença confirmada.',
-
-            okText: 'OK', // String (default: 'OK'). The text of the OK button.
-
-            okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
-
-
-        });
-
-        alertPopup.then(function (res) {
-
-         
-
-        });
-        
-    }
 
 
 }])   
@@ -1159,12 +1137,83 @@ function ($scope, $stateParams, $state, RecuperarSenhaService, $ionicPopup,$cord
 
 }])
    
-.controller('transmissOAoVivoCtrl', ['$scope', '$stateParams', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+.controller('transmissOAoVivoCtrl', ['$scope', '$stateParams','getConfiguracaoPresencaAssembleia','$cordovaNetwork','$ionicPopup','$ionicHistory', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $stateParams) {
+function ($scope, $stateParams,getConfiguracaoPresencaAssembleia,$cordovaNetwork,$ionicPopup,$ionicHistory) {
 
+    
+    $scope.registarAssembleia = function () {
 
+         if ($cordovaNetwork.isOnline()) {
+
+                getConfiguracaoPresencaAssembleia.obter().then(function (dados) {
+                    
+                    console.log(JSON.stringify(dados.data.data));
+                    //Verifica se é para exibir o alerta
+                    if(dados.data.data[0].exibir_alerta == 1){
+                        //Verifica o tipo do alerta 1 para confirm(sim , não) 2 para alert simples
+                        if(dados.data.data[0].id_tipo_alerta == 1){                        
+
+                            var confirmPopup = $ionicPopup.confirm({
+                                title: dados.data.data[0].texto_mensagem_alerta,                              
+                                okText: 'Sim', // String (default: 'OK'). The text of the OK button.
+                                okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+                                cancelText: 'Não'
+                                
+                            });
+
+                            confirmPopup.then(function(res) {
+
+                                if(res) {
+                                console.log('Email enviado!');
+
+                                } else {
+                                
+                                console.log('Email não enviado!');
+
+                                }
+                            });
+
+                        }else if(dados.data.data[0].id_tipo_alerta == 2) {
+
+                             var alertPopup = $ionicPopup.alert({
+                                title: dados.data.data[0].texto_mensagem_alerta,                           
+                                okText: 'OK', // String (default: 'OK'). The text of the OK button.
+                                okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+                            });
+
+                            alertPopup.then(function (res) {
+                                  console.log('Deleted !');
+                              
+                            }); 
+
+                        }
+
+                    }else {
+
+                    }                
+
+                });
+
+            }else{
+                var alertPopup = $ionicPopup.alert({
+                            title: 'Transmissão ao vivo indisponível.',
+                            template: 'Por favor, verifque sua conexão com a internet',
+                            okText: 'OK', // String (default: 'OK'). The text of the OK button.
+                            okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+                });
+
+                alertPopup.then(function (res) {
+                    
+                    $backView = $ionicHistory.backView();
+                    $backView.go();
+
+                }); 
+            }           
+    }
+    //Chamando a função para registrar a assembléia
+     $scope.registarAssembleia();
 }])
    
 .controller('contatoCtrl', ['$scope', '$stateParams','getTipoContatoTelefonicoService','getOperadorasTelefoneService','$q','LOCAL_STORAGE','$ionicLoading','$ionicHistory','$ionicPopup','salvarDadosContatoAssociado', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
