@@ -1030,8 +1030,9 @@ function ($scope, $stateParams,$ionicLoading,conveniosFactory,$ionicHistory,$ion
 
     $scope.redirecionarConamp = function (dados) {
     
-           
-    var script = 'document.body.innerHTML = \'<form class="clube" id="conampForm" action="'+dados.data.data[0].url_action+'" method="post" target="_blank">';
+   //So funciona no iphone no android entra em loop inifnito
+   /*var script = 'alert("eqweqwe");'   
+    script += 'document.body.innerHTML = \'<form id="conampForm" action="'+dados.data.data[0].url_action+'" method="post">';
     script += '<input type="hidden" name="dynamuskey" value="'+dados.data.data[0].dynamuskey+'"/>';
     script += '<input type="hidden" name="dynamus_username" value="'+dados.data.data[0].dynamus_username+'"/>';
     script += '<input type="hidden" name="dynamus_nome" value="'+dados.data.data[0].dynamus_nome+'"/>';
@@ -1041,14 +1042,37 @@ function ($scope, $stateParams,$ionicLoading,conveniosFactory,$ionicHistory,$ion
     script += '<input type="hidden" name="dynamus_token" value="'+dados.data.data[0].dynamus_token+'"/>';                        
     script += '</form>\';';
 
-    script += 'document.getElementById("conampForm").submit();';                       
- 
-    var ref = cordova.InAppBrowser.open("https://conamp.dynamus.club/template-autologin.php", '_blank', 'location=yes');
+    script += 'document.getElementById("conampForm").submit();'; */
+
+    /*var ref = cordova.InAppBrowser.open("https://conamp.dynamus.club/template-autologin.php", '_blank', 'hidden=no,location=yes,clearsessioncache=yes,clearcache=yes');
 
     ref.addEventListener('loadstart', function() {
+       
         ref.executeScript({code: script});
-    });
+    });*/
 
+
+    var pageContent = '<html><head></head><body><form id="conampForm" action="'+dados.data.data[0].url_action+'" method="post">';
+    pageContent += '<input type="hidden" name="dynamuskey" value="'+dados.data.data[0].dynamuskey+'"/>';
+    pageContent += '<input type="hidden" name="dynamus_username" value="'+dados.data.data[0].dynamus_username+'"/>';
+    pageContent += '<input type="hidden" name="dynamus_nome" value="'+dados.data.data[0].dynamus_nome+'"/>';
+    pageContent += '<input type="hidden" name="dynamus_sobrenome" value=""/>';
+    pageContent += '<input type="hidden" name="dynamus_email" value="'+dados.data.data[0].dynamus_email+'"/>';
+    pageContent += '<input type="hidden" name="dynamus_uf_user" value="'+dados.data.data[0].dynamus_uf_user+'"/>'
+    pageContent += '<input type="hidden" name="dynamus_token" value="'+dados.data.data[0].dynamus_token+'"/>';   
+    pageContent += '</form> <script type="text/javascript">document.getElementById("conampForm").submit();</script></body></html>';
+
+    var pageContentUrl = 'data:text/html;base64,' + btoa(pageContent);
+
+    var browserRef = window.cordova.InAppBrowser.open(
+        pageContentUrl ,
+        "_blank",
+        "hidden=no,location=yes,clearsessioncache=yes,clearcache=yes"
+    );
+
+   
+ 
+    
     
 
     };
