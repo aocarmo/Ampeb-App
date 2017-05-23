@@ -1076,10 +1076,88 @@ function ($scope, $stateParams) {
 
 }])
    
-.controller('alterarASenhaCtrl', ['$scope', '$stateParams', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+.controller('alterarASenhaCtrl', ['$scope', '$stateParams','alterarSenha','$cordovaNetwork','$ionicLoading','$ionicPopup','$ionicHistory','LOCAL_STORAGE', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $stateParams) {
+function ($scope, $stateParams,alterarSenha,$cordovaNetwork,$ionicLoading,$ionicPopup,$ionicHistory,LOCAL_STORAGE) {
+
+    $scope.dadosUsuario = JSON.parse(window.localStorage.getItem(LOCAL_STORAGE.local_dados_key));
+
+    $scope.alterarSenhaUsuario = function (form,data) {
+
+        if(form.$valid) {  
+
+            if(data.novaSenha == data.confirmaSenha) {                
+
+                var dados = {usuario: $scope.dadosUsuario.cpf, 
+                            senha_atual: data.senhaAtual,
+                            nova_senha: data.novaSenha,                       
+
+                };
+                    if ($cordovaNetwork.isOnline()) {
+                        
+                        $ionicLoading.show({template: 'Alterando...'}).then(function () {
+                        
+                            alterarSenha.alterar(dados).then(function (retorno) {  
+
+                                if(retorno.data.result == true){
+
+                                    var alertPopup = $ionicPopup.alert({
+                                        title: retorno.data.data.mensagem,                                       
+                                        okText: 'Ok', // String (default: 'OK'). The text of the OK button.
+                                        okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+                                    });
+
+                                    alertPopup.then(function (res) {
+                                    
+                                        $backView = $ionicHistory.backView();
+                                        $backView.go();
+
+                                    });
+
+                                }else if (retorno.data.result == false){
+
+                                     var alertPopup = $ionicPopup.alert({
+                                        title: retorno.data.data.mensagem,                                       
+                                        okText: 'Ok', // String (default: 'OK'). The text of the OK button.
+                                        okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+                                    });
+                                } 
+                            
+                            }).finally(function () {
+                                //em qualquer caso remove o spinner de loading
+                                $ionicLoading.hide();                       
+                            
+                            });
+                        });
+
+                    }else{
+                    var alertPopup = $ionicPopup.alert({
+                            title: 'Não foi possível alterar senha.',
+                            template: 'Verifique sua conexão com ineternet.',
+                            okText: 'Ok', // String (default: 'OK'). The text of the OK button.
+                            okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+                        });
+
+                        alertPopup.then(function (res) {
+                          
+                            $backView = $ionicHistory.backView();
+                            $backView.go();
+
+                        });
+                    }   
+            }else{
+
+                var alertPopup = $ionicPopup.alert({
+                            title:  'ATENÇÃO!',      
+                            template: 'As novas senhas não conferem.',                 
+                            okText: 'Ok', // String (default: 'OK'). The text of the OK button.
+                            okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+                });
+            }
+       
+        }
+    };
 
 
 }])

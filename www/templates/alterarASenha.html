@@ -2,18 +2,21 @@
   <ion-content padding="true" class="has-header">
     <h2 id="alterarASenha-heading3" style="color:#821723;font-weight:300;">Redefinir a senha</h2>
     <hr class="hr-topoPagina">
-    <form id="alterarASenha-form4" class="list">
+    <form name="alterarSenhaForm" ng-submit="alterarSenhaUsuario(alterarSenhaForm,data)" id="alterarASenha-form4" class="list">
       <h5 id="alterarASenha-heading4" style="color:#821723;">Insira as informações</h5>
-      <label class="item item-input" id="alterarASenha-input7" name="txtSenhaAtual">
-        <input type="password" placeholder="Senha Atual">
+      <label class="item item-input" id="alterarASenha-input7"  ng-class="{ 'has-error' : alterarSenhaForm.txtSenhaAtual.$invalid, 'has-no-error' : alterarSenhaForm.txtSenhaAtual.$valid}">
+        <input name="txtSenhaAtual" type="password" placeholder="Senha Atual" ng-model="data.senhaAtual" required>
       </label>
-      <label class="item item-input" id="alterarASenha-input8" name="txtNovaSenha">
-        <input type="password" placeholder="Nova Senha">
+       <div class="form-errors" ng-messages="alterarSenhaForm.txtSenhaAtual.$error" ng-messages-include="templates/form-errors.html"></div> 
+      <label class="item item-input" id="alterarASenha-input8" ng-class="{ 'has-error' : alterarSenhaForm.txtNovaSenha.$invalid, 'has-no-error' : alterarSenhaForm.txtNovaSenha.$valid}">
+        <input name="txtNovaSenha" type="password" placeholder="Nova Senha" ng-model="data.novaSenha" required>
       </label>
-      <label class="item item-input" id="alterarASenha-input9" name="txtConfirmaSenha">
-        <input type="password" placeholder="Confirmar a nova senha">
+       <div class="form-errors" ng-messages="alterarSenhaForm.txtNovaSenha.$error" ng-messages-include="templates/form-errors.html"></div> 
+      <label class="item item-input" id="alterarASenha-input9" ng-class="{ 'has-error' : alterarSenhaForm.txtConfirmaSenha.$invalid, 'has-no-error' : alterarSenhaForm.txtConfirmaSenha.$valid}">
+        <input name="txtConfirmaSenha" type="password" placeholder="Confirmar a nova senha" ng-model="data.confirmaSenha" required>
       </label>
-      <button id="alterarASenha-button6" class="button button-assertive  button-block">Alterar a senha</button>
+      <div class="form-errors" ng-messages="alterarSenhaForm.txtConfirmaSenha.$error" ng-messages-include="templates/form-errors.html"></div> 
+      <button id="alterarASenha-button6" class="button button-assertive  button-block" type="submit">Alterar a senha</button>
     </form>
   </ion-content>
 </ion-view>

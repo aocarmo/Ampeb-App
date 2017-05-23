@@ -974,4 +974,19 @@ angular.module('app.services', [])
         }
     };
 
+}])//Serviços para o modulo de alteracao de senha
+.service('alterarSenha', ['$http', '$q', 'WEB_METODOS','$httpParamSerializerJQLike',  function ($http, $q, WEB_METODOS,$httpParamSerializerJQLike) {
+
+     return {
+
+        alterar: function (data) {
+                                 
+            $http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
+            return $http.post(WEB_METODOS.urlServicosSistema + "?m=alterarSenha", $httpParamSerializerJQLike(data)).then(function (response) {
+                return response;
+            });
+
+        }
+    };
+
 }]);
