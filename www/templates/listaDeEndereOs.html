@@ -8,7 +8,7 @@
     <div class="item item-body" id="listaDeEndereOs-list-item-container3">
       <ion-list id="listaDeEndereOs-list8">
         <ion-item ng-repeat="endereco in enderecos" class="item-icon-left item-icon-right dark" id="listaDeEndereOs-list-item12" ui-sref="endereO({ id_associados_enderecos: endereco.id_associados_enderecos, id_tipo_endereco: endereco.id_tipo_endereco, principal: endereco.principal, descricao_endereco: endereco.descricao_endereco, id_estado: endereco.id_estado, id_municipio: endereco.id_municipio, ponto_de_referencia: endereco.ponto_de_referencia, observacoes: endereco.observacoes, chave_externa: endereco.chave_externa })">
-          <i class="icon {{endereco.icone_tipo_endereco}}"></i>{{endereco.ds_tipo_endereco}}
+          <i class="icon {{endereco.icone_tipo_endereco}} {{endereco.cor_label_endereco}}"></i>{{endereco.ds_tipo_endereco}}
           <i class="icon ion-ios-arrow-right icon-accessory"></i>
           
         </ion-item>      

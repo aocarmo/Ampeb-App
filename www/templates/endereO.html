@@ -8,7 +8,7 @@
         </select>   
       </label>
       <div class="form-errors" ng-messages="enderecoForm.sctTipoEndereco.$error" ng-messages-include="templates/form-errors.html"></div> 
-      <label class="item item-input" id="endereO-input21" ng-class="{ 'has-error' : enderecoForm.txtEnderecoCep.$invalid, 'has-no-error' : enderecoForm.txtEnderecoCep.$valid}">
+      <label class="item item-input item-stacked-label" id="endereO-input21" ng-class="{ 'has-error' : enderecoForm.txtEnderecoCep.$invalid, 'has-no-error' : enderecoForm.txtEnderecoCep.$valid}">
         <span class="input-label">Endereço - CEP</span>
         <input name="txtEnderecoCep" type="text" placeholder="" ng-model="dadosEndereco.descricao_endereco" required>
       </label>
@@ -27,7 +27,7 @@
           </select>                         
       </label>
       <div class="form-errors" ng-messages="enderecoForm.sctCidade.$error" ng-messages-include="templates/form-errors.html"></div>   
-      <label class="item item-input" id="endereO-input20" name="txtPontoReferencia">
+      <label class="item item-input item-stacked-label" id="endereO-input20" name="txtPontoReferencia">
         <span class="input-label">Ponto de Referência</span>
         <input type="text" placeholder="" ng-model="dadosEndereco.ponto_de_referencia">
       </label>
@@ -35,5 +35,9 @@
   
       <button id="endereO-button10" class="button button-assertive  button-block" type="submit">Salvar</button>
     </form>
+     <hr class="hr-topoPagina">
+    <div id="notCia-markdown5" style="text-align:justify;" class="show-list-numbers-and-dots">
+      <p style="color:#454545;font-size:18px;">Endereço principal será usado para envio de correspondências da AMPEB.</p>
+    </div>
   </ion-content>
 </ion-view>

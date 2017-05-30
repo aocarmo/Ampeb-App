@@ -856,12 +856,18 @@ function ($scope, $stateParams, $ionicLoading,$ionicPopup,$cordovaNetwork,LOCAL_
             }).then(function () {
 
                 getDadosEnderecoAssociado.obter(data).then(function (dadosEnderecos) {
-                 
+                   
                     $scope.enderecos = dadosEnderecos.data.data;
-
-                   //Definindo os icones que serão apresentados de acordo com o tipo de endereço 
+                     
+                   //Definindo os icones e cores que serão apresentados de acordo com o tipo de endereço 
                     for (var i = 0; i < $scope.enderecos.length; i++) {
-
+                        //Tratamento para exibir a cor verde.
+                        if($scope.enderecos[i].principal == "S"){
+                             $scope.enderecos[i].cor_label_endereco = "balanced";
+                        }else{
+                              $scope.enderecos[i].cor_label_endereco = "dark";
+                        }
+                        //Tratamento para exibir os icone rescpectivos de cada endereço.
                         if ($scope.enderecos[i].id_tipo_endereco == 1){
 
                             $scope.enderecos[i].icone_tipo_endereco = "ion-ios-home";
@@ -1487,7 +1493,6 @@ function ($scope, $stateParams,getTipoConvenioService,$ionicLoading,getMunicipio
 
                             }else{
                                 $scope.tiposConvenio[i].display = "block";
-                   ;
                             }
 
                         }else{
