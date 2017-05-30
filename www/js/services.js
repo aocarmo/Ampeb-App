@@ -263,45 +263,64 @@ angular.module('app.services', [])
 .service('obterNoticiasService', ['$http', '$q', 'WEB_METODOS', 'noticiasFactory',  function ($http, $q, WEB_METODOS, noticiasFactory) {
 
          // sempre dispara o servi�o pra checar dados mais recentes
-         var listaPost =   $http.get(WEB_METODOS.urlServicosPortalNoticias).then(function (response) {
+         var listaPost =   $http.get(WEB_METODOS.urlServicosPortal + "?taxonomies=noticias").then(function (response) {
+               
+                //Lendo todas as noticias
                 
-                //Retorno da lista de noticias para serem exibidas
-                var deferred = $q.defer();
-                //Id das noticias que não serão excluidas                          
                 var idNoticias = [];
-                //Array de objetos de noticias
-                var arrNoticias = [];
-                //Objeto noticia
-                var noticia = {};
-                //Variaveis que receberão dados de categoria e url de imagem do post
-                var dsCategoria = "";
-                var dsUrlImagem = "";
-
-                //Montando o objeto noticia com os dados disponiveis no primeiro JSON retornado.
                 for (var i = 0; i < response.data.length; i++) {
-                                     
-                    var dsNoticia = "";                  
+
+                    var dsNoticia = "";
+                    var dsCategoria = "";
+                    var dsUrlImagem = "";
                     var dsTitulo = "";
                     var dtNoticiaBD = "";
                     var dtNoticia = "";
-                    var categorias = [];                
-                                 
-                    //Validação de titulo
-                    if (response.data[i].title != null) {
-                        if (response.data[i].title.rendered != null) {
-                             dsTitulo = response.data[i].title.rendered;
-                        }                       
+                    var categorias = [];
+                    
+                         //Valida��o de categoria
+                    if (response.data[i].terms != null) {
+
+                        if (response.data[i].terms.category != null) {
+
+                            if(response.data[i].terms.category.length == 1){
+
+                                if (response.data[i].terms.category[0].name != null) {
+                                    dsCategoria = response.data[i].terms.category[0].name;
+                                }
+
+                            }else if(response.data[i].terms.category.length > 1){
+
+                                for (var j = 0; j < response.data[i].terms.category.length; j++) {
+
+                                    if (response.data[i].terms.category[j].name != null) {
+                                        categorias.push(response.data[i].terms.category[j].name);
+                                    }
+                                }
+
+                                var evento = categorias.indexOf("Próximos Eventos");
+
+                                if(evento > -1){
+                                    dsCategoria = categorias[evento];
+                                }else{
+                                    dsCategoria = categorias[0];
+                                }
+
+                            }
+                        }
                     }
+                    
                    
+                    //Valida��o de titulo
+                    if (response.data[i].title != null) {
+                        dsTitulo = response.data[i].title;
+                    }
+
                     //Valida��o da descri��o
                     if (response.data[i].content != null) {
-
-                        if (response.data[i].content.rendered != null) {
-                            dsNoticia = response.data[i].content.rendered.replace(/(<([^>]+)>)/ig, "");
-                        }
-                       
+                        dsNoticia = response.data[i].content.replace(/(<([^>]+)>)/ig, "");
                     }
-                           
+
                     //Valida��o da data
                     if (response.data[i].date != null) {
                         dtNoticiaBD = response.data[i].date;
@@ -311,162 +330,59 @@ angular.module('app.services', [])
                         dtNoticia = dataNoticia[2] + "-" + dataNoticia[1] + "-" + dataNoticia[0] + " " + dataNoticiaArray[1];
                         
                     }
-                    //Variaveis criadas para receber valores da feature_media caso tenha imagens no post
-                    var url_service_featured_media = "";
-                    var id_feature_media= 0;
-
-                    //Testando se existe imagens para setar a url da feature media
-                    if(response.data[i].featured_media > 0){
-                        url_service_featured_media = WEB_METODOS.urlServicosPortalMedia+response.data[i].featured_media;
-                        id_feature_media = response.data[i].featured_media;
-                    }
-
-                    noticia = { idNoticiaInserir: response.data[i].id, 
-                                dsCategoriaInserir: WEB_METODOS.urlServicosPortalCategoria+response.data[i].id, 
-                                dsTituloInserir: dsTitulo,
-                                dsNoticiaInserir: dsNoticia, 
-                                dtNoticiaBDInserir: dtNoticiaBD, 
-                                dsUrlImagemInserir: url_service_featured_media,
-                                featuredMedia: id_feature_media
-                            };
-
-                    arrNoticias.push(noticia);                   
-
-                }
-                
-                //Buscando as categorias e imagem da noticia.
-                var promisesUrlImagem = [];
-                var promisesCategoria = [];
-                var promissesInserir = [];
-
-                //Montagem das requisições sincronas para obter categorias e imagens
-                for(var i = 0; i < arrNoticias.length; i++) {
-                    //So cria promisses para os post que tem imagem
-                    if(arrNoticias[i].dsUrlImagemInserir != ""){
-                        var promiseUrlImagem = $http.get(arrNoticias[i].dsUrlImagemInserir);
-                        promisesUrlImagem.push(promiseUrlImagem);
-                    }                    
-
-                    var promiseCategoria = $http.get(arrNoticias[i].dsCategoriaInserir);
-                    promisesCategoria.push(promiseCategoria);
-
-                }
-
-                //Chamada do primeiro conjunto de requisições sincronas para obter as url de imagens
-                $q.all(promisesUrlImagem).then(function(resultUrlImagem){
-                       
-                    //Tratando o retorno e populando o arr de noticias com as url de imagens para cada noticia
-                    for(var i = 0; i < resultUrlImagem.length; i++) {  
-
-                         if (resultUrlImagem[i].data != null) {                             
-                            if (resultUrlImagem[i].data.media_details != null) {
-                                if (resultUrlImagem[i].data.media_details.sizes != null) {
-                                    if (resultUrlImagem[i].data.media_details.sizes.medium != null) {
-                                        if (resultUrlImagem[i].data.media_details.sizes.medium.source_url != null) {                                         
-                                             dsUrlImagem = resultUrlImagem[i].data.media_details.sizes.medium.source_url;                                         
-                                        }
+                    //Valida��o da url da imagem
+                    if (response.data[i].featured_image != null) {
+                        if (response.data[i].featured_image.attachment_meta != null) {
+                            if (response.data[i].featured_image.attachment_meta.sizes != null) {
+                                if (response.data[i].featured_image.attachment_meta.sizes.medium != null) {
+                                    if (response.data[i].featured_image.attachment_meta.sizes.medium.url != null) {
+                                        dsUrlImagem = response.data[i].featured_image.attachment_meta.sizes.medium.url;
                                     }
                                 }
                             }
-                        }    
-
-                        for(var j = 0; j < arrNoticias.length; j++) {  
-
-                            if(arrNoticias[j].featuredMedia == resultUrlImagem[i].data.id){
-                                 arrNoticias[j].dsUrlImagemInserir = dsUrlImagem;
-                            }
-                            
                         }
-                          
                     }
-               
-                    //Chamada do segundo conjunto de requisições sincronas para obter as categorias
-                    $q.all(promisesCategoria).then(function(result){
 
-                        //Tratando o retorno e populando o arr de noticias com as categorias                    
-                        for(var i = 0; i < result.length; i++) {
-
-                            if (result[i].data != null) {
-
-                               // if(result[i].data.length == 1){
-
-                                    if (result[i].data[0].name != null) {
-                                      
-                                       dsCategoria = result[i].data[0].name;
-                                    }
-
-                               /* }else if(result[i].data.length > 1){
-
-                                    for (var j = 0; j < result[i].data.length; j++) {
-
-                                        if (result[i].data[j].name != null) {
-                                            categorias.push(result[i].data[j].name);
-                                        }
-                                    }
-
-                                    var evento = categorias.indexOf("Próximos Eventos");
-
-                                    if(evento > -1){
-                                        dsCategoria = categorias[evento];
-                                    }else{
-                                        dsCategoria = categorias[0];
-                                    }
-
-                                }*/
-                            }
-                           
-                           arrNoticias[i].dsCategoriaInserir = dsCategoria;                            
-
-                        }     
-                        
-                        //Montagem das requisições sincronas para inserir as noticias
-                        for (var j = 0; j < arrNoticias.length; j++) {
-                             //Tratamento para não exibir eventos em noticias
-                            if(arrNoticias[j].dsCategoriaInserir != "Próximos Eventos"){
-
-                                var promiseInserir = noticiasFactory.insert(arrNoticias[j].idNoticiaInserir, arrNoticias[j].dsCategoriaInserir, arrNoticias[j].dsTituloInserir, arrNoticias[j].dsNoticiaInserir,  arrNoticias[j].dtNoticiaBDInserir, arrNoticias[j].dsUrlImagemInserir, 0);
-                                promissesInserir.push(promiseInserir);
-                                //Pegando os id das noticias que não serão excluidas
-                                idNoticias.push(arrNoticias[j].idNoticiaInserir);                            
-                           
-                            }
-                        }    
-                        //Chamada do terceiro conjunto de requisições sincronas para inserir as noticias
-                        $q.all(promissesInserir).then(function(resultInserir){
-                            
-                           //Excluindo do banco noticias que não estão mais disponiveis no servico
-                            var noticiasExcluir =  noticiasFactory.deleteNoticias(idNoticias.join()).then(function (noticiasExcluirRetorno) {    
-                                return noticiasExcluirRetorno;
-                            });                                          
-
-                            var retornoNoticiasExibir = [];
-                            
-                            //Executando a exclusão das noticias
-                            $q.all([noticiasExcluir]).then(function(result){
-
-                                for (var i = 0; i < result.length; i++){
-                                    retornoNoticiasExibir.push(result[i]);
-                                }
-
-                                if(retornoNoticiasExibir[0][0].retorno == 1){
-                                    //Após excluídas as noticias, seleciona as noticias salvas no banco
-                                    noticiasFactory.selectListaNoticias().then(function (dadosOnline) {
-                    
-                                        deferred.resolve(dadosOnline);
-                                    });
-                            
-                                }
-                                
-                            }); 
-                           
-                        });         
-
-                    });
+                    //Tratamento para não exibir eventos em noticias
+                    if(dsCategoria != "Próximos Eventos"){
+                        noticiasFactory.insert(response.data[i].ID, dsCategoria, dsTitulo, dsNoticia, dtNoticiaBD, dsUrlImagem, 0);
                      
-                });
-              //Retorno das noticias salvas
-              return deferred.promise;
-             
+                        //Pegando os id das noticias que não serão excluidas
+                        idNoticias.push(response.data[i].ID);
+                    }
+                  
+                }
+                     
+                    var deferred = $q.defer();
+
+                    //Excluindo do banco noticias que não estão mais disponiveis no servico
+                    var noticiasExcluir =  noticiasFactory.deleteNoticias(idNoticias.join()).then(function (noticiasExcluirRetorno) {    
+                        return noticiasExcluirRetorno;
+                    });                                          
+
+                    var retornoNoticiasExibir = [];
+                    
+                    //Executando a exclusão das noticias
+                    $q.all([noticiasExcluir]).then(function(result){
+
+                        for (var i = 0; i < result.length; i++){
+                            retornoNoticiasExibir.push(result[i]);
+                        }
+
+                        if(retornoNoticiasExibir[0][0].retorno == 1){
+                            //Após excluídas as noticias, seleciona as noticias salvas no banco
+                            noticiasFactory.selectListaNoticias().then(function (dadosOnline) {
+            
+                                deferred.resolve(dadosOnline);
+                            });
+                    
+                        }
+                        
+                    });          
+
+                return deferred.promise;
+
+               
             });
              
           
@@ -482,45 +398,63 @@ angular.module('app.services', [])
     return {
         obterNoticiasOnlineRefresh: function () {
           
-            return $http.get(WEB_METODOS.urlServicosPortalNoticias).then(function (response) {
+         return  $http.get(WEB_METODOS.urlServicosPortal + "?taxonomies=noticias").then(function (response) {
                
-                //Retorno da lista de noticias para serem exibidas
-                var deferred = $q.defer();
-                //Id das noticias que não serão excluidas                          
+                //Lendo todas as noticias
                 var idNoticias = [];
-                //Array de objetos de noticias
-                var arrNoticias = [];
-                //Objeto noticia
-                var noticia = {};
-                //Variaveis que receberão dados de categoria e url de imagem do post
-                var dsCategoria = "";
-                var dsUrlImagem = "";
-
-                //Montando o objeto noticia com os dados disponiveis no primeiro JSON retornado.
                 for (var i = 0; i < response.data.length; i++) {
-                                     
-                    var dsNoticia = "";                  
+
+                    var dsNoticia = "";
+                    var dsCategoria = "";
+                    var dsUrlImagem = "";
                     var dsTitulo = "";
                     var dtNoticiaBD = "";
                     var dtNoticia = "";
-                    var categorias = [];                
-                                 
-                    //Validação de titulo
-                    if (response.data[i].title != null) {
-                        if (response.data[i].title.rendered != null) {
-                             dsTitulo = response.data[i].title.rendered;
-                        }                       
+                    var categorias = [];
+                    
+                         //Valida��o de categoria
+                    if (response.data[i].terms != null) {
+
+                        if (response.data[i].terms.category != null) {
+
+                            if(response.data[i].terms.category.length == 1){
+
+                                if (response.data[i].terms.category[0].name != null) {
+                                    dsCategoria = response.data[i].terms.category[0].name;
+                                }
+
+                            }else if(response.data[i].terms.category.length > 1){
+
+                                for (var j = 0; j < response.data[i].terms.category.length; j++) {
+
+                                    if (response.data[i].terms.category[j].name != null) {
+                                        categorias.push(response.data[i].terms.category[j].name);
+                                    }
+                                }
+
+                                var evento = categorias.indexOf("Próximos Eventos");
+
+                                if(evento > -1){
+                                    dsCategoria = categorias[evento];
+                                }else{
+                                    dsCategoria = categorias[0];
+                                }
+
+                            }
+                        }
                     }
+                    
                    
+                    //Valida��o de titulo
+                    if (response.data[i].title != null) {
+                        dsTitulo = response.data[i].title;
+                    }
+
                     //Valida��o da descri��o
                     if (response.data[i].content != null) {
-
-                        if (response.data[i].content.rendered != null) {
-                            dsNoticia = response.data[i].content.rendered.replace(/(<([^>]+)>)/ig, "");
-                        }
-                       
+                        dsNoticia = response.data[i].content.replace(/(<([^>]+)>)/ig, "");
                     }
-                           
+
                     //Valida��o da data
                     if (response.data[i].date != null) {
                         dtNoticiaBD = response.data[i].date;
@@ -530,162 +464,58 @@ angular.module('app.services', [])
                         dtNoticia = dataNoticia[2] + "-" + dataNoticia[1] + "-" + dataNoticia[0] + " " + dataNoticiaArray[1];
                         
                     }
-                    //Variaveis criadas para receber valores da feature_media caso tenha imagens no post
-                    var url_service_featured_media = "";
-                    var id_feature_media= 0;
-
-                    //Testando se existe imagens para setar a url da feature media
-                    if(response.data[i].featured_media > 0){
-                        url_service_featured_media = WEB_METODOS.urlServicosPortalMedia+response.data[i].featured_media;
-                        id_feature_media = response.data[i].featured_media;
-                    }
-
-                    noticia = { idNoticiaInserir: response.data[i].id, 
-                                dsCategoriaInserir: WEB_METODOS.urlServicosPortalCategoria+response.data[i].id, 
-                                dsTituloInserir: dsTitulo,
-                                dsNoticiaInserir: dsNoticia, 
-                                dtNoticiaBDInserir: dtNoticiaBD, 
-                                dsUrlImagemInserir: url_service_featured_media,
-                                featuredMedia: id_feature_media
-                            };
-
-                    arrNoticias.push(noticia);                   
-
-                }
-                
-                //Buscando as categorias e imagem da noticia.
-                var promisesUrlImagem = [];
-                var promisesCategoria = [];
-                var promissesInserir = [];
-
-                //Montagem das requisições sincronas para obter categorias e imagens
-                for(var i = 0; i < arrNoticias.length; i++) {
-                    //So cria promisses para os post que tem imagem
-                    if(arrNoticias[i].dsUrlImagemInserir != ""){
-                        var promiseUrlImagem = $http.get(arrNoticias[i].dsUrlImagemInserir);
-                        promisesUrlImagem.push(promiseUrlImagem);
-                    }                    
-
-                    var promiseCategoria = $http.get(arrNoticias[i].dsCategoriaInserir);
-                    promisesCategoria.push(promiseCategoria);
-
-                }
-                
-                //Chamada do primeiro conjunto de requisições sincronas para obter as url de imagens
-                $q.all(promisesUrlImagem).then(function(resultUrlImagem){
-                       
-                    //Tratando o retorno e populando o arr de noticias com as url de imagens para cada noticia
-                    for(var i = 0; i < resultUrlImagem.length; i++) {  
-
-                         if (resultUrlImagem[i].data != null) {                             
-                            if (resultUrlImagem[i].data.media_details != null) {
-                                if (resultUrlImagem[i].data.media_details.sizes != null) {
-                                    if (resultUrlImagem[i].data.media_details.sizes.medium != null) {
-                                        if (resultUrlImagem[i].data.media_details.sizes.medium.source_url != null) {                                         
-                                             dsUrlImagem = resultUrlImagem[i].data.media_details.sizes.medium.source_url;                                         
-                                        }
+                    //Valida��o da url da imagem
+                    if (response.data[i].featured_image != null) {
+                        if (response.data[i].featured_image.attachment_meta != null) {
+                            if (response.data[i].featured_image.attachment_meta.sizes != null) {
+                                if (response.data[i].featured_image.attachment_meta.sizes.medium != null) {
+                                    if (response.data[i].featured_image.attachment_meta.sizes.medium.url != null) {
+                                        dsUrlImagem = response.data[i].featured_image.attachment_meta.sizes.medium.url;
                                     }
                                 }
                             }
-                        }    
-
-                        for(var j = 0; j < arrNoticias.length; j++) {  
-
-                            if(arrNoticias[j].featuredMedia == resultUrlImagem[i].data.id){
-                                 arrNoticias[j].dsUrlImagemInserir = dsUrlImagem;
-                            }
-                            
                         }
-                          
                     }
+
+                    //Tratamento para não exibir eventos em noticias
+                    if(dsCategoria != "Próximos Eventos"){
+                        noticiasFactory.insert(response.data[i].ID, dsCategoria, dsTitulo, dsNoticia, dtNoticiaBD, dsUrlImagem, 0);
+
+                        //Pegando os id das noticias que não serão excluidas
+                        idNoticias.push(response.data[i].ID);
+
+                    }
+                   
+                }
                
-                    //Chamada do segundo conjunto de requisições sincronas para obter as categorias
-                    $q.all(promisesCategoria).then(function(result){
+                 var deferred = $q.defer();
 
-                        //Tratando o retorno e populando o arr de noticias com as categorias                    
-                        for(var i = 0; i < result.length; i++) {
+                    //Excluindo do banco noticias que não estão mais disponiveis no servico
+                    var noticiasExcluir =  noticiasFactory.deleteNoticias(idNoticias.join()).then(function (noticiasExcluirRetorno) {    
+                        return noticiasExcluirRetorno;
+                    });                                          
 
-                            if (result[i].data != null) {
-
-                                //if(result[i].data.length == 1){
-
-                                    if (result[i].data[0].name != null) {
-                                      
-                                       dsCategoria = result[i].data[0].name;
-                                    }
-
-                                /*}else if(result[i].data.length > 1){
-
-                                    for (var j = 0; j < result[i].data.length; j++) {
-
-                                        if (result[i].data[j].name != null) {
-                                            categorias.push(result[i].data[j].name);
-                                        }
-                                    }
-
-                                    var evento = categorias.indexOf("Próximos Eventos");
-
-                                    if(evento > -1){
-                                        dsCategoria = categorias[evento];
-                                    }else{
-                                        dsCategoria = categorias[0];
-                                    }
-
-                                }*/
-                            }
-                           
-                           arrNoticias[i].dsCategoriaInserir = dsCategoria;                            
-
-                        }     
-                        
-                        //Montagem das requisições sincronas para inserir as noticias
-                        for (var j = 0; j < arrNoticias.length; j++) {
-                             //Tratamento para não exibir eventos em noticias
-                            if(arrNoticias[j].dsCategoriaInserir != "Próximos Eventos"){
-
-                                var promiseInserir = noticiasFactory.insert(arrNoticias[j].idNoticiaInserir, arrNoticias[j].dsCategoriaInserir, arrNoticias[j].dsTituloInserir, arrNoticias[j].dsNoticiaInserir,  arrNoticias[j].dtNoticiaBDInserir, arrNoticias[j].dsUrlImagemInserir, 0);
-                                promissesInserir.push(promiseInserir);
-                                //Pegando os id das noticias que não serão excluidas
-                                idNoticias.push(arrNoticias[j].idNoticiaInserir);                            
-                           
-                            }
-                        }    
-                        //Chamada do terceiro conjunto de requisições sincronas para inserir as noticias
-                        $q.all(promissesInserir).then(function(resultInserir){
-                            
-                           //Excluindo do banco noticias que não estão mais disponiveis no servico
-                            var noticiasExcluir =  noticiasFactory.deleteNoticias(idNoticias.join()).then(function (noticiasExcluirRetorno) {    
-                                return noticiasExcluirRetorno;
-                            });                                          
-
-                            var retornoNoticiasExibir = [];
-                            
-                            //Executando a exclusão das noticias
-                            $q.all([noticiasExcluir]).then(function(result){
-
-                                for (var i = 0; i < result.length; i++){
-                                    retornoNoticiasExibir.push(result[i]);
-                                }
-
-                                if(retornoNoticiasExibir[0][0].retorno == 1){
-                                    //Após excluídas as noticias, seleciona as noticias salvas no banco
-                                    noticiasFactory.selectListaNoticias().then(function (dadosOnline) {
+                    var retornoNoticiasExibir = [];
                     
-                                        deferred.resolve(dadosOnline);
-                                    });
-                            
-                                }
-                                
-                            }); 
-                           
-                        });         
+                    //Executando a exclusão das noticias
+                    $q.all([noticiasExcluir]).then(function(result){
 
-                    });
-                     
-                });
-              //Retorno das noticias salvas
-              return deferred.promise;
-             
+                        for (var i = 0; i < result.length; i++){
+                            retornoNoticiasExibir.push(result[i]);
+                        }
+
+                        if(retornoNoticiasExibir[0][0].retorno == 1){
+                            //Após excluídas as noticias, seleciona as noticias salvas no banco
+                            noticiasFactory.selectListaNoticias().then(function (dadosOnline) {
+            
+                                deferred.resolve(dadosOnline);
+                            });
+                    
+                        }
+                        
+                    });          
+
+                return deferred.promise;
             });
 
         }
@@ -696,45 +526,64 @@ angular.module('app.services', [])
 .service('obterEventosService', ['$http', '$q', 'WEB_METODOS', 'eventosFactory',  function ($http, $q, WEB_METODOS, eventosFactory) {
 
       // sempre dispara o servi�o pra checar dados mais recentes
-         var listaPost =   $http.get(WEB_METODOS.urlServicosPortalEventos).then(function (response) {
+         var listaPost =   $http.get(WEB_METODOS.urlServicosPortal + "?taxonomies=noticias").then(function (response) {
                
-                //Retorno da lista de noticias para serem exibidas
-                var deferred = $q.defer();
-                //Id das noticias que não serão excluidas                          
-                var idNoticias = [];
-                //Array de objetos de noticias
-                var arrNoticias = [];
-                //Objeto noticia
-                var noticia = {};
-                //Variaveis que receberão dados de categoria e url de imagem do post
-                var dsCategoria = "";
-                var dsUrlImagem = "";
-
-                //Montando o objeto noticia com os dados disponiveis no primeiro JSON retornado.
+                //Lendo todas as noticias
+                var idEventos = [];                
+                    
                 for (var i = 0; i < response.data.length; i++) {
-                                     
-                    var dsNoticia = "";                  
+
+                    var dsNoticia = "";
+                    var dsCategoria = "";
+                    var dsUrlImagem = "";
                     var dsTitulo = "";
                     var dtNoticiaBD = "";
                     var dtNoticia = "";
-                    var categorias = [];                
-                                 
-                    //Validação de titulo
-                    if (response.data[i].title != null) {
-                        if (response.data[i].title.rendered != null) {
-                             dsTitulo = response.data[i].title.rendered;
-                        }                       
+                    var categorias = [];
+                    
+                         //Valida��o de categoria
+                    if (response.data[i].terms != null) {
+
+                        if (response.data[i].terms.category != null) {
+
+                            if(response.data[i].terms.category.length == 1){
+
+                                if (response.data[i].terms.category[0].name != null) {
+                                    dsCategoria = response.data[i].terms.category[0].name;
+                                }
+
+                            }else if(response.data[i].terms.category.length > 1){
+
+                                for (var j = 0; j < response.data[i].terms.category.length; j++) {
+
+                                    if (response.data[i].terms.category[j].name != null) {
+                                        categorias.push(response.data[i].terms.category[j].name);
+                                    }
+                                }
+
+                                var evento = categorias.indexOf("Próximos Eventos");
+
+                                if(evento > -1){
+                                    dsCategoria = categorias[evento];
+                                }else{
+                                    dsCategoria = categorias[0];
+                                }
+
+                            }
+                        }
                     }
+                    
                    
+                    //Valida��o de titulo
+                    if (response.data[i].title != null) {
+                        dsTitulo = response.data[i].title;
+                    }
+
                     //Valida��o da descri��o
                     if (response.data[i].content != null) {
-
-                        if (response.data[i].content.rendered != null) {
-                            dsNoticia = response.data[i].content.rendered.replace(/(<([^>]+)>)/ig, "");
-                        }
-                       
+                        dsNoticia = response.data[i].content.replace(/(<([^>]+)>)/ig, "");
                     }
-                           
+
                     //Valida��o da data
                     if (response.data[i].date != null) {
                         dtNoticiaBD = response.data[i].date;
@@ -744,162 +593,59 @@ angular.module('app.services', [])
                         dtNoticia = dataNoticia[2] + "-" + dataNoticia[1] + "-" + dataNoticia[0] + " " + dataNoticiaArray[1];
                         
                     }
-                    //Variaveis criadas para receber valores da feature_media caso tenha imagens no post
-                    var url_service_featured_media = "";
-                    var id_feature_media= 0;
-
-                    //Testando se existe imagens para setar a url da feature media
-                    if(response.data[i].featured_media > 0){
-                        url_service_featured_media = WEB_METODOS.urlServicosPortalMedia+response.data[i].featured_media;
-                        id_feature_media = response.data[i].featured_media;
-                    }
-
-                    noticia = { idNoticiaInserir: response.data[i].id, 
-                                dsCategoriaInserir: WEB_METODOS.urlServicosPortalCategoria+response.data[i].id, 
-                                dsTituloInserir: dsTitulo,
-                                dsNoticiaInserir: dsNoticia, 
-                                dtNoticiaBDInserir: dtNoticiaBD, 
-                                dsUrlImagemInserir: url_service_featured_media,
-                                featuredMedia: id_feature_media
-                            };
-
-                    arrNoticias.push(noticia);                   
-
-                }
-                
-                //Buscando as categorias e imagem da noticia.
-                var promisesUrlImagem = [];
-                var promisesCategoria = [];
-                var promissesInserir = [];
-
-                //Montagem das requisições sincronas para obter categorias e imagens
-                for(var i = 0; i < arrNoticias.length; i++) {
-                    //So cria promisses para os post que tem imagem
-                    if(arrNoticias[i].dsUrlImagemInserir != ""){
-                        var promiseUrlImagem = $http.get(arrNoticias[i].dsUrlImagemInserir);
-                        promisesUrlImagem.push(promiseUrlImagem);
-                    }                    
-
-                    var promiseCategoria = $http.get(arrNoticias[i].dsCategoriaInserir);
-                    promisesCategoria.push(promiseCategoria);
-
-                }
-                
-                //Chamada do primeiro conjunto de requisições sincronas para obter as url de imagens
-                $q.all(promisesUrlImagem).then(function(resultUrlImagem){
-                       
-                    //Tratando o retorno e populando o arr de noticias com as url de imagens para cada noticia
-                    for(var i = 0; i < resultUrlImagem.length; i++) {  
-
-                         if (resultUrlImagem[i].data != null) {                             
-                            if (resultUrlImagem[i].data.media_details != null) {
-                                if (resultUrlImagem[i].data.media_details.sizes != null) {
-                                    if (resultUrlImagem[i].data.media_details.sizes.medium != null) {
-                                        if (resultUrlImagem[i].data.media_details.sizes.medium.source_url != null) {                                         
-                                             dsUrlImagem = resultUrlImagem[i].data.media_details.sizes.medium.source_url;                                         
-                                        }
+                    //Valida��o da url da imagem
+                    if (response.data[i].featured_image != null) {
+                        if (response.data[i].featured_image.attachment_meta != null) {
+                            if (response.data[i].featured_image.attachment_meta.sizes != null) {
+                                if (response.data[i].featured_image.attachment_meta.sizes.medium != null) {
+                                    if (response.data[i].featured_image.attachment_meta.sizes.medium.url != null) {
+                                        dsUrlImagem = response.data[i].featured_image.attachment_meta.sizes.medium.url;
                                     }
                                 }
                             }
-                        }    
-
-                        for(var j = 0; j < arrNoticias.length; j++) {  
-
-                            if(arrNoticias[j].featuredMedia == resultUrlImagem[i].data.id){
-                                 arrNoticias[j].dsUrlImagemInserir = dsUrlImagem;
-                            }
-                            
                         }
-                          
                     }
-               
-                    //Chamada do segundo conjunto de requisições sincronas para obter as categorias
-                    $q.all(promisesCategoria).then(function(result){
 
-                        //Tratando o retorno e populando o arr de noticias com as categorias                    
-                        for(var i = 0; i < result.length; i++) {
-
-                            if (result[i].data != null) {
-
-                                //if(result[i].data.length == 1){
-
-                                    if (result[i].data[0].name != null) {
-                                      
-                                       dsCategoria = result[i].data[0].name;
-                                    }
-
-                               /* }else if(result[i].data.length > 1){
-
-                                    for (var j = 0; j < result[i].data.length; j++) {
-
-                                        if (result[i].data[j].name != null) {
-                                            categorias.push(result[i].data[j].name);
-                                        }
-                                    }
-
-                                    var evento = categorias.indexOf("Próximos Eventos");
-
-                                    if(evento > -1){
-                                        dsCategoria = categorias[evento];
-                                    }else{
-                                        dsCategoria = categorias[0];
-                                    }
-
-                                }*/
-                            }
-                           
-                           arrNoticias[i].dsCategoriaInserir = dsCategoria;                            
-
-                        }     
+                    //Tratamento para não exibir eventos em noticias
+                    if(dsCategoria == "Próximos Eventos"){
+                        eventosFactory.insert(response.data[i].ID, dsCategoria, dsTitulo, dsNoticia, dtNoticiaBD, dsUrlImagem, 0);     
                         
-                        //Montagem das requisições sincronas para inserir as noticias
-                        for (var j = 0; j < arrNoticias.length; j++) {
-                             //Tratamento para não exibir eventos em noticias
-                            if(arrNoticias[j].dsCategoriaInserir == "Próximos Eventos"){
+                        //Pegando os id dos eventos que não serão excluidas
+                        idEventos.push(response.data[i].ID);                 
 
-                                var promiseInserir = eventosFactory.insert(arrNoticias[j].idNoticiaInserir, arrNoticias[j].dsCategoriaInserir, arrNoticias[j].dsTituloInserir, arrNoticias[j].dsNoticiaInserir,  arrNoticias[j].dtNoticiaBDInserir, arrNoticias[j].dsUrlImagemInserir, 0);
-                                promissesInserir.push(promiseInserir);
-                                //Pegando os id das noticias que não serão excluidas
-                                idNoticias.push(arrNoticias[j].idNoticiaInserir);                            
-                           
-                            }
-                        }    
-                        //Chamada do terceiro conjunto de requisições sincronas para inserir as noticias
-                        $q.all(promissesInserir).then(function(resultInserir){
-                            
-                           //Excluindo do banco noticias que não estão mais disponiveis no servico
-                            var noticiasExcluir =  eventosFactory.deleteEventos(idNoticias.join()).then(function (noticiasExcluirRetorno) {    
-                                return noticiasExcluirRetorno;
-                            });                                          
+                    }
+                        
+                }
 
-                            var retornoNoticiasExibir = [];
-                            
-                            //Executando a exclusão das noticias
-                            $q.all([noticiasExcluir]).then(function(result){
 
-                                for (var i = 0; i < result.length; i++){
-                                    retornoNoticiasExibir.push(result[i]);
-                                }
+                 var deferred = $q.defer();
 
-                                if(retornoNoticiasExibir[0][0].retorno == 1){
-                                    //Após excluídas as noticias, seleciona as noticias salvas no banco
-                                    eventosFactory.selectListaNoticias().then(function (dadosOnline) {
+                    //Excluindo do banco eventos que não estão mais disponiveis no servico
+                    var eventosExcluir =  eventosFactory.deleteEventos(idEventos.join()).then(function (eventosExcluirRetorno) {    
+                        return eventosExcluirRetorno;
+                    });                                          
+
+                    var retornoEventosExibir = [];
                     
-                                        deferred.resolve(dadosOnline);
-                                    });
-                            
-                                }
-                                
-                            }); 
-                           
-                        });         
+                    //Executando a exclusão das noticias
+                    $q.all([eventosExcluir]).then(function(result){
 
-                    });
-                     
-                });
-              //Retorno das noticias salvas
-              return deferred.promise;
-             
+                        for (var i = 0; i < result.length; i++){
+                            retornoEventosExibir.push(result[i]);
+                        }
+
+                        if(retornoEventosExibir[0][0].retorno == 1){
+                            //Após excluídas as noticias, seleciona as noticias salvas no banco
+                            eventosFactory.selectListaNoticias().then(function (dadosOnline) {
+            
+                                deferred.resolve(dadosOnline);
+                            });
+                    
+                        }
+                        
+                    });          
+                    
+                return deferred.promise;
             });
 
 
@@ -916,45 +662,63 @@ angular.module('app.services', [])
     return {
         obterEventosOnlineRefresh: function () {
           
-         return $http.get(WEB_METODOS.urlServicosPortalEventos).then(function (response) {
+         return $http.get(WEB_METODOS.urlServicosPortal + "?taxonomies=noticias").then(function (response) {
                
-                //Retorno da lista de noticias para serem exibidas
-                var deferred = $q.defer();
-                //Id das noticias que não serão excluidas                          
-                var idNoticias = [];
-                //Array de objetos de noticias
-                var arrNoticias = [];
-                //Objeto noticia
-                var noticia = {};
-                //Variaveis que receberão dados de categoria e url de imagem do post
-                var dsCategoria = "";
-                var dsUrlImagem = "";
-
-                //Montando o objeto noticia com os dados disponiveis no primeiro JSON retornado.
+                //Lendo todas as noticias
+                var idEventos = [];      
                 for (var i = 0; i < response.data.length; i++) {
-                                     
-                    var dsNoticia = "";                  
+
+                    var dsNoticia = "";
+                    var dsCategoria = "";
+                    var dsUrlImagem = "";
                     var dsTitulo = "";
                     var dtNoticiaBD = "";
                     var dtNoticia = "";
-                    var categorias = [];                
-                                 
-                    //Validação de titulo
-                    if (response.data[i].title != null) {
-                        if (response.data[i].title.rendered != null) {
-                             dsTitulo = response.data[i].title.rendered;
-                        }                       
+                    var categorias = [];
+                    
+                         //Valida��o de categoria
+                    if (response.data[i].terms != null) {
+
+                        if (response.data[i].terms.category != null) {
+
+                            if(response.data[i].terms.category.length == 1){
+
+                                if (response.data[i].terms.category[0].name != null) {
+                                    dsCategoria = response.data[i].terms.category[0].name;
+                                }
+
+                            }else if(response.data[i].terms.category.length > 1){
+
+                                for (var j = 0; j < response.data[i].terms.category.length; j++) {
+
+                                    if (response.data[i].terms.category[j].name != null) {
+                                        categorias.push(response.data[i].terms.category[j].name);
+                                    }
+                                }
+
+                                var evento = categorias.indexOf("Próximos Eventos");
+
+                                if(evento > -1){
+                                    dsCategoria = categorias[evento];
+                                }else{
+                                    dsCategoria = categorias[0];
+                                }
+
+                            }
+                        }
                     }
+                    
                    
+                    //Valida��o de titulo
+                    if (response.data[i].title != null) {
+                        dsTitulo = response.data[i].title;
+                    }
+
                     //Valida��o da descri��o
                     if (response.data[i].content != null) {
-
-                        if (response.data[i].content.rendered != null) {
-                            dsNoticia = response.data[i].content.rendered.replace(/(<([^>]+)>)/ig, "");
-                        }
-                       
+                        dsNoticia = response.data[i].content.replace(/(<([^>]+)>)/ig, "");
                     }
-                           
+
                     //Valida��o da data
                     if (response.data[i].date != null) {
                         dtNoticiaBD = response.data[i].date;
@@ -964,164 +728,58 @@ angular.module('app.services', [])
                         dtNoticia = dataNoticia[2] + "-" + dataNoticia[1] + "-" + dataNoticia[0] + " " + dataNoticiaArray[1];
                         
                     }
-                    //Variaveis criadas para receber valores da feature_media caso tenha imagens no post
-                    var url_service_featured_media = "";
-                    var id_feature_media= 0;
-
-                    //Testando se existe imagens para setar a url da feature media
-                    if(response.data[i].featured_media > 0){
-                        url_service_featured_media = WEB_METODOS.urlServicosPortalMedia+response.data[i].featured_media;
-                        id_feature_media = response.data[i].featured_media;
-                    }
-
-                    noticia = { idNoticiaInserir: response.data[i].id, 
-                                dsCategoriaInserir: WEB_METODOS.urlServicosPortalCategoria+response.data[i].id, 
-                                dsTituloInserir: dsTitulo,
-                                dsNoticiaInserir: dsNoticia, 
-                                dtNoticiaBDInserir: dtNoticiaBD, 
-                                dsUrlImagemInserir: url_service_featured_media,
-                                featuredMedia: id_feature_media
-                            };
-
-                    arrNoticias.push(noticia);                   
-
-                }
-                
-                //Buscando as categorias e imagem da noticia.
-                var promisesUrlImagem = [];
-                var promisesCategoria = [];
-                var promissesInserir = [];
-
-                //Montagem das requisições sincronas para obter categorias e imagens
-                for(var i = 0; i < arrNoticias.length; i++) {
-                    //So cria promisses para os post que tem imagem
-                    if(arrNoticias[i].dsUrlImagemInserir != ""){
-                        var promiseUrlImagem = $http.get(arrNoticias[i].dsUrlImagemInserir);
-                        promisesUrlImagem.push(promiseUrlImagem);
-                    }                    
-
-                    var promiseCategoria = $http.get(arrNoticias[i].dsCategoriaInserir);
-                    promisesCategoria.push(promiseCategoria);
-
-                }
-                
-                //Chamada do primeiro conjunto de requisições sincronas para obter as url de imagens
-                $q.all(promisesUrlImagem).then(function(resultUrlImagem){
-                       
-                    //Tratando o retorno e populando o arr de noticias com as url de imagens para cada noticia
-                    for(var i = 0; i < resultUrlImagem.length; i++) {  
-
-                         if (resultUrlImagem[i].data != null) {                             
-                            if (resultUrlImagem[i].data.media_details != null) {
-                                if (resultUrlImagem[i].data.media_details.sizes != null) {
-                                    if (resultUrlImagem[i].data.media_details.sizes.medium != null) {
-                                        if (resultUrlImagem[i].data.media_details.sizes.medium.source_url != null) {                                         
-                                             dsUrlImagem = resultUrlImagem[i].data.media_details.sizes.medium.source_url;                                         
-                                        }
+                    //Valida��o da url da imagem
+                    if (response.data[i].featured_image != null) {
+                        if (response.data[i].featured_image.attachment_meta != null) {
+                            if (response.data[i].featured_image.attachment_meta.sizes != null) {
+                                if (response.data[i].featured_image.attachment_meta.sizes.medium != null) {
+                                    if (response.data[i].featured_image.attachment_meta.sizes.medium.url != null) {
+                                        dsUrlImagem = response.data[i].featured_image.attachment_meta.sizes.medium.url;
                                     }
                                 }
                             }
-                        }    
-
-                        for(var j = 0; j < arrNoticias.length; j++) {  
-
-                            if(arrNoticias[j].featuredMedia == resultUrlImagem[i].data.id){
-                                 arrNoticias[j].dsUrlImagemInserir = dsUrlImagem;
-                            }
-                            
                         }
-                          
                     }
-               
-                    //Chamada do segundo conjunto de requisições sincronas para obter as categorias
-                    $q.all(promisesCategoria).then(function(result){
 
-                        //Tratando o retorno e populando o arr de noticias com as categorias                    
-                        for(var i = 0; i < result.length; i++) {
+                    //Tratamento para não exibir eventos em noticias
+                    if(dsCategoria == "Próximos Eventos"){
+                        eventosFactory.insert(response.data[i].ID, dsCategoria, dsTitulo, dsNoticia, dtNoticiaBD, dsUrlImagem, 0);
+                        //Pegando os id dos eventos que não serão excluidas
+                        idEventos.push(response.data[i].ID);        
+                   
+                    }
+                   
+                }
 
-                            if (result[i].data != null) {
+                 var deferred = $q.defer();
 
-                               // if(result[i].data.length == 1){
+                    //Excluindo do banco eventos que não estão mais disponiveis no servico
+                    var eventosExcluir =  eventosFactory.deleteEventos(idEventos.join()).then(function (eventosExcluirRetorno) {    
+                        return eventosExcluirRetorno;
+                    });                                          
 
-                                    if (result[i].data[0].name != null) {
-                                      
-                                       dsCategoria = result[i].data[0].name;
-                                    }
-
-                              /*  }else if(result[i].data.length > 1){
-
-                                    for (var j = 0; j < result[i].data.length; j++) {
-
-                                        if (result[i].data[j].name != null) {
-                                            categorias.push(result[i].data[j].name);
-                                        }
-                                    }
-
-                                    var evento = categorias.indexOf("Próximos Eventos");
-
-                                    if(evento > -1){
-                                        dsCategoria = categorias[evento];
-                                    }else{
-                                        dsCategoria = categorias[0];
-                                    }
-
-                                }*/
-                            }
-                           
-                           arrNoticias[i].dsCategoriaInserir = dsCategoria;                            
-
-                        }     
-                        
-                        //Montagem das requisições sincronas para inserir as noticias
-                        for (var j = 0; j < arrNoticias.length; j++) {
-                             //Tratamento para não exibir eventos em noticias
-                            if(arrNoticias[j].dsCategoriaInserir == "Próximos Eventos"){
-
-                                var promiseInserir = eventosFactory.insert(arrNoticias[j].idNoticiaInserir, arrNoticias[j].dsCategoriaInserir, arrNoticias[j].dsTituloInserir, arrNoticias[j].dsNoticiaInserir,  arrNoticias[j].dtNoticiaBDInserir, arrNoticias[j].dsUrlImagemInserir, 0);
-                                promissesInserir.push(promiseInserir);
-                                //Pegando os id das noticias que não serão excluidas
-                                idNoticias.push(arrNoticias[j].idNoticiaInserir);                            
-                           
-                            }
-                        }    
-                        //Chamada do terceiro conjunto de requisições sincronas para inserir as noticias
-                        $q.all(promissesInserir).then(function(resultInserir){
-                            
-                           //Excluindo do banco noticias que não estão mais disponiveis no servico
-                            var noticiasExcluir =  eventosFactory.deleteEventos(idNoticias.join()).then(function (noticiasExcluirRetorno) {    
-                                return noticiasExcluirRetorno;
-                            });                                          
-
-                            var retornoNoticiasExibir = [];
-                            
-                            //Executando a exclusão das noticias
-                            $q.all([noticiasExcluir]).then(function(result){
-
-                                for (var i = 0; i < result.length; i++){
-                                    retornoNoticiasExibir.push(result[i]);
-                                }
-
-                                if(retornoNoticiasExibir[0][0].retorno == 1){
-                                    //Após excluídas as noticias, seleciona as noticias salvas no banco
-                                    eventosFactory.selectListaNoticias().then(function (dadosOnline) {
+                    var retornoEventosExibir = [];
                     
-                                        deferred.resolve(dadosOnline);
-                                    });
-                            
-                                }
-                                
-                            }); 
-                           
-                        });         
+                    //Executando a exclusão das noticias
+                    $q.all([eventosExcluir]).then(function(result){
 
-                    });
-                     
-                });
-              //Retorno das noticias salvas
-              return deferred.promise;
-             
+                        for (var i = 0; i < result.length; i++){
+                            retornoEventosExibir.push(result[i]);
+                        }
+
+                        if(retornoEventosExibir[0][0].retorno == 1){
+                            //Após excluídas as noticias, seleciona as noticias salvas no banco
+                            eventosFactory.selectListaNoticias().then(function (dadosOnline) {
+            
+                                deferred.resolve(dadosOnline);
+                            });
+                    
+                        }
+                        
+                    });          
+                    
+                return deferred.promise;
             });
-
 
         }
     };
