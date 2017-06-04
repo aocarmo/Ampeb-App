@@ -1,9 +1,9 @@
 ﻿angular.module('app.controllers', [])
   
-.controller('aMPEBCtrl', ['$scope', '$stateParams','$state','$q', '$cordovaCamera','$ionicPopup','LOCAL_STORAGE','$timeout','noticiasFactory','eventosFactory','obterNoticiasService','obterEventosService','obterEventosServiceRefresh','obterNoticiasServiceRefresh','atualizarFotoAssociado','$cordovaNetwork','$ionicLoading','$ionicHistory', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+.controller('aMPEBCtrl', ['$scope', '$stateParams','$state','$q', '$cordovaCamera','$ionicPopup','LOCAL_STORAGE','$timeout','noticiasFactory','eventosFactory','obterNoticiasService','obterEventosService','obterEventosServiceRefresh','obterNoticiasServiceRefresh','atualizarFotoAssociado','$cordovaNetwork','$ionicLoading','$ionicHistory','fiquePorDentroFactory','obterFiquePorDentroService','obterFiquePorDentroServiceRefresh', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $stateParams,$state, $q,$cordovaCamera, $ionicPopup, LOCAL_STORAGE,$timeout,noticiasFactory,eventosFactory,obterNoticiasService,obterEventosService,obterEventosServiceRefresh,obterNoticiasServiceRefresh,atualizarFotoAssociado,$cordovaNetwork,$ionicLoading,$ionicHistory) {
+function ($scope, $stateParams,$state, $q,$cordovaCamera, $ionicPopup, LOCAL_STORAGE,$timeout,noticiasFactory,eventosFactory,obterNoticiasService,obterEventosService,obterEventosServiceRefresh,obterNoticiasServiceRefresh,atualizarFotoAssociado,$cordovaNetwork,$ionicLoading,$ionicHistory,fiquePorDentroFactory,obterFiquePorDentroService,obterFiquePorDentroServiceRefresh) {
     
   
    /***************** Bloco para atualizações de notificações ********************/
@@ -31,16 +31,20 @@ function ($scope, $stateParams,$state, $q,$cordovaCamera, $ionicPopup, LOCAL_STO
           var qtdEventos = eventosFactory.obterQtdEventosNaoLido().then(function (qtdEventoNaoLido) {    
             return qtdEventoNaoLido;
         });   
+
+           var qtdFiquePorDentro= fiquePorDentroFactory.obterQtdNoticiaNaoLida().then(function (qtdFiquePorDentroNaoLido) {    
+            return qtdFiquePorDentroNaoLido;
+        });   
         
         var retornoNotificacoes = [];
 
           //Pega o retorno de forma sincrona do ajax.
-         $q.all([qtdNoticias, qtdEventos]).then(function(result){
+         $q.all([qtdNoticias, qtdEventos, qtdFiquePorDentro]).then(function(result){
             for (var i = 0; i < result.length; i++){
                 retornoNotificacoes.push(result[i]);
             }
-          
-            if(retornoNotificacoes[0] != null && retornoNotificacoes[1] != null){
+       
+            if(retornoNotificacoes[0] != null && retornoNotificacoes[1] != null && retornoNotificacoes[2] != null){
                 //Testa caso o a quantidade seja maior que 0 exibe os itens não lidos.
 
                 if(retornoNotificacoes[0][0].qtdNoticiasNaoLidas > 0){
@@ -54,6 +58,12 @@ function ($scope, $stateParams,$state, $q,$cordovaCamera, $ionicPopup, LOCAL_STO
                     document.getElementById("eventosBadge").textContent=retornoNotificacoes[1][0].qtdEventosNaoLidos;
                 }else{
                     document.getElementById("eventosBadge").textContent="";
+                }
+
+                if(retornoNotificacoes[2][0].qtdFiquePorDentroNaoLidas > 0){
+                    document.getElementById("fiquePorDentroBadge").textContent=retornoNotificacoes[2][0].qtdFiquePorDentroNaoLidas;
+                }else{
+                    document.getElementById("fiquePorDentroBadge").textContent="";
                 }
                 
              }
@@ -73,20 +83,25 @@ function ($scope, $stateParams,$state, $q,$cordovaCamera, $ionicPopup, LOCAL_STO
                 var eventos =  obterEventosServiceRefresh.obterEventosOnlineRefresh().then(function (dadosEvento) {
 
                     return dadosEvento;
-                });     
+                }); 
+
+                var fiquePorDentro =  obterFiquePorDentroServiceRefresh.obterNoticiasOnlineRefresh().then(function (dadosFiquePorDentro) {    
+                    return dadosFiquePorDentro;
+                });       
 
                 var retornos = [];
 
-                $q.all([eventos,noticias]).then(function(result){
+                $q.all([eventos,noticias,fiquePorDentro]).then(function(result){
                    
                     for (var i = 0; i < result.length; i++){
                         retornos.push(result[i]);
                     }
                  
-                    if(retornos[0] != null && retornos[1] != null){
+                    if(retornos[0] != null && retornos[1] != null && retornos[2] != null){
                         //Setando a variavel de sessão para informar ao controller de cada tela para buscar a informação atualizada do banco.
-                         window.localStorage.setItem("eventos", true);
-                         window.localStorage.setItem("noticias", true);
+                        window.localStorage.setItem("eventos", true);
+                        window.localStorage.setItem("noticias", true);
+                        window.localStorage.setItem("fiquePordentro", true);
                         $scope.obterNotificacoes();
                     }
                 });
@@ -110,20 +125,24 @@ function ($scope, $stateParams,$state, $q,$cordovaCamera, $ionicPopup, LOCAL_STO
             return dadosEvento;
         });     
 
+        var fiquePorDentro =  obterFiquePorDentroService.obterNoticiasOnline().then(function (dadosFiquePorDentro) {    
+            return dadosFiquePorDentro;
+        });     
+
         var retornos = [];
 
-        $q.all([noticias, eventos]).then(function(result){
+        $q.all([noticias, eventos,fiquePorDentro]).then(function(result){
             for (var i = 0; i < result.length; i++){
                 retornos.push(result[i]);
             }
-             if(retornos[0] != null && retornos[1] != null){
+             if(retornos[0] != null && retornos[1] != null && retornos[2] != null){
                $scope.obterNotificacoes();
              }
         });
 
     }
 
-    //Sempre que entrar na tela inicial busca novos dados.
+    //Sempre que entrar na tela inicial busca novos dados.   
     $scope.atualizarDados();
 
     /***************** Fim do Bloco para atualizações de notificações ********************/
@@ -146,9 +165,15 @@ function ($scope, $stateParams,$state, $q,$cordovaCamera, $ionicPopup, LOCAL_STO
     $scope.logout = function () {
         //Removendo dados da sessão
         window.localStorage.removeItem(LOCAL_STORAGE.local_dados_key);
-        window.localStorage.removeItem(LOCAL_STORAGE.manter_logado);        
+        window.localStorage.removeItem(LOCAL_STORAGE.manter_logado);          
         window.localStorage.removeItem("noticias");
         window.localStorage.removeItem("eventos");
+        window.localStorage.removeItem("fiquePordentro");
+        
+        //Setando o token como vazio para permitir obter as noticias e eventos publicos
+        window.localStorage.setItem(LOCAL_STORAGE.local_token, "");
+        window.localStorage.setItem(LOCAL_STORAGE.tipo_retorno_post, 'publish');
+        window.localStorage.setItem(LOCAL_STORAGE.filtro_retorno_post, '&status=publish');   
         
         $state.go('aMPEBAPP');
     }
@@ -263,11 +288,16 @@ function ($scope, $stateParams,$state, $q,$cordovaCamera, $ionicPopup, LOCAL_STO
 
 
 }])   
-.controller('aMPEBAPPCtrl', ['$scope', '$stateParams', '$state', '$http', '$ionicPopup', '$ionicLoading', 'LoginService','LOCAL_STORAGE','$cordovaNetwork',// The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+.controller('aMPEBAPPCtrl', ['$scope', '$stateParams', '$state', '$http', '$ionicPopup', '$ionicLoading', 'LoginService','LOCAL_STORAGE','$cordovaNetwork','getToken',// The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $stateParams, $state, $http, $ionicPopup, $ionicLoading, LoginService,LOCAL_STORAGE,$cordovaNetwork) {
+function ($scope, $stateParams, $state, $http, $ionicPopup, $ionicLoading, LoginService,LOCAL_STORAGE,$cordovaNetwork,getToken) {
   
+    //Setando o token como vazio para permitir obter as noticias e eventos publicos
+    window.localStorage.setItem(LOCAL_STORAGE.local_token, "");
+    window.localStorage.setItem(LOCAL_STORAGE.tipo_retorno_post, 'publish');
+    window.localStorage.setItem(LOCAL_STORAGE.filtro_retorno_post, '&status=publish');   
+    
     $scope.data = {};    
     var manteLogado =  window.localStorage.getItem(LOCAL_STORAGE.manter_logado);
   
@@ -285,18 +315,35 @@ function ($scope, $stateParams, $state, $http, $ionicPopup, $ionicLoading, Login
                  
                     if (dados.data.result == true) {
 
-                        //Guardando as informações do usuario logado na sessão.
-                        window.localStorage.setItem(LOCAL_STORAGE.local_dados_key, JSON.stringify(dados.data.data));
-                      
-                        if (data.manterConectado == true) {
-                            window.localStorage.setItem(LOCAL_STORAGE.manter_logado, "true");
-                              console.log(data.manterConectado);
-                        }else{
-                            window.localStorage.setItem(LOCAL_STORAGE.manter_logado, "false");
-                              console.log(data.manterConectado);
-                        }              
-                        //Direciona para a tela inicial              
-                        $state.go('aMPEB');
+                        var dadosUsuarioObterToken = {
+                            username: data.usuario,
+                            password: data.senha
+                        };
+
+                        getToken.obter(dadosUsuarioObterToken).then(function (retornoToken){                    
+                            //Guardando as informações do token pra serviços privados.
+                            window.localStorage.setItem(LOCAL_STORAGE.local_token, "Bearer "+retornoToken.data.token);
+                            window.localStorage.setItem(LOCAL_STORAGE.tipo_retorno_post, 'private');
+                            window.localStorage.setItem(LOCAL_STORAGE.filtro_retorno_post, '&status=private,publish');
+
+                            //Guardando as informações do usuario logado na sessão.
+                            window.localStorage.setItem(LOCAL_STORAGE.local_dados_key, JSON.stringify(dados.data.data));
+                        
+                            if (data.manterConectado == true) {
+                                window.localStorage.setItem(LOCAL_STORAGE.manter_logado, "true");
+                                
+                            }else{
+                                window.localStorage.setItem(LOCAL_STORAGE.manter_logado, "false");
+                                
+                            }              
+                            //Direciona para a tela inicial              
+                            $state.go('aMPEB');
+                        }).finally(function () {
+                            //em qualquer caso remove o spinner de loading
+                            $ionicLoading.hide();            
+                            });
+
+                     
                     }else {
                         var alertPopup = $ionicPopup.alert({
                         title: 'Usuário ou senha inválidos!',
@@ -304,9 +351,6 @@ function ($scope, $stateParams, $state, $http, $ionicPopup, $ionicLoading, Login
                         okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
                         });
                     }
-                    }).finally(function () {
-                    //em qualquer caso remove o spinner de loading
-                    $ionicLoading.hide();            
                     });
                 });
             }else{
@@ -320,7 +364,7 @@ function ($scope, $stateParams, $state, $http, $ionicPopup, $ionicLoading, Login
             }
         }
     };
-    
+   
 }])
    
 .controller('notCiasCtrl', ['$scope', '$stateParams', 'obterNoticiasService','noticiasFactory', '$ionicPopup', 'LOCAL_STORAGE', '$ionicLoading','$cordovaNetwork','$ionicHistory', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
@@ -328,6 +372,7 @@ function ($scope, $stateParams, $state, $http, $ionicPopup, $ionicLoading, Login
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
 function ($scope, $stateParams, obterNoticiasService, noticiasFactory, $ionicPopup, LOCAL_STORAGE, $ionicLoading, $cordovaNetwork, $ionicHistory) {
    
+     
     //Verifica se estivar online pega dados via serviço 
     if ($cordovaNetwork.isOnline()) {
         $ionicLoading.show({
@@ -338,7 +383,7 @@ function ($scope, $stateParams, obterNoticiasService, noticiasFactory, $ionicPop
 
             //Caso verdadeiro busca a nova informação do contrario continua em cache
             if(atualizado){
-                noticiasFactory.selectListaNoticias().then(function (dados) {
+                noticiasFactory.selectListaNoticias($stateParams.tipo).then(function (dados) {
                          
                     $scope.listaNoticias = dados;
                     //Marcando noticias ja lidas
@@ -372,7 +417,7 @@ function ($scope, $stateParams, obterNoticiasService, noticiasFactory, $ionicPop
         $ionicLoading.show({
             template: 'Buscando...'
         }).then(function () {
-             noticiasFactory.selectListaNoticias().then(function (dados) {
+             noticiasFactory.selectListaNoticias($stateParams.tipo).then(function (dados) {
              
                 if (dados[0] == null) {
                     var alertPopup = $ionicPopup.alert({
@@ -506,12 +551,95 @@ function ($scope, $stateParams,obterEventosService, $ionicPopup, LOCAL_STORAGE, 
 
 }])
    
-.controller('meuMuralCtrl', ['$scope', '$stateParams', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+.controller('meuMuralCtrl', ['$scope', '$stateParams', 'obterFiquePorDentroService', '$ionicPopup', 'LOCAL_STORAGE', '$ionicLoading','$cordovaNetwork','$ionicHistory','fiquePorDentroFactory', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $stateParams) {
+function ($scope, $stateParams,obterFiquePorDentroService, $ionicPopup, LOCAL_STORAGE, $ionicLoading, $cordovaNetwork, $ionicHistory,fiquePorDentroFactory) {
 
+    //Verifica se estivar online pega dados via serviço 
+        if ($cordovaNetwork.isOnline()) {
+            $ionicLoading.show({
+                template: 'Buscando...'
+            }).then(function () {
 
+                //Verifica se e pra buscar a informação que foi atualizada recente.
+                var atualizado = window.localStorage.getItem("fiquePordentro");
+             
+                //Caso verdadeiro busca a nova informação do contrario continua em cache
+                if(atualizado){
+
+                    fiquePorDentroFactory.selectListaNoticias().then(function (dadosArmazenados) {
+                
+                        $scope.fiquePorDentro = dadosArmazenados;
+                        
+                        fiquePorDentroFactory.marcarNoticiasLidas().then(function (marcados) {
+                            
+                        });           
+
+                    }).finally(function () {
+                        //em qualquer caso remove o spinner de loading
+                        $ionicLoading.hide();
+                    });
+
+                }else{
+                    obterFiquePorDentroService.obterNoticiasOnline().then(function (dados) {
+
+                        $scope.fiquePorDentro = dados;
+                    
+                        fiquePorDentroFactory.marcarNoticiasLidas().then(function (marcados) {
+                            
+                        });     
+
+                    }).finally(function () {
+                        //em qualquer caso remove o spinner de loading
+                        $ionicLoading.hide();
+                    });
+                }
+                
+
+            });
+        } else {
+            //Pega dados do banco
+            $ionicLoading.show({
+                template: 'Buscando...'
+            }).then(function () {
+                fiquePorDentroFactory.selectListaNoticias().then(function (dadosArmazenados) {
+                
+                    if (dadosArmazenados[0] == null) {
+                        var alertPopup = $ionicPopup.alert({
+                            title: 'Sem dados offline',
+                            template: 'Por favor, conecte seu dispositivo a internet',
+                            okText: 'Ok', // String (default: 'OK'). The text of the OK button.
+                            okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+                        });
+
+                        alertPopup.then(function (res) {
+
+                            $backView = $ionicHistory.backView();
+                            $backView.go();
+
+                        });
+
+                    } else {
+                        $scope.fiquePorDentro = dadosArmazenados;
+                        
+                        marcarEventosLidos.marcar().then(function (marcados) {
+                            
+                        });
+                    }
+                
+
+                }).finally(function () {
+                    //em qualquer caso remove o spinner de loading
+                    $ionicLoading.hide();
+                });
+
+            });
+        }
+
+    
+    // Pegando dados do usuário da sessão
+        $scope.dadosUsuario = JSON.parse(window.localStorage.getItem(LOCAL_STORAGE.local_dados_key));
 }])
    
 .controller('notCiaCtrl', ['$scope', '$stateParams','$ionicLoading','noticiasFactory', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
@@ -586,11 +714,27 @@ function ($scope, $stateParams, $ionicLoading, conveniosFactory) {
 
 }])
    
-.controller('muralCtrl', ['$scope', '$stateParams', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+.controller('muralCtrl', ['$scope', '$stateParams','$ionicLoading','fiquePorDentroFactory', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $stateParams) {
+function ($scope, $stateParams ,$ionicLoading, fiquePorDentroFactory) {
 
+$scope.noticia = {};
+    //Pega dados do banco
+    $ionicLoading.show({
+        template: 'Buscando...'
+    }).then(function () {
+
+        fiquePorDentroFactory.selectNoticia($stateParams.id).then(function (dados) {        
+         
+            $scope.noticia = dados;
+
+        }).finally(function () {
+            //em qualquer caso remove o spinner de loading
+            $ionicLoading.hide();
+        });
+
+    });
 
 }])
    
@@ -1233,7 +1377,7 @@ function ($scope, $stateParams,getConfiguracaoPresencaAssembleia,$cordovaNetwork
 
                 getConfiguracaoPresencaAssembleia.obter().then(function (dados) {
                     
-                    console.log(JSON.stringify(dados.data.data));
+                  
                     //Verifica se é para exibir o alerta
                     if(dados.data.data[0].exibir_alerta == 1){
                         //Verifica o tipo do alerta 1 para confirm(sim , não) 2 para alert simples

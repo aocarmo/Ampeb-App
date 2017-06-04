@@ -45,7 +45,8 @@ angular.module('app', ['ionic', 'app.controllers', 'app.routes', 'app.directives
     }
 
     //Criando tabelas
-    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS noticia (id integer primary key, dsCategoria varchar(50), dsTitulo varchar(250), dsNoticia text, dtNoticia text, dsUrlImagem text, flLido integer)");
+    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS noticia (id integer primary key, dsCategoria varchar(50), dsTitulo varchar(250), dsNoticia text, dtNoticia text, dsUrlImagem text, flLido integer, status varchar(25), dtAtualizacao text)");
+    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS fique_por_dentro (id integer primary key, dsCategoria varchar(50), dsTitulo varchar(250), dsNoticia text, dtNoticia text, dsUrlImagem text, flLido integer, status varchar(25), dtAtualizacao text)");
     $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS evento (id integer primary key, dsCategoria varchar(50), dsTitulo varchar(250), dsNoticia text, dtNoticia text, dsUrlImagem text, flLido integer)");
     $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS municipio_convenio (id integer primary key, nmMunicipioConvenio varchar(100))");
     $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS tipo_convenio (id integer primary key, nmTipoConvenio varchar(50), flPrivado integer, dsUrlImagem text)");

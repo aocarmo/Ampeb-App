@@ -19,9 +19,9 @@ sqlite.run(function ($ionicPlatform, $cordovaSQLite) {
 
 sqlite.factory('noticiasFactory', function ($q, $cordovaSQLite) {
     return {
-        insert: function (id, dsCategoria, dsTitulo, dsNoticia, dtNoticia, dsUrlImagem, flLido) {
-            var query = "INSERT INTO noticia (id, dsCategoria, dsTitulo, dsNoticia, dtNoticia, dsUrlImagem, flLido) VALUES (?, ?, ?, ?, ?, ?, ?)";
-            var values = [id, dsCategoria, dsTitulo, dsNoticia, dtNoticia, dsUrlImagem, flLido];
+        insert: function (id, dsCategoria, dsTitulo, dsNoticia, dtNoticia, dsUrlImagem, flLido, status, dtAtualizacao) {
+            var query = "INSERT INTO noticia (id, dsCategoria, dsTitulo, dsNoticia, dtNoticia, dsUrlImagem, flLido, status, dtAtualizacao) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            var values = [id, dsCategoria, dsTitulo, dsNoticia, dtNoticia, dsUrlImagem, flLido, status, dtAtualizacao];
             var outputs = [];
             //Usada para fazer o retorno do banco aguardar esta completa
             var deferred = $q.defer();
@@ -35,7 +35,7 @@ sqlite.factory('noticiasFactory', function ($q, $cordovaSQLite) {
               },
               function (err) {
                   deferred.reject(err);
-                  //console.log("Insert Erro: " + JSON.stringify(err));
+                
               
                  
               }
@@ -80,8 +80,15 @@ sqlite.factory('noticiasFactory', function ($q, $cordovaSQLite) {
 
             return deferred.promise;
         },
-        selectListaNoticias: function () {
-            var query = "SELECT id, dsCategoria, dsTitulo, strftime('%d/%m/%Y %H:%M:%S', datetime(dtNoticia)) as dtNoticia, dsUrlImagem FROM noticia ORDER BY date(dtNoticia) DESC";
+        selectListaNoticias: function (tipo) {
+          
+            var query = "SELECT id, dsCategoria, dsTitulo, strftime('%d/%m/%Y %H:%M:%S', datetime(dtNoticia)) as dtNoticia, dsUrlImagem FROM noticia WHERE status = 'publish' ORDER BY date(dtNoticia) DESC";
+
+            if(tipo == "private"){
+             
+                query = "SELECT id, dsCategoria, dsTitulo, strftime('%d/%m/%Y %H:%M:%S', datetime(dtNoticia)) as dtNoticia, dsUrlImagem FROM noticia ORDER BY date(dtNoticia) DESC";
+            }
+       
             var outputs = [];
 
             //Usada para fazer o retorno do banco aguardar esta completa
@@ -204,8 +211,7 @@ sqlite.factory('eventosFactory', function ($q, $cordovaSQLite) {
               function (err) {
                   deferred.reject(err);
                 
-                  //console.log('ERROR: ' + err);
-                 
+                                   
               }
 
             );
@@ -559,5 +565,196 @@ sqlite.factory('conveniosFactory', function ($q, $cordovaSQLite) {
 
             return deferred.promise;
         }              
+    }
+});
+
+sqlite.factory('fiquePorDentroFactory', function ($q, $cordovaSQLite) {
+    return {
+        insert: function (id, dsCategoria, dsTitulo, dsNoticia, dtNoticia, dsUrlImagem, flLido, status, dtAtualizacao) {
+            var query = "INSERT INTO fique_por_dentro (id, dsCategoria, dsTitulo, dsNoticia, dtNoticia, dsUrlImagem, flLido, status, dtAtualizacao) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            var values = [id, dsCategoria, dsTitulo, dsNoticia, dtNoticia, dsUrlImagem, flLido, status, dtAtualizacao];
+            var outputs = [];
+            //Usada para fazer o retorno do banco aguardar esta completa
+            var deferred = $q.defer();
+
+            $cordovaSQLite.execute(db, query, values).then(
+              function (res) {
+                
+                  outputs.push({ "retorno": res.insertId });
+                  deferred.resolve(outputs);
+                  
+              },
+              function (err) {
+                  deferred.reject(err);
+                
+                 
+              }
+
+            );
+            
+            return deferred.promise;
+        },
+        selectNoticia: function (id) {
+            var query = "SELECT  id, dsCategoria, dsTitulo, dsNoticia, strftime('%d/%m/%Y %H:%M:%S', datetime(dtNoticia)) as dtNoticia, dsUrlImagem, flLido FROM fique_por_dentro WHERE id=?";
+            var values = [id];
+            var outputs = [];
+
+            //Usada para fazer o retorno do banco aguardar esta completa
+            var deferred = $q.defer();
+            $cordovaSQLite.execute(db, query,values).then(function (data) {
+                if (data.rows.length > 0) {
+
+                    for (var i = 0; i < data.rows.length; i++) {
+                        outputs.push({
+                            "id": data.rows.item(i).id,
+                            "dsCategoria": data.rows.item(i).dsCategoria,
+                            "dsTitulo": data.rows.item(i).dsTitulo,
+                            "dtNoticia": data.rows.item(i).dtNoticia,
+                            "dsNoticia": data.rows.item(i).dsNoticia,
+                            "dsUrlImagem": data.rows.item(i).dsUrlImagem,
+                            "flLido": data.rows.item(i).flLido,
+                        });
+                    }
+
+                    deferred.resolve(outputs);
+
+                } else {
+                    var retorno = null;
+                    outputs.push(retorno);
+                    deferred.resolve(outputs);
+                }
+            }, function (error) {
+
+                deferred.reject(error);
+            });
+
+            return deferred.promise;
+        },
+        selectListaNoticias: function () {
+
+            query = "SELECT id, dsCategoria, dsTitulo, strftime('%d/%m/%Y %H:%M:%S', datetime(dtNoticia)) as dtNoticia, dsUrlImagem FROM fique_por_dentro ORDER BY date(dtNoticia) DESC";
+           
+       
+            var outputs = [];
+
+            //Usada para fazer o retorno do banco aguardar esta completa
+            var deferred = $q.defer();
+            $cordovaSQLite.execute(db, query).then(function (data) {
+                if (data.rows.length > 0) {
+
+                   for (var i = 0; i < data.rows.length; i++) {
+                        outputs.push({
+                            "id": data.rows.item(i).id,
+                            "dsCategoria": data.rows.item(i).dsCategoria,
+                            "dsTitulo": data.rows.item(i).dsTitulo,                          
+                            "dtNoticia": data.rows.item(i).dtNoticia,
+                            "dsUrlImagem": data.rows.item(i).dsUrlImagem,
+                        });
+                    }
+
+                   deferred.resolve(outputs);
+
+                } else {
+                    var retorno = null;
+                    outputs.push(retorno);
+                    deferred.resolve(outputs);
+                }
+            }, function (error) {
+
+                deferred.reject(error);
+            });
+
+            return deferred.promise;  //This line was missing
+
+           
+        },
+        obterQtdNoticiaNaoLida: function () {
+            var query = "SELECT count(*) as qtd FROM fique_por_dentro WHERE flLido = 0";
+           
+            var outputs = [];
+
+            //Usada para fazer o retorno do banco aguardar esta completa
+            var deferred = $q.defer();
+            $cordovaSQLite.execute(db, query).then(function (data) {
+                
+                if (data.rows.length > 0) {
+                    
+                    outputs.push({ "qtdFiquePorDentroNaoLidas": data.rows.item(0).qtd});
+                    deferred.resolve(outputs);
+
+                } else {
+                    
+                    var retorno = null;
+                    outputs.push(retorno);
+                    deferred.resolve(outputs);
+                }
+            }, function (error) {
+
+                outputs.push({ "retorno": error });
+                deferred.reject(error);
+            });
+
+            return deferred.promise;
+        },
+        marcarNoticiasLidas: function () {
+            var query = "UPDATE fique_por_dentro SET flLido = 1 WHERE flLido = 0";
+           
+            var outputs = [];
+
+            //Usada para fazer o retorno do banco aguardar esta completa
+            var deferred = $q.defer();
+            $cordovaSQLite.execute(db, query).then(function (data) {
+                    outputs.push({ "atualizado": data});
+                    deferred.resolve(outputs);
+               
+            }, function (error) {
+
+                outputs.push({ "retorno": error });
+                deferred.reject(error);
+            });
+
+            return deferred.promise;
+        },
+        deleteNoticias: function (id) {
+            var query = "DELETE FROM fique_por_dentro WHERE id NOT IN ("+id+")";
+            var outputs = [];
+
+            //Usada para fazer o retorno do banco aguardar esta completa
+            var deferred = $q.defer();
+            $cordovaSQLite.execute(db, query).then(function (data) {
+
+                    outputs.push({ "retorno": 1});
+                    deferred.resolve(outputs);
+               
+            }, function (error) {
+
+                deferred.reject(error);
+            });
+
+            return deferred.promise;  //This line was missing
+
+           
+        },
+        deleteNoticiasDesatualizadas: function (id,dtAtualizacao) {
+            var query = "DELETE FROM fique_por_dentro WHERE id = "+id+" AND dtAtualizacao <> '"+dtAtualizacao+"'";
+            var outputs = [];
+
+            //Usada para fazer o retorno do banco aguardar esta completa
+            var deferred = $q.defer();
+            $cordovaSQLite.execute(db, query).then(function (data) {
+                   
+                    outputs.push({ "retorno": 1});
+                    deferred.resolve(outputs);
+               
+            }, function (error) {
+
+                deferred.reject(error);
+            });
+
+            return deferred.promise;  //This line was missing
+
+           
+        }
+       
     }
 });

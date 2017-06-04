@@ -64,7 +64,8 @@ angular.module('app.routes', [])
   .state('mural', {
     url: '/detalheMural',
     templateUrl: 'templates/mural.html',
-    controller: 'muralCtrl'
+    controller: 'muralCtrl',
+    params: { id: null, },
   })
 
   .state('meuCadastroNaAMPEB', {
