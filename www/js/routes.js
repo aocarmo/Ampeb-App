@@ -28,6 +28,12 @@ angular.module('app.routes', [])
     controller: 'notCiasCtrl'
   })
 
+   .state('listaEnquetes', {
+    url: '/listaEnquetes',
+    templateUrl: 'templates/listaEnquetes.html',
+    controller: 'listaEnquetesCtrl'
+  })
+
   .state('prXimosEventos', {
     url: '/proximosEventos',
     templateUrl: 'templates/prXimosEventos.html',
@@ -108,13 +114,16 @@ angular.module('app.routes', [])
   .state('enquete', {
     url: '/enquete',
     templateUrl: 'templates/enquete.html',
-    controller: 'enqueteCtrl'
+    controller: 'enqueteCtrl',
+    params: { id: null, dataExpiracao: null },
+
   })
 
   .state('resultadoDaEnquete', {
     url: '/resultadoEnquete',
     templateUrl: 'templates/resultadoDaEnquete.html',
-    controller: 'resultadoDaEnqueteCtrl'
+    controller: 'resultadoDaEnqueteCtrl',
+    params: { id: null, }
   })
 
   .state('alterarASenha', {

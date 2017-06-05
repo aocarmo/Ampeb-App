@@ -758,3 +758,136 @@ sqlite.factory('fiquePorDentroFactory', function ($q, $cordovaSQLite) {
        
     }
 });
+
+sqlite.factory('enqueteFactory', function ($q, $cordovaSQLite) {
+    return {
+        insert: function (id, dsEnquete, totalVotos, totalVotantes, dtCadastro, dtExpiracao, flAtivo, flLido) {
+            var query = "INSERT INTO enquetes (id, dsEnquete, totalVotos, totalVotantes, dtCadastro, dtExpiracao, flAtivo, flLido) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            var values = [id, dsEnquete, totalVotos, totalVotantes, dtCadastro, dtExpiracao, flAtivo, flLido];
+            var outputs = [];
+            //Usada para fazer o retorno do banco aguardar esta completa
+            var deferred = $q.defer();
+
+            $cordovaSQLite.execute(db, query, values).then(
+              function (res) {
+                
+                  outputs.push({ "retorno": res.insertId });
+                  deferred.resolve(outputs);
+                  
+              },
+              function (err) {
+                  deferred.reject(err);
+                }
+
+            );
+            
+            return deferred.promise;
+        },
+        selectListaEnquetes: function () {
+
+            query = "SELECT id, dsEnquete, totalVotos, totalVotantes, strftime('%d/%m/%Y %H:%M:%S', datetime(dtCadastro)) as dtCadastro, strftime('%d/%m/%Y %H:%M:%S', datetime(dtExpiracao)) as dtExpiracao, flAtivo FROM enquetes ORDER BY date(dtCadastro) DESC";
+                  
+            var outputs = [];
+
+            //Usada para fazer o retorno do banco aguardar esta completa
+            var deferred = $q.defer();
+            $cordovaSQLite.execute(db, query).then(function (data) {
+                if (data.rows.length > 0) {
+
+                   for (var i = 0; i < data.rows.length; i++) {
+                        outputs.push({
+                            "id": data.rows.item(i).id,
+                            "dsEnquete": data.rows.item(i).dsEnquete,
+                            "totalVotos": data.rows.item(i).totalVotos,                          
+                            "totalVotantes": data.rows.item(i).totalVotantes,
+                            "dtCadastro": data.rows.item(i).dtCadastro,
+                            "dtExpiracao": data.rows.item(i).dtExpiracao,
+                            "flAtivo": data.rows.item(i).flAtivo
+                        });
+                    }
+
+                   deferred.resolve(outputs);
+
+                } else {
+                    var retorno = null;
+                    outputs.push(retorno);
+                    deferred.resolve(outputs);
+                }
+            }, function (error) {
+
+                deferred.reject(error);
+            });
+
+            return deferred.promise;  //This line was missing
+
+           
+        },
+        obterQtdEnqueteNaoLida: function () {
+            var query = "SELECT count(*) as qtd FROM enquetes WHERE flLido = 0";
+           
+            var outputs = [];
+
+            //Usada para fazer o retorno do banco aguardar esta completa
+            var deferred = $q.defer();
+            $cordovaSQLite.execute(db, query).then(function (data) {
+                
+                if (data.rows.length > 0) {
+                    
+                    outputs.push({ "qtdEnqueteNaoLidas": data.rows.item(0).qtd});
+                    deferred.resolve(outputs);
+
+                } else {
+                    
+                    var retorno = null;
+                    outputs.push(retorno);
+                    deferred.resolve(outputs);
+                }
+            }, function (error) {
+
+                outputs.push({ "retorno": error });
+                deferred.reject(error);
+            });
+
+            return deferred.promise;
+        },
+        marcarEnquetesLidas: function () {
+            var query = "UPDATE enquetes SET flLido = 1 WHERE flLido = 0";
+           
+            var outputs = [];
+
+            //Usada para fazer o retorno do banco aguardar esta completa
+            var deferred = $q.defer();
+            $cordovaSQLite.execute(db, query).then(function (data) {
+                    outputs.push({ "atualizado": data});
+                    deferred.resolve(outputs);
+               
+            }, function (error) {
+
+                outputs.push({ "retorno": error });
+                deferred.reject(error);
+            });
+
+            return deferred.promise;
+        },
+        deleteEnquetes: function (id) {
+            var query = "DELETE FROM enquetes WHERE id NOT IN ("+id+")";
+            var outputs = [];
+
+            //Usada para fazer o retorno do banco aguardar esta completa
+            var deferred = $q.defer();
+            $cordovaSQLite.execute(db, query).then(function (data) {
+
+                    outputs.push({ "retorno": 1});
+                    deferred.resolve(outputs);
+               
+            }, function (error) {
+
+                deferred.reject(error);
+            });
+
+            return deferred.promise;  //This line was missing
+
+        }
+       
+    }
+});

@@ -3,15 +3,19 @@
     <h2 id="enquete-heading22" style="color:#821723;font-weight:300;">Enquete</h2>
     <hr class="hr-topoPagina">
     <div id="enquete-markdown11" style="text-align:justify;" class="show-list-numbers-and-dots">
-      <p style="color:#000000;font-size:18px;">Diante das discussões em todo o país a respeito do fim do foro privilegiado, previsto na PEC 470/05 e apensadas, a Ampeb quer saber sua opinião: Você é a favor da extinção do foro privilegiado?</p>
+      <p style="color:#000000;font-size:18px;">{{enquete[0].pollq_question}}</p>
     </div>
-    <form id="enquete-form10" class="list">
-      <ion-radio id="enquete-radio1">Sim</ion-radio>
-      <ion-radio id="enquete-radio2">Não</ion-radio>
-      <div id="enquete-button-bar1" class="button-bar">
-        <button id="enquete-button18" style="font-size:18px;" class="button button-assertive  button-block">Votar!</button>
-        <a ui-sref="resultadoDaEnquete" id="enquete-button19" style="font-size:18px;" class="button button-assertive  button-block">Resultado</a>
-      </div>
+    <form name="enqueteForm" id="enquete-form10" class="list" ng-submit="votar(enqueteForm,enquete[0].pollq_id,respostaEnquete)">
+       
+      <ion-radio ng-repeat="resposta in enquete[0].answers" id="enquete-radio1"  ng-model="respostaEnquete.answer" ng-value="resposta.polla_aid" ng-required="true">{{resposta.polla_answers}}</ion-radio>      
+       <div align="center" class="row">
+          <div class="col col-50">
+           <button type="submit" id="enquete-button18" style="font-size:18px;" ng-disabled="habilitarVoto == 'true'" class="button button-assertive  button-block">Votar!</button>
+          </div>
+          <div class="col col-50">
+           <button id="enquete-button18" style="font-size:18px;" class="button button-assertive  button-block" ui-sref="resultadoDaEnquete({id: enquete[0].pollq_id})">Resultado</button>
+          </div>
+        </div>
     </form>
   </ion-content>
 </ion-view>

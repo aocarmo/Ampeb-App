@@ -1324,9 +1324,6 @@ angular.module('app.services', [])
 
                         if(retornoNoticiasExibir[0][0].retorno == 1){
 
-                            //Selecionando qual tipo de noticia será 
-                            var tipo = window.localStorage.getItem(LOCAL_STORAGE.tipo_retorno_post);
-                         
                             //Após excluídas as noticias, seleciona as noticias salvas no banco
                             fiquePorDentroFactory.selectListaNoticias().then(function (dadosOnline) {
             
@@ -1345,4 +1342,81 @@ angular.module('app.services', [])
         }
     };
         
-}])
+}])//Serviços para obter uma lsta de enquetes
+.service('getListaEnquete', ['$http', '$q', 'WEB_METODOS','LOCAL_STORAGE','enqueteFactory',  function ($http, $q, WEB_METODOS,LOCAL_STORAGE,enqueteFactory) {
+
+    return {
+
+        obter: function () {    
+
+            return $http.get(WEB_METODOS.urlObterEnquete,{headers: {'Authorization': window.localStorage.getItem(LOCAL_STORAGE.local_token)}}).then(function (response) {
+                //Inserindo as enquetes no banco de dados.  
+                var idEnquetes = [];
+                for (var i = 0; i < response.data.length; i++) {
+
+                    enqueteFactory.insert(response.data[i].pollq_id, response.data[i].pollq_question, response.data[i].pollq_totalvotes, response.data[i].pollq_totalvoters, response.data[i].pollq_date, response.data[i].pollq_expiry, response.data[i].pollq_active, 0);
+                    
+                    idEnquetes.push(response.data[i].pollq_id);
+                }
+
+                var deferred = $q.defer();
+
+                    //Excluindo do banco enquetes que não estão mais disponiveis no servico
+                    var enquetesExcluir =  enqueteFactory.deleteEnquetes(idEnquetes.join()).then(function (enquetesExcluirRetorno) {    
+                        return enquetesExcluirRetorno;
+                    });                                          
+
+                    var enquetesExibir = [];
+                    
+                    //Executando a exclusão das enquetes
+                    $q.all([enquetesExcluir]).then(function(result){
+
+                        for (var i = 0; i < result.length; i++){
+                            enquetesExibir.push(result[i]);
+                        }
+
+                        if(enquetesExibir[0][0].retorno == 1){                        
+                            
+                            //Obtendo as enquetes do banco de dados.
+                            enqueteFactory.selectListaEnquetes().then(function (dadosEnquete) {
+                                deferred.resolve(dadosEnquete);
+                            });
+                    
+                        }
+                        
+                    });          
+                   
+                return deferred.promise;
+            });
+
+        }
+    };
+//Serviços para obter uma enquete especifica
+}]).service('getEnquete', ['$http', '$q', 'WEB_METODOS','LOCAL_STORAGE',  function ($http, $q, WEB_METODOS,LOCAL_STORAGE) {
+
+    return {
+
+        obter: function (id) {    
+
+            return $http.get(WEB_METODOS.urlObterEnquete+"?id="+id,{headers: {'Authorization': window.localStorage.getItem(LOCAL_STORAGE.local_token)}}).then(function (response) {
+                return response;
+            });
+
+        }
+    };
+
+}]).service('votarEnquete', ['$http', '$q', 'WEB_METODOS','LOCAL_STORAGE',  function ($http, $q, WEB_METODOS,LOCAL_STORAGE) {
+
+    return {
+
+        votar: function (id,id_answer) {    
+
+            return $http.get(WEB_METODOS.urlVotarEnquete+"?id="+id+"&id_answer="+id_answer,{headers: {'Authorization': window.localStorage.getItem(LOCAL_STORAGE.local_token)}}).then(function (response) {
+              
+                return response;
+            });
+
+        }
+    };
+
+}]);

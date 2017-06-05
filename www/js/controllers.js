@@ -1,9 +1,9 @@
 ﻿angular.module('app.controllers', [])
   
-.controller('aMPEBCtrl', ['$scope', '$stateParams','$state','$q', '$cordovaCamera','$ionicPopup','LOCAL_STORAGE','$timeout','noticiasFactory','eventosFactory','obterNoticiasService','obterEventosService','obterEventosServiceRefresh','obterNoticiasServiceRefresh','atualizarFotoAssociado','$cordovaNetwork','$ionicLoading','$ionicHistory','fiquePorDentroFactory','obterFiquePorDentroService','obterFiquePorDentroServiceRefresh', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+.controller('aMPEBCtrl', ['$scope', '$stateParams','$state','$q', '$cordovaCamera','$ionicPopup','LOCAL_STORAGE','$timeout','noticiasFactory','eventosFactory','obterNoticiasService','obterEventosService','obterEventosServiceRefresh','obterNoticiasServiceRefresh','atualizarFotoAssociado','$cordovaNetwork','$ionicLoading','$ionicHistory','fiquePorDentroFactory','obterFiquePorDentroService','obterFiquePorDentroServiceRefresh','getListaEnquete','enqueteFactory', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $stateParams,$state, $q,$cordovaCamera, $ionicPopup, LOCAL_STORAGE,$timeout,noticiasFactory,eventosFactory,obterNoticiasService,obterEventosService,obterEventosServiceRefresh,obterNoticiasServiceRefresh,atualizarFotoAssociado,$cordovaNetwork,$ionicLoading,$ionicHistory,fiquePorDentroFactory,obterFiquePorDentroService,obterFiquePorDentroServiceRefresh) {
+function ($scope, $stateParams,$state, $q,$cordovaCamera, $ionicPopup, LOCAL_STORAGE,$timeout,noticiasFactory,eventosFactory,obterNoticiasService,obterEventosService,obterEventosServiceRefresh,obterNoticiasServiceRefresh,atualizarFotoAssociado,$cordovaNetwork,$ionicLoading,$ionicHistory,fiquePorDentroFactory,obterFiquePorDentroService,obterFiquePorDentroServiceRefresh,getListaEnquete,enqueteFactory) {
     
   
    /***************** Bloco para atualizações de notificações ********************/
@@ -35,16 +35,20 @@ function ($scope, $stateParams,$state, $q,$cordovaCamera, $ionicPopup, LOCAL_STO
            var qtdFiquePorDentro= fiquePorDentroFactory.obterQtdNoticiaNaoLida().then(function (qtdFiquePorDentroNaoLido) {    
             return qtdFiquePorDentroNaoLido;
         });   
+
+        var qtdEnquete = enqueteFactory.obterQtdEnqueteNaoLida().then(function (qtdEnqueteNaoLido) {    
+            return qtdEnqueteNaoLido;
+        });   
         
         var retornoNotificacoes = [];
 
           //Pega o retorno de forma sincrona do ajax.
-         $q.all([qtdNoticias, qtdEventos, qtdFiquePorDentro]).then(function(result){
+         $q.all([qtdNoticias, qtdEventos, qtdFiquePorDentro, qtdEnquete]).then(function(result){
             for (var i = 0; i < result.length; i++){
                 retornoNotificacoes.push(result[i]);
             }
        
-            if(retornoNotificacoes[0] != null && retornoNotificacoes[1] != null && retornoNotificacoes[2] != null){
+            if(retornoNotificacoes[0] != null && retornoNotificacoes[1] != null && retornoNotificacoes[2] != null  && retornoNotificacoes[3] != null){
                 //Testa caso o a quantidade seja maior que 0 exibe os itens não lidos.
 
                 if(retornoNotificacoes[0][0].qtdNoticiasNaoLidas > 0){
@@ -64,6 +68,12 @@ function ($scope, $stateParams,$state, $q,$cordovaCamera, $ionicPopup, LOCAL_STO
                     document.getElementById("fiquePorDentroBadge").textContent=retornoNotificacoes[2][0].qtdFiquePorDentroNaoLidas;
                 }else{
                     document.getElementById("fiquePorDentroBadge").textContent="";
+                }
+
+                if(retornoNotificacoes[3][0].qtdEnqueteNaoLidas > 0){
+                    document.getElementById("enquetesBadge").textContent=retornoNotificacoes[3][0].qtdEnqueteNaoLidas;
+                }else{
+                    document.getElementById("enquetesBadge").textContent="";
                 }
                 
              }
@@ -85,19 +95,23 @@ function ($scope, $stateParams,$state, $q,$cordovaCamera, $ionicPopup, LOCAL_STO
                     return dadosEvento;
                 }); 
 
-                var fiquePorDentro =  obterFiquePorDentroServiceRefresh.obterNoticiasOnlineRefresh().then(function (dadosFiquePorDentro) {    
+                var fiquePorDentro = obterFiquePorDentroServiceRefresh.obterNoticiasOnlineRefresh().then(function (dadosFiquePorDentro) {    
                     return dadosFiquePorDentro;
+                });   
+
+                var enquete = getListaEnquete.obter().then(function (dadosEnquete) {    
+                    return dadosEnquete;
                 });       
 
                 var retornos = [];
 
-                $q.all([eventos,noticias,fiquePorDentro]).then(function(result){
+                $q.all([eventos,noticias,fiquePorDentro, enquete]).then(function(result){
                    
                     for (var i = 0; i < result.length; i++){
                         retornos.push(result[i]);
                     }
                  
-                    if(retornos[0] != null && retornos[1] != null && retornos[2] != null){
+                    if(retornos[0] != null && retornos[1] != null && retornos[2] != null && retornos[3] != null){
                         //Setando a variavel de sessão para informar ao controller de cada tela para buscar a informação atualizada do banco.
                         window.localStorage.setItem("eventos", true);
                         window.localStorage.setItem("noticias", true);
@@ -127,15 +141,19 @@ function ($scope, $stateParams,$state, $q,$cordovaCamera, $ionicPopup, LOCAL_STO
 
         var fiquePorDentro =  obterFiquePorDentroService.obterNoticiasOnline().then(function (dadosFiquePorDentro) {    
             return dadosFiquePorDentro;
+        });  
+
+        var enquetes =  getListaEnquete.obter().then(function (dadosEnquetes) {    
+            return dadosEnquetes;
         });     
 
         var retornos = [];
 
-        $q.all([noticias, eventos,fiquePorDentro]).then(function(result){
+        $q.all([noticias, eventos, fiquePorDentro, enquetes]).then(function(result){
             for (var i = 0; i < result.length; i++){
                 retornos.push(result[i]);
             }
-             if(retornos[0] != null && retornos[1] != null && retornos[2] != null){
+             if(retornos[0] != null && retornos[1] != null && retornos[2] != null && retornos[3] != null){
                $scope.obterNotificacoes();
              }
         });
@@ -320,7 +338,8 @@ function ($scope, $stateParams, $state, $http, $ionicPopup, $ionicLoading, Login
                             password: data.senha
                         };
 
-                        getToken.obter(dadosUsuarioObterToken).then(function (retornoToken){                    
+                        getToken.obter(dadosUsuarioObterToken).then(function (retornoToken){    
+                           
                             //Guardando as informações do token pra serviços privados.
                             window.localStorage.setItem(LOCAL_STORAGE.local_token, "Bearer "+retornoToken.data.token);
                             window.localStorage.setItem(LOCAL_STORAGE.tipo_retorno_post, 'private');
@@ -1210,19 +1229,214 @@ function ($scope, $stateParams,$ionicLoading,conveniosFactory,$ionicHistory,$ion
 
 }])
    
-.controller('enqueteCtrl', ['$scope', '$stateParams', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+.controller('enqueteCtrl', ['$scope', '$stateParams','$cordovaNetwork','$ionicLoading','$ionicPopup','$ionicHistory','LOCAL_STORAGE','getEnquete','votarEnquete',// The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $stateParams) {
+function ($scope, $stateParams, $cordovaNetwork, $ionicLoading, $ionicPopup, $ionicHistory, LOCAL_STORAGE, getEnquete,votarEnquete) {
+        
+    
+      if ($cordovaNetwork.isOnline()) {
+
+        $scope.enquete = {};
+
+        $ionicLoading.show({template: 'Buscando...'}).then(function () {
+        
+            getEnquete.obter($stateParams.id).then(function (retorno) {  
+            
+                $scope.enquete = retorno.data;
+                $scope.habilitarVoto = "";
+                //Validando se uma enquete expirou
+                if($scope.enquete[0].pollq_expiry == "1969-12-31T21:00:00"){
+                   $scope.habilitarVoto = "false";
+                }else{
+
+                    var dataExpiracao  = new Date($scope.enquete[0].pollq_expiry);
+                    var dataAtual = new Date();
+                    if(dataAtual > dataExpiracao){
+                      $scope.habilitarVoto = "true";
+                    }else{
+                        $scope.habilitarVoto = "false";
+                    }
+                }               
+       
+              
+            }).finally(function () {
+                //em qualquer caso remove o spinner de loading
+                $ionicLoading.hide();                       
+            
+            });
+        });
+
+    }else{
+    var alertPopup = $ionicPopup.alert({
+            title: 'Não foi possível obter a enquete.',
+            template: 'Verifique sua conexão com ineternet.',
+            okText: 'Ok', // String (default: 'OK'). The text of the OK button.
+            okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+        });
+
+        alertPopup.then(function (res) {
+            
+            $backView = $ionicHistory.backView();
+            $backView.go();
+
+        });
+    }
+    $scope.respostaEnquete = {};
+      //Função paa ataulizar os dados pessoais.
+    $scope.votar = function(form,id,respostaEnquete) { 
+
+      if(form.$valid){
+      
+            if ($cordovaNetwork.isOnline()) {
+
+                $scope.enquete = {};
+
+                $ionicLoading.show({template: 'Votando...'}).then(function () {
+                
+                    votarEnquete.votar(id,respostaEnquete.answer).then(function (retorno) {  
+                    
+                    
+                    if(retorno.data[0].code == 200){
+
+                            var alertPopup = $ionicPopup.alert({
+                                title: retorno.data[0].message,                       
+                                okText: 'Ok', // String (default: 'OK'). The text of the OK button.
+                                okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+                            });
+
+                            alertPopup.then(function (res) {
+                                
+                                $backView = $ionicHistory.backView();
+                                $backView.go();
+
+                            });
+                    }else {
+                        
+                            var alertPopup = $ionicPopup.alert({
+                                title: retorno.data[0].message,                       
+                                okText: 'Ok', // String (default: 'OK'). The text of the OK button.
+                                okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+                            });
+
+                            alertPopup.then(function (res) {
+                                
+                                $backView = $ionicHistory.backView();
+                                $backView.go();
+
+                            });
+                    }
+                    
+                    }).finally(function () {
+                        //em qualquer caso remove o spinner de loading
+                        $ionicLoading.hide();                       
+                    
+                    });
+                });
+
+            }else{
+                var alertPopup = $ionicPopup.alert({
+                    title: 'Não foi possível votar a enquete.',
+                    template: 'Verifique sua conexão com ineternet.',
+                    okText: 'Ok', // String (default: 'OK'). The text of the OK button.
+                    okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+                });
+            
+            }
+      }else{
+           var alertPopup = $ionicPopup.alert({
+                    title: 'Por favor, escolha uma resposta opção.',                    
+                    okText: 'Ok', // String (default: 'OK'). The text of the OK button.
+                    okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+                });
+      }
+
+    };   
 
 
 }])
    
-.controller('resultadoDaEnqueteCtrl', ['$scope', '$stateParams', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+.controller('listaEnquetesCtrl', ['$scope', '$stateParams','$cordovaNetwork','$ionicLoading','$ionicPopup','$ionicHistory','LOCAL_STORAGE','getListaEnquete','enqueteFactory', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $stateParams) {
+function ($scope, $stateParams,$cordovaNetwork,$ionicLoading,$ionicPopup,$ionicHistory,LOCAL_STORAGE,getListaEnquete, enqueteFactory) {
 
+    if ($cordovaNetwork.isOnline()) {
+
+        $scope.enquetes = {};
+
+        $ionicLoading.show({template: 'Buscando...'}).then(function () {
+        
+            getListaEnquete.obter().then(function (retorno) {  
+            
+                $scope.enquetes = retorno;      
+                //Marcando noticias ja lidas
+                enqueteFactory.marcarEnquetesLidas().then(function (marcados) {
+                    
+                });     
+            
+            }).finally(function () {
+                //em qualquer caso remove o spinner de loading
+                $ionicLoading.hide();                       
+            
+            });
+        });
+
+    }else{
+    var alertPopup = $ionicPopup.alert({
+            title: 'Não foi possível obter a lista de enquetes.',
+            template: 'Verifique sua conexão com ineternet.',
+            okText: 'Ok', // String (default: 'OK'). The text of the OK button.
+            okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+        });
+
+        alertPopup.then(function (res) {
+            
+            $backView = $ionicHistory.backView();
+            $backView.go();
+
+        });
+    }   
+
+}])
+.controller('resultadoDaEnqueteCtrl', ['$scope', '$stateParams','$cordovaNetwork','$ionicLoading','$ionicPopup','$ionicHistory','LOCAL_STORAGE','getEnquete', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+// You can include any angular dependencies as parameters for this function
+// TIP: Access Route Parameters for your page via $stateParams.parameterName
+function ($scope, $stateParams, $cordovaNetwork, $ionicLoading, $ionicPopup, $ionicHistory, LOCAL_STORAGE, getEnquete) {
+
+
+      if ($cordovaNetwork.isOnline()) {
+
+        $scope.enquete = {};
+
+        $ionicLoading.show({template: 'Buscando...'}).then(function () {
+        
+            getEnquete.obter($stateParams.id).then(function (retorno) {  
+            
+                $scope.enquete = retorno.data;           
+              
+            }).finally(function () {
+                //em qualquer caso remove o spinner de loading
+                $ionicLoading.hide();                       
+            
+            });
+        });
+
+    }else{
+    var alertPopup = $ionicPopup.alert({
+            title: 'Não foi possível obter o resultado da enquete.',
+            template: 'Verifique sua conexão com ineternet.',
+            okText: 'Ok', // String (default: 'OK'). The text of the OK button.
+            okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+        });
+
+        alertPopup.then(function (res) {
+            
+            $backView = $ionicHistory.backView();
+            $backView.go();
+
+        });
+    }   
 
 }])
    

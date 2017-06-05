@@ -17,7 +17,10 @@ angular.module('app.constants', [])
     urlServicosPortalFiquePorDentro: 'http://www.ampeb.org.br/homologacao/wp-json/rest-api-ampeb/v1/posts?_embed&categories=196&status=private&per_page=20',
     urlImagemTipoConvenio: 'http://ampebteste.web2319.uni5.net/homologacao_sistema/anexos/imagens_tipo_convenio/',
     urlImagemConvenio: 'http://ampebteste.web2319.uni5.net/homologacao_sistema/anexos/imagens_convenio/',
-    urlObterToken: 'http://www.ampeb.org.br/homologacao/wp-json/jwt-auth/v1/token'
+    urlObterToken: 'http://www.ampeb.org.br/homologacao/wp-json/jwt-auth/v1/token',
+    urlObterEnquete: 'http://www.ampeb.org.br/homologacao/wp-json/rest-api-ampeb/v1/polls',
+    urlVotarEnquete: 'http://www.ampeb.org.br/homologacao/wp-json/rest-api-ampeb/v1/polls/vote/'
+
 
 }).constant('LOCAL_STORAGE', {
     local_dados_key: 'dadosUsuario',
