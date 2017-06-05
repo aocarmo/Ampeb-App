@@ -9,7 +9,7 @@
     </ion-slides>
     <div class="spacer" style="width: 300px; height: 32px;"></div>    
     <div id="detalheDoEvento-markdown10" style="text-align:justify;" class="show-list-numbers-and-dots">
-      <p style="color:#454545;font-size:18px;">{{evento[0].dsNoticia}}</p>
+      <p ng-bind-html="evento[0].dsNoticia"></p>       
     </div>
   </ion-content>
 </ion-view>

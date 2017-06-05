@@ -306,7 +306,7 @@ angular.module('app.services', [])
 
                                     var dsNoticia = "";
                                     var dsCategoria = "";
-                                    var dsUrlImagem = "";
+                                    var dsUrlImagem = "img/img_not_found.jpg";
                                     var dsTitulo = "";
                                     var dtNoticiaBD = "";
                                     var dtNoticia = "";
@@ -354,7 +354,7 @@ angular.module('app.services', [])
 
                                     //Valida��o da descri��o
                                     if (response.data[i].content.rendered != null) {
-                                        dsNoticia = response.data[i].content.rendered.replace(/(<([^>]+)>)/ig, "");
+                                        dsNoticia = response.data[i].content.rendered;
                                     }
 
                                     //Valida��o da data
@@ -421,14 +421,14 @@ angular.module('app.services', [])
         
 }])
 /***** Serviços para o modulo de eventos *****/
-.service('obterEventosService', ['$http', '$q', 'WEB_METODOS', 'eventosFactory',  function ($http, $q, WEB_METODOS, eventosFactory) {
+.service('obterEventosService', ['$http', '$q', 'WEB_METODOS', 'eventosFactory','LOCAL_STORAGE',  function ($http, $q, WEB_METODOS, eventosFactory,LOCAL_STORAGE) {
 
     return {
         obterEventosOnline: function () {
           
-         return  $http.get(WEB_METODOS.urlServicosPortalNoticias+window.localStorage.getItem(LOCAL_STORAGE.filtro_retorno_post),{headers: {'Authorization': window.localStorage.getItem(LOCAL_STORAGE.local_token)}}).then(function (response) {
-                      
-                        //Lendo todas as noticias
+         return  $http.get(WEB_METODOS.urlServicosPortalEventos+window.localStorage.getItem(LOCAL_STORAGE.filtro_retorno_post),{headers: {'Authorization': window.localStorage.getItem(LOCAL_STORAGE.local_token)}}).then(function (response) {
+                  
+                       //Lendo todas as noticias
                         var tipoConsulta = 0;               
                         var idNoticias = [];
                         var deferred = $q.defer();
@@ -439,13 +439,14 @@ angular.module('app.services', [])
                        
                         //Loop para verificar e exluir todos os post que sofreram modificações
                         for (var i = 0; i < response.data.length; i++) {
-                            noticiasFactory.deleteNoticiasDesatualizadas(response.data[i].id, response.data[i].modified);   
+                            
+                            eventosFactory.deleteEventosDesatualizados(response.data[i].id, response.data[i].modified);   
                             //Pegando os id das noticias que não serão excluidas
                             idNoticias.push(response.data[i].id);               
                         }
-
+                                                       
                         //Excluindo do banco noticias que não estão mais disponiveis no servico
-                        var noticiasExcluir =  noticiasFactory.deleteNoticias(idNoticias.join(),tipoConsulta).then(function (noticiasExcluirRetorno) {    
+                        var noticiasExcluir =  eventosFactory.deleteEventos(idNoticias.join(),tipoConsulta).then(function (noticiasExcluirRetorno) {    
                             return noticiasExcluirRetorno;
                         });                                          
 
@@ -460,11 +461,11 @@ angular.module('app.services', [])
 
                             if(retornoNoticiasExibir[0][0].retorno == 1){
 
-                                for (var i = 0; i < response.data.length; i++) {
-
+                                 for (var i = 0; i < response.data.length; i++) {
+                                   
                                     var dsNoticia = "";
                                     var dsCategoria = "";
-                                    var dsUrlImagem = "";
+                                    var dsUrlImagem = "img/img_not_found.jpg";
                                     var dsTitulo = "";
                                     var dtNoticiaBD = "";
                                     var dtNoticia = "";
@@ -512,7 +513,7 @@ angular.module('app.services', [])
 
                                     //Valida��o da descri��o
                                     if (response.data[i].content.rendered != null) {
-                                        dsNoticia = response.data[i].content.rendered.replace(/(<([^>]+)>)/ig, "");
+                                        dsNoticia = response.data[i].content.rendered;
                                     }
 
                                     //Valida��o da data
@@ -548,30 +549,30 @@ angular.module('app.services', [])
                                     if (response.data[i].modified != null) {
                                         dtAtualizacao = response.data[i].modified;                 
                                     }
-                                
+                                   
                                     //Tratamento para não exibir eventos em noticias
                                     if(dsCategoria == "Próximos Eventos"){
-                                        noticiasFactory.insert(response.data[i].id, dsCategoria, dsTitulo, dsNoticia, dtNoticiaBD, dsUrlImagem, 0, dsStatus, dtAtualizacao,tipoConsulta);                                    
-                                      
+                                      eventosFactory.insert(response.data[i].id, dsCategoria, dsTitulo, dsNoticia, dtNoticiaBD, dsUrlImagem, 0, dsStatus, dtAtualizacao,tipoConsulta);                                    
+                                     
                                     }
                                 
-                                }                                 
-
+                                }                           
+                              
                                 //Selecionando qual tipo de noticia será 
                                 var tipo = window.localStorage.getItem(LOCAL_STORAGE.tipo_retorno_post);
                                
                                 //Após excluídas as noticias, seleciona as noticias salvas no banco
-                                noticiasFactory.selectListaNoticias(tipo).then(function (dadosOnline) {
+                                eventosFactory.selectListaNoticias(tipo).then(function (dadosOnline) {
 
                                     deferred.resolve(dadosOnline);
-                                });        
+                                });      
 
                             }                                      
 
-                        });                 
+                        });     
 
-                     return deferred.promise;                          
-               
+                     return deferred.promise;             
+                     
             });
 
 
@@ -815,7 +816,7 @@ angular.module('app.services', [])
 
                     var dsNoticia = "";
                     var dsCategoria = "";
-                    var dsUrlImagem = "";
+                    var dsUrlImagem = "img/img_not_found.jpg";
                     var dsTitulo = "";
                     var dtNoticiaBD = "";
                     var dtNoticia = "";
@@ -863,7 +864,7 @@ angular.module('app.services', [])
 
                     //Valida��o da descri��o
                     if (response.data[i].content.rendered != null) {
-                        dsNoticia = response.data[i].content.rendered.replace(/(<([^>]+)>)/ig, "");
+                        dsNoticia = response.data[i].content.rendered;
                     }
 
                     //Valida��o da data
@@ -972,7 +973,7 @@ angular.module('app.services', [])
 
                     var dsNoticia = "";
                     var dsCategoria = "";
-                    var dsUrlImagem = "";
+                    var dsUrlImagem = "img/img_not_found.jpg";
                     var dsTitulo = "";
                     var dtNoticiaBD = "";
                     var dtNoticia = "";
@@ -1020,7 +1021,7 @@ angular.module('app.services', [])
 
                     //Valida��o da descri��o
                     if (response.data[i].content.rendered != null) {
-                        dsNoticia = response.data[i].content.rendered.replace(/(<([^>]+)>)/ig, "");
+                        dsNoticia = response.data[i].content.rendered;
                     }
 
                     //Valida��o da data

@@ -214,9 +214,9 @@ sqlite.factory('noticiasFactory', function ($q, $cordovaSQLite) {
 
 sqlite.factory('eventosFactory', function ($q, $cordovaSQLite) {
     return {
-        insert: function (id, dsCategoria, dsTitulo, dsNoticia, dtNoticia, dsUrlImagem, flLido) {
-            var query = "INSERT INTO evento (id, dsCategoria, dsTitulo, dsNoticia, dtNoticia, dsUrlImagem, flLido) VALUES (?, ?, ?, ?, ?, ?, ?)";
-            var values = [id, dsCategoria, dsTitulo, dsNoticia, dtNoticia, dsUrlImagem, flLido];
+        insert: function (id, dsCategoria, dsTitulo, dsNoticia, dtNoticia, dsUrlImagem, flLido, status, dtAtualizacao, tpConsulta) {
+            var query = "INSERT INTO evento (id, dsCategoria, dsTitulo, dsNoticia, dtNoticia, dsUrlImagem, flLido, status, dtAtualizacao, tpConsulta) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            var values = [id, dsCategoria, dsTitulo, dsNoticia, dtNoticia, dsUrlImagem, flLido, status, dtAtualizacao, tpConsulta];
             var outputs = [];
             //Usada para fazer o retorno do banco aguardar esta completa
             var deferred = $q.defer();
@@ -274,8 +274,15 @@ sqlite.factory('eventosFactory', function ($q, $cordovaSQLite) {
 
             return deferred.promise;
         },
-        selectListaNoticias: function () {
-            var query = "SELECT id, dsCategoria, dsTitulo, strftime('%d/%m/%Y %H:%M:%S', datetime(dtNoticia)) as dtNoticia, dsUrlImagem FROM evento ORDER BY date(dtNoticia) DESC";
+        selectListaNoticias: function (tipo) {
+          
+            var query = "SELECT id, dsCategoria, dsTitulo, strftime('%d/%m/%Y %H:%M:%S', datetime(dtNoticia)) as dtNoticia, dsUrlImagem FROM evento WHERE status = 'publish' ORDER BY date(dtNoticia) DESC";
+
+            if(tipo == "private"){
+             
+                query = "SELECT id, dsCategoria, dsTitulo, strftime('%d/%m/%Y %H:%M:%S', datetime(dtNoticia)) as dtNoticia, dsUrlImagem FROM evento ORDER BY date(dtNoticia) DESC";
+            }
+          
             var outputs = [];
 
             //Usada para fazer o retorno do banco aguardar esta completa
@@ -355,14 +362,34 @@ sqlite.factory('eventosFactory', function ($q, $cordovaSQLite) {
 
             return deferred.promise;
         },
-        deleteEventos: function (id) {
-            var query = "DELETE FROM evento WHERE id NOT IN ("+id+")";
+        deleteEventos: function (id,tpConsulta) {
+            var query = "DELETE FROM evento WHERE id NOT IN ("+id+") AND tpConsulta = "+tpConsulta;
             var outputs = [];
 
             //Usada para fazer o retorno do banco aguardar esta completa
             var deferred = $q.defer();
             $cordovaSQLite.execute(db, query).then(function (data) {
 
+                    outputs.push({ "retorno": 1});
+                    deferred.resolve(outputs);
+               
+            }, function (error) {
+
+                deferred.reject(error);
+            });
+
+            return deferred.promise;  //This line was missing
+
+           
+        },
+        deleteEventosDesatualizados: function (id,dtAtualizacao) {
+            var query = "DELETE FROM evento WHERE id = "+id+" AND dtAtualizacao <> '"+dtAtualizacao+"'";
+            var outputs = [];
+
+            //Usada para fazer o retorno do banco aguardar esta completa
+            var deferred = $q.defer();
+            $cordovaSQLite.execute(db, query).then(function (data) {
+                  
                     outputs.push({ "retorno": 1});
                     deferred.resolve(outputs);
                

@@ -1,9 +1,9 @@
 ﻿angular.module('app.controllers', [])
   
-.controller('aMPEBCtrl', ['$scope', '$stateParams','$state','$q', '$cordovaCamera','$ionicPopup','LOCAL_STORAGE','$timeout','noticiasFactory','eventosFactory','obterNoticiasService','obterEventosService','obterEventosServiceRefresh','atualizarFotoAssociado','$cordovaNetwork','$ionicLoading','$ionicHistory','fiquePorDentroFactory','obterFiquePorDentroService','obterFiquePorDentroServiceRefresh','getListaEnquete','enqueteFactory', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+.controller('aMPEBCtrl', ['$scope', '$stateParams','$state','$q', '$cordovaCamera','$ionicPopup','LOCAL_STORAGE','$timeout','noticiasFactory','eventosFactory','obterNoticiasService','obterEventosService','atualizarFotoAssociado','$cordovaNetwork','$ionicLoading','$ionicHistory','fiquePorDentroFactory','obterFiquePorDentroService','obterFiquePorDentroServiceRefresh','getListaEnquete','enqueteFactory', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $stateParams,$state, $q,$cordovaCamera, $ionicPopup, LOCAL_STORAGE,$timeout,noticiasFactory,eventosFactory,obterNoticiasService,obterEventosService,obterEventosServiceRefresh,atualizarFotoAssociado,$cordovaNetwork,$ionicLoading,$ionicHistory,fiquePorDentroFactory,obterFiquePorDentroService,obterFiquePorDentroServiceRefresh,getListaEnquete,enqueteFactory) {
+function ($scope, $stateParams,$state, $q,$cordovaCamera, $ionicPopup, LOCAL_STORAGE,$timeout,noticiasFactory,eventosFactory,obterNoticiasService,obterEventosService,atualizarFotoAssociado,$cordovaNetwork,$ionicLoading,$ionicHistory,fiquePorDentroFactory,obterFiquePorDentroService,obterFiquePorDentroServiceRefresh,getListaEnquete,enqueteFactory) {
     
   
    /***************** Bloco para atualizações de notificações ********************/
@@ -45,7 +45,7 @@ function ($scope, $stateParams,$state, $q,$cordovaCamera, $ionicPopup, LOCAL_STO
             for (var i = 0; i < result.length; i++){
                 retornoNotificacoes.push(result[i]);
             }
-       
+            
             if(retornoNotificacoes[0] != null && retornoNotificacoes[1] != null && retornoNotificacoes[2] != null  && retornoNotificacoes[3] != null){
                 //Testa caso o a quantidade seja maior que 0 exibe os itens não lidos.
 
@@ -88,7 +88,7 @@ function ($scope, $stateParams,$state, $q,$cordovaCamera, $ionicPopup, LOCAL_STO
                     return dadosNoticia;
                 });  
 
-                var eventos =  obterEventosServiceRefresh.obterEventosOnlineRefresh().then(function (dadosEvento) {
+                var eventos =  obterEventosService.obterEventosOnline().then(function (dadosEvento) {
 
                     return dadosEvento;
                 }); 
