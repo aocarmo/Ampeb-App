@@ -1,9 +1,9 @@
 ﻿angular.module('app.controllers', [])
   
-.controller('aMPEBCtrl', ['$scope', '$stateParams','$state','$q', '$cordovaCamera','$ionicPopup','LOCAL_STORAGE','$timeout','noticiasFactory','eventosFactory','obterNoticiasService','obterEventosService','obterEventosServiceRefresh','obterNoticiasServiceRefresh','atualizarFotoAssociado','$cordovaNetwork','$ionicLoading','$ionicHistory','fiquePorDentroFactory','obterFiquePorDentroService','obterFiquePorDentroServiceRefresh','getListaEnquete','enqueteFactory', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+.controller('aMPEBCtrl', ['$scope', '$stateParams','$state','$q', '$cordovaCamera','$ionicPopup','LOCAL_STORAGE','$timeout','noticiasFactory','eventosFactory','obterNoticiasService','obterEventosService','obterEventosServiceRefresh','atualizarFotoAssociado','$cordovaNetwork','$ionicLoading','$ionicHistory','fiquePorDentroFactory','obterFiquePorDentroService','obterFiquePorDentroServiceRefresh','getListaEnquete','enqueteFactory', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $stateParams,$state, $q,$cordovaCamera, $ionicPopup, LOCAL_STORAGE,$timeout,noticiasFactory,eventosFactory,obterNoticiasService,obterEventosService,obterEventosServiceRefresh,obterNoticiasServiceRefresh,atualizarFotoAssociado,$cordovaNetwork,$ionicLoading,$ionicHistory,fiquePorDentroFactory,obterFiquePorDentroService,obterFiquePorDentroServiceRefresh,getListaEnquete,enqueteFactory) {
+function ($scope, $stateParams,$state, $q,$cordovaCamera, $ionicPopup, LOCAL_STORAGE,$timeout,noticiasFactory,eventosFactory,obterNoticiasService,obterEventosService,obterEventosServiceRefresh,atualizarFotoAssociado,$cordovaNetwork,$ionicLoading,$ionicHistory,fiquePorDentroFactory,obterFiquePorDentroService,obterFiquePorDentroServiceRefresh,getListaEnquete,enqueteFactory) {
     
   
    /***************** Bloco para atualizações de notificações ********************/
@@ -16,9 +16,7 @@ function ($scope, $stateParams,$state, $q,$cordovaCamera, $ionicPopup, LOCAL_STO
     $scope.$on('$ionicView.beforeEnter', function() {
        $scope.obterNotificacoes(); 
       
-    });
-
-    
+    });    
     
     //Funcao para obter as notificacoes de noticias
     $scope.obterNotificacoes = function() {  
@@ -86,7 +84,7 @@ function ($scope, $stateParams,$state, $q,$cordovaCamera, $ionicPopup, LOCAL_STO
         $scope.refresh = function() {
            
             $timeout( function() {
-                var noticias =  obterNoticiasServiceRefresh.obterNoticiasOnlineRefresh().then(function (dadosNoticia) {    
+                var noticias =  obterNoticiasService.obterNoticiasOnline().then(function (dadosNoticia) {    
                     return dadosNoticia;
                 });  
 
@@ -113,8 +111,7 @@ function ($scope, $stateParams,$state, $q,$cordovaCamera, $ionicPopup, LOCAL_STO
                  
                     if(retornos[0] != null && retornos[1] != null && retornos[2] != null && retornos[3] != null){
                         //Setando a variavel de sessão para informar ao controller de cada tela para buscar a informação atualizada do banco.
-                        window.localStorage.setItem("eventos", true);
-                        window.localStorage.setItem("noticias", true);
+                        window.localStorage.setItem("eventos", true);                      
                         window.localStorage.setItem("fiquePordentro", true);
                         $scope.obterNotificacoes();
                     }
@@ -183,12 +180,12 @@ function ($scope, $stateParams,$state, $q,$cordovaCamera, $ionicPopup, LOCAL_STO
     $scope.logout = function () {
         //Removendo dados da sessão
         window.localStorage.removeItem(LOCAL_STORAGE.local_dados_key);
-        window.localStorage.removeItem(LOCAL_STORAGE.manter_logado);          
-        window.localStorage.removeItem("noticias");
+        window.localStorage.removeItem(LOCAL_STORAGE.manter_logado);         
+    
         window.localStorage.removeItem("eventos");
         window.localStorage.removeItem("fiquePordentro");
         
-        //Setando o token como vazio para permitir obter as noticias e eventos publicos
+        //Setando o token como vazio para permitir obter somente as noticias e eventos publicos
         window.localStorage.setItem(LOCAL_STORAGE.local_token, "");
         window.localStorage.setItem(LOCAL_STORAGE.tipo_retorno_post, 'publish');
         window.localStorage.setItem(LOCAL_STORAGE.filtro_retorno_post, '&status=publish');   
@@ -397,25 +394,7 @@ function ($scope, $stateParams, obterNoticiasService, noticiasFactory, $ionicPop
         $ionicLoading.show({
             template: 'Buscando...'
         }).then(function () {
-            //Verifica se e pra buscar a informação que foi atualizada recente.
-            var atualizado = window.localStorage.getItem("noticias");
-
-            //Caso verdadeiro busca a nova informação do contrario continua em cache
-            if(atualizado){
-                noticiasFactory.selectListaNoticias($stateParams.tipo).then(function (dados) {
-                         
-                    $scope.listaNoticias = dados;
-                    //Marcando noticias ja lidas
-                    noticiasFactory.marcarNoticiasLidas().then(function (marcados) {
-                       
-                    });
-                        
-                }).finally(function () {
-                    //em qualquer caso remove o spinner de loading
-                    $ionicLoading.hide();
-                });
-
-            }else{
+         
                 obterNoticiasService.obterNoticiasOnline().then(function (dados) {
 
                     $scope.listaNoticias = dados;
@@ -427,8 +406,7 @@ function ($scope, $stateParams, obterNoticiasService, noticiasFactory, $ionicPop
                 }).finally(function () {
                     //em qualquer caso remove o spinner de loading
                     $ionicLoading.hide();
-                });
-            }
+                });           
 
         });
     } else {

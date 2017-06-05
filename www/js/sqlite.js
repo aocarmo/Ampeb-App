@@ -19,16 +19,16 @@ sqlite.run(function ($ionicPlatform, $cordovaSQLite) {
 
 sqlite.factory('noticiasFactory', function ($q, $cordovaSQLite) {
     return {
-        insert: function (id, dsCategoria, dsTitulo, dsNoticia, dtNoticia, dsUrlImagem, flLido, status, dtAtualizacao) {
-            var query = "INSERT INTO noticia (id, dsCategoria, dsTitulo, dsNoticia, dtNoticia, dsUrlImagem, flLido, status, dtAtualizacao) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            var values = [id, dsCategoria, dsTitulo, dsNoticia, dtNoticia, dsUrlImagem, flLido, status, dtAtualizacao];
+        insert: function (id, dsCategoria, dsTitulo, dsNoticia, dtNoticia, dsUrlImagem, flLido, status, dtAtualizacao, tpConsulta) {
+            var query = "INSERT INTO noticia (id, dsCategoria, dsTitulo, dsNoticia, dtNoticia, dsUrlImagem, flLido, status, dtAtualizacao, tpConsulta) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            var values = [id, dsCategoria, dsTitulo, dsNoticia, dtNoticia, dsUrlImagem, flLido, status, dtAtualizacao, tpConsulta];
             var outputs = [];
             //Usada para fazer o retorno do banco aguardar esta completa
             var deferred = $q.defer();
 
             $cordovaSQLite.execute(db, query, values).then(
               function (res) {
-                
+                 
                   outputs.push({ "retorno": res.insertId });
                   deferred.resolve(outputs);
                   
@@ -88,7 +88,7 @@ sqlite.factory('noticiasFactory', function ($q, $cordovaSQLite) {
              
                 query = "SELECT id, dsCategoria, dsTitulo, strftime('%d/%m/%Y %H:%M:%S', datetime(dtNoticia)) as dtNoticia, dsUrlImagem FROM noticia ORDER BY date(dtNoticia) DESC";
             }
-       
+          
             var outputs = [];
 
             //Usada para fazer o retorno do banco aguardar esta completa
@@ -168,14 +168,34 @@ sqlite.factory('noticiasFactory', function ($q, $cordovaSQLite) {
 
             return deferred.promise;
         },
-        deleteNoticias: function (id) {
-            var query = "DELETE FROM noticia WHERE id NOT IN ("+id+")";
+        deleteNoticias: function (id,tpConsulta) {
+            var query = "DELETE FROM noticia WHERE id NOT IN ("+id+") AND tpConsulta = "+tpConsulta;
             var outputs = [];
 
             //Usada para fazer o retorno do banco aguardar esta completa
             var deferred = $q.defer();
             $cordovaSQLite.execute(db, query).then(function (data) {
 
+                    outputs.push({ "retorno": 1});
+                    deferred.resolve(outputs);
+               
+            }, function (error) {
+
+                deferred.reject(error);
+            });
+
+            return deferred.promise;  //This line was missing
+
+           
+        },
+        deleteNoticiasDesatualizadas: function (id,dtAtualizacao) {
+            var query = "DELETE FROM noticia WHERE id = "+id+" AND dtAtualizacao <> '"+dtAtualizacao+"'";
+            var outputs = [];
+
+            //Usada para fazer o retorno do banco aguardar esta completa
+            var deferred = $q.defer();
+            $cordovaSQLite.execute(db, query).then(function (data) {
+                  
                     outputs.push({ "retorno": 1});
                     deferred.resolve(outputs);
                
