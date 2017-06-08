@@ -329,8 +329,8 @@ angular.module('app.services', [])
 
                                                 for (var j = 0; j < response.data[i]._embedded['wp:term'][0].length; j++) {
 
-                                                    if (response.data[i]._embedded['wp:term'][0][i] != null) {
-                                                        categorias.push(response.data[i]._embedded['wp:term'][0][i].name);
+                                                    if (response.data[i]._embedded['wp:term'][0][j] != null) {
+                                                        categorias.push(response.data[i]._embedded['wp:term'][0][j].name);
                                                     }
                                                 }
 
@@ -459,26 +459,30 @@ angular.module('app.services', [])
                                     if (response.data[i]._embedded['wp:term'] != null) {
 
                                         if(response.data[i]._embedded['wp:term'][0].length == 1){
-
+                                             console.log(response.data[i].id+"| Tem uma categoria");
                                             if (response.data[i]._embedded['wp:term'][0][0].name != null) {
                                                 dsCategoria = response.data[i]._embedded['wp:term'][0][0].name;
                                             }
 
                                         }else if(response.data[i]._embedded['wp:term'][0].length > 1){
-
+                                            console.log(response.data[i].id+"| Tem duas categoria");
                                             for (var j = 0; j < response.data[i]._embedded['wp:term'][0].length; j++) {
 
-                                                if (response.data[i]._embedded['wp:term'][0][i] != null) {
-                                                    categorias.push(response.data[i]._embedded['wp:term'][0][i].name);
+                                                if (response.data[i]._embedded['wp:term'][0][j] != null) {
+                                                    categorias.push(response.data[i]._embedded['wp:term'][0][j].name);
                                                 }
                                             }
 
                                             var evento = categorias.indexOf("Próximos Eventos");
 
                                             if(evento > -1){
+                                                
                                                 dsCategoria = categorias[evento];
+                                                 console.log(response.data[i].id+"|"+dsCategoria);
                                             }else{
+                                             
                                                 dsCategoria = categorias[0];
+                                                  console.log(response.data[i].id+"|"+dsCategoria);
                                             }
 
                                         }
@@ -529,7 +533,7 @@ angular.module('app.services', [])
                                 if (response.data[i].modified != null) {
                                     dtAtualizacao = response.data[i].modified;                 
                                 }
-                            
+                                
                                 //Tratamento para não exibir eventos em noticias
                                 if(dsCategoria != "Próximos Eventos"){
 
@@ -624,8 +628,8 @@ angular.module('app.services', [])
 
                                                 for (var j = 0; j < response.data[i]._embedded['wp:term'][0].length; j++) {
 
-                                                    if (response.data[i]._embedded['wp:term'][0][i] != null) {
-                                                        categorias.push(response.data[i]._embedded['wp:term'][0][i].name);
+                                                    if (response.data[i]._embedded['wp:term'][0][j] != null) {
+                                                        categorias.push(response.data[i]._embedded['wp:term'][0][j].name);
                                                     }
                                                 }
 
@@ -761,8 +765,8 @@ angular.module('app.services', [])
 
                                             for (var j = 0; j < response.data[i]._embedded['wp:term'][0].length; j++) {
 
-                                                if (response.data[i]._embedded['wp:term'][0][i] != null) {
-                                                    categorias.push(response.data[i]._embedded['wp:term'][0][i].name);
+                                                if (response.data[i]._embedded['wp:term'][0][j] != null) {
+                                                    categorias.push(response.data[i]._embedded['wp:term'][0][j].name);
                                                 }
                                             }
 
@@ -1110,8 +1114,8 @@ angular.module('app.services', [])
 
                                 for (var j = 0; j < response.data[i]._embedded['wp:term'][0].length; j++) {
 
-                                    if (response.data[i]._embedded['wp:term'][0][i] != null) {
-                                        categorias.push(response.data[i]._embedded['wp:term'][0][i].name);
+                                    if (response.data[i]._embedded['wp:term'][0][j] != null) {
+                                        categorias.push(response.data[i]._embedded['wp:term'][0][j].name);
                                     }
                                 }
 
@@ -1260,8 +1264,8 @@ angular.module('app.services', [])
 
                                             for (var j = 0; j < response.data[i]._embedded['wp:term'][0].length; j++) {
 
-                                                if (response.data[i]._embedded['wp:term'][0][i] != null) {
-                                                    categorias.push(response.data[i]._embedded['wp:term'][0][i].name);
+                                                if (response.data[i]._embedded['wp:term'][0][j] != null) {
+                                                    categorias.push(response.data[i]._embedded['wp:term'][0][j].name);
                                                 }
                                             }
 
@@ -1333,7 +1337,7 @@ angular.module('app.services', [])
                                             "dsUrlImagem": dsUrlImagem
                                         });
 
-                                      fiquePorDentroFactory.insert(response.data[i].id, dsCategoria, dsTitulo, dsNoticia, dtNoticiaBD, dsUrlImagem, 0, dsStatus, dtAtualizacao);
+                                      fiquePorDentroFactory.insert(response.data[i].id, dsCategoria, dsTitulo, dsNoticia, dtNoticiaBD, dsUrlImagem, 1, dsStatus, dtAtualizacao);
                                     
                                 }
                             
