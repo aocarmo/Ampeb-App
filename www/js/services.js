@@ -363,7 +363,7 @@ angular.module('app.services', [])
                                         //Feito para retorna no servi�o online a data ja no formato correto
                                         var dataNoticiaArray = response.data[i].date.split("T");
                                         var dataNoticia  = dataNoticiaArray[0].split("-");
-                                        dtNoticia = dataNoticia[2] + "-" + dataNoticia[1] + "-" + dataNoticia[0] + " " + dataNoticiaArray[1];
+                                        dtNoticia = dataNoticia[2] + "/" + dataNoticia[1] + "/" + dataNoticia[0] + " " + dataNoticiaArray[1];
                                         
                                     }
                                     //Valida��o da url da imagem
@@ -459,13 +459,13 @@ angular.module('app.services', [])
                                     if (response.data[i]._embedded['wp:term'] != null) {
 
                                         if(response.data[i]._embedded['wp:term'][0].length == 1){
-                                             console.log(response.data[i].id+"| Tem uma categoria");
+                                             
                                             if (response.data[i]._embedded['wp:term'][0][0].name != null) {
                                                 dsCategoria = response.data[i]._embedded['wp:term'][0][0].name;
                                             }
 
                                         }else if(response.data[i]._embedded['wp:term'][0].length > 1){
-                                            console.log(response.data[i].id+"| Tem duas categoria");
+                                           
                                             for (var j = 0; j < response.data[i]._embedded['wp:term'][0].length; j++) {
 
                                                 if (response.data[i]._embedded['wp:term'][0][j] != null) {
@@ -478,11 +478,11 @@ angular.module('app.services', [])
                                             if(evento > -1){
                                                 
                                                 dsCategoria = categorias[evento];
-                                                 console.log(response.data[i].id+"|"+dsCategoria);
+                                                 
                                             }else{
                                              
                                                 dsCategoria = categorias[0];
-                                                  console.log(response.data[i].id+"|"+dsCategoria);
+                                                 
                                             }
 
                                         }
@@ -506,7 +506,7 @@ angular.module('app.services', [])
                                     //Feito para retorna no servi�o online a data ja no formato correto
                                     var dataNoticiaArray = response.data[i].date.split("T");
                                     var dataNoticia  = dataNoticiaArray[0].split("-");
-                                    dtNoticia = dataNoticia[2] + "-" + dataNoticia[1] + "-" + dataNoticia[0] + " " + dataNoticiaArray[1];
+                                    dtNoticia = dataNoticia[2] + "/" + dataNoticia[1] + "/" + dataNoticia[0] + " " + dataNoticiaArray[1];
                                     
                                 }
                                 //Valida��o da url da imagem
@@ -662,7 +662,7 @@ angular.module('app.services', [])
                                         //Feito para retorna no servi�o online a data ja no formato correto
                                         var dataNoticiaArray = response.data[i].date.split("T");
                                         var dataNoticia  = dataNoticiaArray[0].split("-");
-                                        dtNoticia = dataNoticia[2] + "-" + dataNoticia[1] + "-" + dataNoticia[0] + " " + dataNoticiaArray[1];
+                                        dtNoticia = dataNoticia[2] + "/" + dataNoticia[1] + "/" + dataNoticia[0] + " " + dataNoticiaArray[1];
                                         
                                     }
                                     //Valida��o da url da imagem
@@ -799,7 +799,7 @@ angular.module('app.services', [])
                                     //Feito para retorna no servi�o online a data ja no formato correto
                                     var dataNoticiaArray = response.data[i].date.split("T");
                                     var dataNoticia  = dataNoticiaArray[0].split("-");
-                                    dtNoticia = dataNoticia[2] + "-" + dataNoticia[1] + "-" + dataNoticia[0] + " " + dataNoticiaArray[1];
+                                    dtNoticia = dataNoticia[2] + "/" + dataNoticia[1] + "/" + dataNoticia[0] + " " + dataNoticiaArray[1];
                                     
                                 }
                                 //Valida��o da url da imagem
@@ -1148,7 +1148,7 @@ angular.module('app.services', [])
                         //Feito para retorna no servi�o online a data ja no formato correto
                         var dataNoticiaArray = response.data[i].date.split("T");
                         var dataNoticia  = dataNoticiaArray[0].split("-");
-                        dtNoticia = dataNoticia[2] + "-" + dataNoticia[1] + "-" + dataNoticia[0] + " " + dataNoticiaArray[1];
+                        dtNoticia = dataNoticia[2] + "/" + dataNoticia[1] + "/" + dataNoticia[0] + " " + dataNoticiaArray[1];
                         
                     }
                     //Valida��o da url da imagem
@@ -1298,7 +1298,7 @@ angular.module('app.services', [])
                                     //Feito para retorna no servi�o online a data ja no formato correto
                                     var dataNoticiaArray = response.data[i].date.split("T");
                                     var dataNoticia  = dataNoticiaArray[0].split("-");
-                                    dtNoticia = dataNoticia[2] + "-" + dataNoticia[1] + "-" + dataNoticia[0] + " " + dataNoticiaArray[1];
+                                    dtNoticia = dataNoticia[2] + "/" + dataNoticia[1] + "/" + dataNoticia[0] + " " + dataNoticiaArray[1];
                                     
                                 }
                                 //Valida��o da url da imagem
