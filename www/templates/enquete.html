@@ -10,7 +10,7 @@
       <ion-radio ng-repeat="resposta in enquete[0].answers" id="enquete-radio1"  ng-model="respostaEnquete.answer" ng-value="resposta.polla_aid" ng-required="true">{{resposta.polla_answers}}</ion-radio>      
        <div align="center" class="row">
           <div class="col col-50">
-           <button type="submit" id="enquete-button18" style="font-size:18px;" ng-disabled="habilitarVoto == 'true'" class="button button-assertive  button-block">Votar!</button>
+           <button type="submit" id="enquete-button18" style="font-size:18px;" ng-disabled="habilitarVoto == 'true'" class="button button-assertive  button-block">Votar</button>
           </div>
           <div class="col col-50">
            <button id="enquete-button18" style="font-size:18px;" class="button button-assertive  button-block" ui-sref="resultadoDaEnquete({id: enquete[0].pollq_id})">Resultado</button>

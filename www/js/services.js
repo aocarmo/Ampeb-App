@@ -420,6 +420,142 @@ angular.module('app.services', [])
     };
         
 }])
+/***** Serviços para o modulo de noticias ler mais *****/
+.service('obterNoticiasServiceObterMais', ['$http', '$q', 'WEB_METODOS', 'noticiasFactory','LOCAL_STORAGE',  function ($http, $q, WEB_METODOS, noticiasFactory,LOCAL_STORAGE) {
+
+       
+             
+          
+    return {
+        obter: function (pagina) {
+        
+           return   $http.get(WEB_METODOS.urlServicosPortalNoticias+window.localStorage.getItem(LOCAL_STORAGE.filtro_retorno_post)+"&page="+pagina,{headers: {'Authorization': window.localStorage.getItem(LOCAL_STORAGE.local_token)}}).then(function (response) {
+                      
+                        //Lendo todas as noticias
+                        var tipoConsulta = 0;               
+                        var idNoticias = [];
+                        var listaNoticias = [];
+                        var deferred = $q.defer();
+
+                        if(window.localStorage.getItem(LOCAL_STORAGE.tipo_retorno_post) == "private"){
+                            tipoConsulta = 1;
+                        }
+                             
+                            for (var i = 0; i < response.data.length; i++) {
+
+                                var dsNoticia = "";
+                                var dsCategoria = "";
+                                var dsUrlImagem = "img/img_not_found.jpg";
+                                var dsTitulo = "";
+                                var dtNoticiaBD = "";
+                                var dtNoticia = "";
+                                var dsStatus = "";
+                                var dtAtualizacao = "";
+                                var categorias = [];
+                                
+                                //Valida��o de categoria
+                                if (response.data[i]._embedded != null) {
+
+                                    if (response.data[i]._embedded['wp:term'] != null) {
+
+                                        if(response.data[i]._embedded['wp:term'][0].length == 1){
+
+                                            if (response.data[i]._embedded['wp:term'][0][0].name != null) {
+                                                dsCategoria = response.data[i]._embedded['wp:term'][0][0].name;
+                                            }
+
+                                        }else if(response.data[i]._embedded['wp:term'][0].length > 1){
+
+                                            for (var j = 0; j < response.data[i]._embedded['wp:term'][0].length; j++) {
+
+                                                if (response.data[i]._embedded['wp:term'][0][i] != null) {
+                                                    categorias.push(response.data[i]._embedded['wp:term'][0][i].name);
+                                                }
+                                            }
+
+                                            var evento = categorias.indexOf("Próximos Eventos");
+
+                                            if(evento > -1){
+                                                dsCategoria = categorias[evento];
+                                            }else{
+                                                dsCategoria = categorias[0];
+                                            }
+
+                                        }
+                                    }
+                                }
+                                
+                            
+                                //Valida��o de titulo
+                                if (response.data[i].title.rendered != null) {
+                                    dsTitulo = response.data[i].title.rendered;
+                                }
+
+                                //Valida��o da descri��o
+                                if (response.data[i].content.rendered != null) {
+                                    dsNoticia = response.data[i].content.rendered;
+                                }
+
+                                //Valida��o da data
+                                if (response.data[i].date != null) {
+                                    dtNoticiaBD = response.data[i].date;
+                                    //Feito para retorna no servi�o online a data ja no formato correto
+                                    var dataNoticiaArray = response.data[i].date.split("T");
+                                    var dataNoticia  = dataNoticiaArray[0].split("-");
+                                    dtNoticia = dataNoticia[2] + "-" + dataNoticia[1] + "-" + dataNoticia[0] + " " + dataNoticiaArray[1];
+                                    
+                                }
+                                //Valida��o da url da imagem
+                                if (response.data[i]._embedded.hasOwnProperty('wp:featuredmedia')) {                        
+                                    if (response.data[i]._embedded['wp:featuredmedia'][0] != null) {
+                                        if (response.data[i]._embedded['wp:featuredmedia'][0].media_details != null) {
+                                            if (response.data[i]._embedded['wp:featuredmedia'][0].media_details.sizes != null) {
+                                                if (response.data[i]._embedded['wp:featuredmedia'][0].media_details.sizes.medium != null) {
+                                                    if (response.data[i]._embedded['wp:featuredmedia'][0].media_details.sizes.medium.source_url != null) {
+                                                        dsUrlImagem = response.data[i]._embedded['wp:featuredmedia'][0].media_details.sizes.medium.source_url;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                //Validacao do status
+                                if (response.data[i].status != null) {
+                                    dsStatus = response.data[i].status;
+                                }
+
+                                //Valida��o da data
+                                if (response.data[i].modified != null) {
+                                    dtAtualizacao = response.data[i].modified;                 
+                                }
+                            
+                                //Tratamento para não exibir eventos em noticias
+                                if(dsCategoria != "Próximos Eventos"){
+
+                                       listaNoticias.push({
+                                            "id": response.data[i].id,
+                                            "dsCategoria": dsCategoria,
+                                            "dsTitulo": dsTitulo,                          
+                                            "dtNoticia": dtNoticia,
+                                            "dsUrlImagem": dsUrlImagem
+                                        });
+
+                                    noticiasFactory.insert(response.data[i].id, dsCategoria, dsTitulo, dsNoticia, dtNoticiaBD, dsUrlImagem, 1, dsStatus, dtAtualizacao,tipoConsulta);                                    
+                                    
+                                }
+                            
+                            }
+
+                            return listaNoticias;      
+
+
+            });
+
+        }
+    };
+        
+}])
 /***** Serviços para o modulo de eventos *****/
 .service('obterEventosService', ['$http', '$q', 'WEB_METODOS', 'eventosFactory','LOCAL_STORAGE',  function ($http, $q, WEB_METODOS, eventosFactory,LOCAL_STORAGE) {
 
@@ -573,6 +709,139 @@ angular.module('app.services', [])
 
                      return deferred.promise;             
                      
+            });
+
+
+        }
+    };
+        
+}])
+/***** Serviços para o modulo de eventos *****/
+.service('obterEventosServiceObterMais', ['$http', '$q', 'WEB_METODOS', 'eventosFactory','LOCAL_STORAGE',  function ($http, $q, WEB_METODOS, eventosFactory,LOCAL_STORAGE) {
+
+    return {
+        obter: function (pagina) {
+          
+         return  $http.get(WEB_METODOS.urlServicosPortalEventos+window.localStorage.getItem(LOCAL_STORAGE.filtro_retorno_post)+"&page="+pagina,{headers: {'Authorization': window.localStorage.getItem(LOCAL_STORAGE.local_token)}}).then(function (response) {
+                     
+                        //Lendo todas as noticias
+                        var tipoConsulta = 0;               
+                        var idNoticias = [];
+                        var listaNoticias = [];
+                        var deferred = $q.defer();
+
+                        if(window.localStorage.getItem(LOCAL_STORAGE.tipo_retorno_post) == "private"){
+                            tipoConsulta = 1;
+                        }
+                             
+                            for (var i = 0; i < response.data.length; i++) {
+
+                                var dsNoticia = "";
+                                var dsCategoria = "";
+                                var dsUrlImagem = "img/img_not_found.jpg";
+                                var dsTitulo = "";
+                                var dtNoticiaBD = "";
+                                var dtNoticia = "";
+                                var dsStatus = "";
+                                var dtAtualizacao = "";
+                                var categorias = [];
+                                
+                                //Valida��o de categoria
+                                if (response.data[i]._embedded != null) {
+
+                                    if (response.data[i]._embedded['wp:term'] != null) {
+
+                                        if(response.data[i]._embedded['wp:term'][0].length == 1){
+
+                                            if (response.data[i]._embedded['wp:term'][0][0].name != null) {
+                                                dsCategoria = response.data[i]._embedded['wp:term'][0][0].name;
+                                            }
+
+                                        }else if(response.data[i]._embedded['wp:term'][0].length > 1){
+
+                                            for (var j = 0; j < response.data[i]._embedded['wp:term'][0].length; j++) {
+
+                                                if (response.data[i]._embedded['wp:term'][0][i] != null) {
+                                                    categorias.push(response.data[i]._embedded['wp:term'][0][i].name);
+                                                }
+                                            }
+
+                                            var evento = categorias.indexOf("Próximos Eventos");
+
+                                            if(evento > -1){
+                                                dsCategoria = categorias[evento];
+                                            }else{
+                                                dsCategoria = categorias[0];
+                                            }
+
+                                        }
+                                    }
+                                }
+                                
+                            
+                                //Valida��o de titulo
+                                if (response.data[i].title.rendered != null) {
+                                    dsTitulo = response.data[i].title.rendered;
+                                }
+
+                                //Valida��o da descri��o
+                                if (response.data[i].content.rendered != null) {
+                                    dsNoticia = response.data[i].content.rendered;
+                                }
+
+                                //Valida��o da data
+                                if (response.data[i].date != null) {
+                                    dtNoticiaBD = response.data[i].date;
+                                    //Feito para retorna no servi�o online a data ja no formato correto
+                                    var dataNoticiaArray = response.data[i].date.split("T");
+                                    var dataNoticia  = dataNoticiaArray[0].split("-");
+                                    dtNoticia = dataNoticia[2] + "-" + dataNoticia[1] + "-" + dataNoticia[0] + " " + dataNoticiaArray[1];
+                                    
+                                }
+                                //Valida��o da url da imagem
+                                if (response.data[i]._embedded.hasOwnProperty('wp:featuredmedia')) {                        
+                                    if (response.data[i]._embedded['wp:featuredmedia'][0] != null) {
+                                        if (response.data[i]._embedded['wp:featuredmedia'][0].media_details != null) {
+                                            if (response.data[i]._embedded['wp:featuredmedia'][0].media_details.sizes != null) {
+                                                if (response.data[i]._embedded['wp:featuredmedia'][0].media_details.sizes.medium != null) {
+                                                    if (response.data[i]._embedded['wp:featuredmedia'][0].media_details.sizes.medium.source_url != null) {
+                                                        dsUrlImagem = response.data[i]._embedded['wp:featuredmedia'][0].media_details.sizes.medium.source_url;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                //Validacao do status
+                                if (response.data[i].status != null) {
+                                    dsStatus = response.data[i].status;
+                                }
+
+                                //Valida��o da data
+                                if (response.data[i].modified != null) {
+                                    dtAtualizacao = response.data[i].modified;                 
+                                }
+                            
+                                //Tratamento para não exibir eventos em noticias
+                                if(dsCategoria == "Próximos Eventos"){
+
+                                       listaNoticias.push({
+                                            "id": response.data[i].id,
+                                            "dsCategoria": dsCategoria,
+                                            "dsTitulo": dsTitulo,                          
+                                            "dtNoticia": dtNoticia,
+                                            "dsUrlImagem": dsUrlImagem
+                                        });
+
+                                    eventosFactory.insert(response.data[i].id, dsCategoria, dsTitulo, dsNoticia, dtNoticiaBD, dsUrlImagem, 1, dsStatus, dtAtualizacao,tipoConsulta);                                    
+                                    
+                                }
+                            
+                            }
+
+                            return listaNoticias;      
+
             });
 
 
@@ -799,166 +1068,11 @@ angular.module('app.services', [])
         }
     };
 
-}])/***** Serviços para o modulo de noticias *****/
-.service('obterFiquePorDentroService', ['$http', '$q', 'WEB_METODOS', 'fiquePorDentroFactory','LOCAL_STORAGE',  function ($http, $q, WEB_METODOS, fiquePorDentroFactory,LOCAL_STORAGE) {
+}])
+.service('obterFiquePorDentroService', ['$http', '$q', 'WEB_METODOS', 'fiquePorDentroFactory','LOCAL_STORAGE',  function ($http, $q, WEB_METODOS, fiquePorDentroFactory, LOCAL_STORAGE) {
 
-       
-    var listaFiquePorDentro =  $http.get(WEB_METODOS.urlServicosPortalFiquePorDentro,{headers: {'Authorization': window.localStorage.getItem(LOCAL_STORAGE.local_token)}}).then(function (response) {
-           
-             //Loop para verificar e exluir todos os post que sofreram modificações
-              for (var i = 0; i < response.data.length; i++) {
-                  fiquePorDentroFactory.deleteNoticiasDesatualizadas(response.data[i].id, response.data[i].modified);
-                 
-              }
-            //Lendo todas as noticias
-               var idNoticias = [];
-                for (var i = 0; i < response.data.length; i++) {
-
-                    var dsNoticia = "";
-                    var dsCategoria = "";
-                    var dsUrlImagem = "img/img_not_found.jpg";
-                    var dsTitulo = "";
-                    var dtNoticiaBD = "";
-                    var dtNoticia = "";
-                    var dsStatus = "";
-                    var dtAtualizacao = "";
-                    var categorias = [];
-                    
-                    //Valida��o de categoria
-                    if (response.data[i]._embedded != null) {
-
-                        if (response.data[i]._embedded['wp:term'] != null) {
-
-                            if(response.data[i]._embedded['wp:term'][0].length == 1){
-
-                                if (response.data[i]._embedded['wp:term'][0][0].name != null) {
-                                    dsCategoria = response.data[i]._embedded['wp:term'][0][0].name;
-                                }
-
-                            }else if(response.data[i]._embedded['wp:term'][0].length > 1){
-
-                                for (var j = 0; j < response.data[i]._embedded['wp:term'][0].length; j++) {
-
-                                    if (response.data[i]._embedded['wp:term'][0][i] != null) {
-                                        categorias.push(response.data[i]._embedded['wp:term'][0][i].name);
-                                    }
-                                }
-
-                                var evento = categorias.indexOf("Próximos Eventos");
-
-                                if(evento > -1){
-                                    dsCategoria = categorias[evento];
-                                }else{
-                                    dsCategoria = categorias[0];
-                                }
-
-                            }
-                        }
-                    }
-                    
-                   
-                    //Valida��o de titulo
-                    if (response.data[i].title.rendered != null) {
-                        dsTitulo = response.data[i].title.rendered;
-                    }
-
-                    //Valida��o da descri��o
-                    if (response.data[i].content.rendered != null) {
-                        dsNoticia = response.data[i].content.rendered;
-                    }
-
-                    //Valida��o da data
-                    if (response.data[i].date != null) {
-                        dtNoticiaBD = response.data[i].date;
-                        //Feito para retorna no servi�o online a data ja no formato correto
-                        var dataNoticiaArray = response.data[i].date.split("T");
-                        var dataNoticia  = dataNoticiaArray[0].split("-");
-                        dtNoticia = dataNoticia[2] + "-" + dataNoticia[1] + "-" + dataNoticia[0] + " " + dataNoticiaArray[1];
-                        
-                    }
-                    //Valida��o da url da imagem
-                    if (response.data[i]._embedded.hasOwnProperty('wp:featuredmedia')) {                        
-                        if (response.data[i]._embedded['wp:featuredmedia'][0] != null) {
-                            if (response.data[i]._embedded['wp:featuredmedia'][0].media_details != null) {
-                                if (response.data[i]._embedded['wp:featuredmedia'][0].media_details.sizes != null) {
-                                    if (response.data[i]._embedded['wp:featuredmedia'][0].media_details.sizes.medium != null) {
-                                        if (response.data[i]._embedded['wp:featuredmedia'][0].media_details.sizes.medium.source_url != null) {
-                                            dsUrlImagem = response.data[i]._embedded['wp:featuredmedia'][0].media_details.sizes.medium.source_url;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    //Validacao do status
-                    if (response.data[i].status != null) {
-                        dsStatus = response.data[i].status;
-                    }
-
-                    //Valida��o da data
-                    if (response.data[i].modified != null) {
-                        dtAtualizacao = response.data[i].modified;                 
-                    }
-                 
-                    //Tratamento para não exibir eventos em noticias
-                    if(dsCategoria != "Próximos Eventos"){
-                        fiquePorDentroFactory.insert(response.data[i].id, dsCategoria, dsTitulo, dsNoticia, dtNoticiaBD, dsUrlImagem, 0, dsStatus, dtAtualizacao);
-                     
-                        //Pegando os id das noticias que não serão excluidas
-                        idNoticias.push(response.data[i].id);
-                    }
-                  
-                }
-                     
-                    var deferred = $q.defer();
-
-                    //Excluindo do banco noticias que não estão mais disponiveis no servico
-                    var noticiasExcluir =  fiquePorDentroFactory.deleteNoticias(idNoticias.join()).then(function (noticiasExcluirRetorno) {    
-                        return noticiasExcluirRetorno;
-                    });                                          
-
-                    var retornoNoticiasExibir = [];
-                    
-                    //Executando a exclusão das noticias
-                    $q.all([noticiasExcluir]).then(function(result){
-
-                        for (var i = 0; i < result.length; i++){
-                            retornoNoticiasExibir.push(result[i]);
-                        }
-
-                        if(retornoNoticiasExibir[0][0].retorno == 1){
-
-                            //Selecionando qual tipo de noticia será 
-                            var tipo = window.localStorage.getItem(LOCAL_STORAGE.tipo_retorno_post);
-                         
-                            //Após excluídas as noticias, seleciona as noticias salvas no banco
-                            fiquePorDentroFactory.selectListaNoticias().then(function (dadosOnline) {
-            
-                                deferred.resolve(dadosOnline);
-                            });
-                    
-                        }
-                        
-                    });          
-                   
-                return deferred.promise;              
-                
-               
-            });
-          
     return {
         obterNoticiasOnline: function () {
-        
-           return  listaFiquePorDentro;
-
-        }
-    };
-        
-}]).service('obterFiquePorDentroServiceRefresh', ['$http', '$q', 'WEB_METODOS', 'fiquePorDentroFactory','LOCAL_STORAGE',  function ($http, $q, WEB_METODOS, fiquePorDentroFactory, LOCAL_STORAGE) {
-
-    return {
-        obterNoticiasOnlineRefresh: function () {
           
          return  $http.get(WEB_METODOS.urlServicosPortalFiquePorDentro,{headers: {'Authorization': window.localStorage.getItem(LOCAL_STORAGE.local_token)}}).then(function (response) {
            
@@ -1104,7 +1218,137 @@ angular.module('app.services', [])
         }
     };
         
-}])//Serviços para obter uma lsta de enquetes
+}])
+.service('obterFiquePorDentroServiceObterMais', ['$http', '$q', 'WEB_METODOS', 'fiquePorDentroFactory','LOCAL_STORAGE',  function ($http, $q, WEB_METODOS, fiquePorDentroFactory, LOCAL_STORAGE) {
+
+    return {
+        obter: function (pagina) {
+          
+         return   $http.get(WEB_METODOS.urlServicosPortalFiquePorDentro+"&page="+pagina,{headers: {'Authorization': window.localStorage.getItem(LOCAL_STORAGE.local_token)}}).then(function (response) {
+                      
+                        //Lendo todas as noticias
+                        var tipoConsulta = 0;               
+                        var idNoticias = [];
+                        var listaNoticias = [];
+                        var deferred = $q.defer();
+
+                      
+                            for (var i = 0; i < response.data.length; i++) {
+
+                                var dsNoticia = "";
+                                var dsCategoria = "";
+                                var dsUrlImagem = "img/img_not_found.jpg";
+                                var dsTitulo = "";
+                                var dtNoticiaBD = "";
+                                var dtNoticia = "";
+                                var dsStatus = "";
+                                var dtAtualizacao = "";
+                                var categorias = [];
+                                
+                                //Valida��o de categoria
+                                if (response.data[i]._embedded != null) {
+
+                                    if (response.data[i]._embedded['wp:term'] != null) {
+
+                                        if(response.data[i]._embedded['wp:term'][0].length == 1){
+
+                                            if (response.data[i]._embedded['wp:term'][0][0].name != null) {
+                                                dsCategoria = response.data[i]._embedded['wp:term'][0][0].name;
+                                            }
+
+                                        }else if(response.data[i]._embedded['wp:term'][0].length > 1){
+
+                                            for (var j = 0; j < response.data[i]._embedded['wp:term'][0].length; j++) {
+
+                                                if (response.data[i]._embedded['wp:term'][0][i] != null) {
+                                                    categorias.push(response.data[i]._embedded['wp:term'][0][i].name);
+                                                }
+                                            }
+
+                                            var evento = categorias.indexOf("Próximos Eventos");
+
+                                            if(evento > -1){
+                                                dsCategoria = categorias[evento];
+                                            }else{
+                                                dsCategoria = categorias[0];
+                                            }
+
+                                        }
+                                    }
+                                }
+                                
+                            
+                                //Valida��o de titulo
+                                if (response.data[i].title.rendered != null) {
+                                    dsTitulo = response.data[i].title.rendered;
+                                }
+
+                                //Valida��o da descri��o
+                                if (response.data[i].content.rendered != null) {
+                                    dsNoticia = response.data[i].content.rendered;
+                                }
+
+                                //Valida��o da data
+                                if (response.data[i].date != null) {
+                                    dtNoticiaBD = response.data[i].date;
+                                    //Feito para retorna no servi�o online a data ja no formato correto
+                                    var dataNoticiaArray = response.data[i].date.split("T");
+                                    var dataNoticia  = dataNoticiaArray[0].split("-");
+                                    dtNoticia = dataNoticia[2] + "-" + dataNoticia[1] + "-" + dataNoticia[0] + " " + dataNoticiaArray[1];
+                                    
+                                }
+                                //Valida��o da url da imagem
+                                if (response.data[i]._embedded.hasOwnProperty('wp:featuredmedia')) {                        
+                                    if (response.data[i]._embedded['wp:featuredmedia'][0] != null) {
+                                        if (response.data[i]._embedded['wp:featuredmedia'][0].media_details != null) {
+                                            if (response.data[i]._embedded['wp:featuredmedia'][0].media_details.sizes != null) {
+                                                if (response.data[i]._embedded['wp:featuredmedia'][0].media_details.sizes.medium != null) {
+                                                    if (response.data[i]._embedded['wp:featuredmedia'][0].media_details.sizes.medium.source_url != null) {
+                                                        dsUrlImagem = response.data[i]._embedded['wp:featuredmedia'][0].media_details.sizes.medium.source_url;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                //Validacao do status
+                                if (response.data[i].status != null) {
+                                    dsStatus = response.data[i].status;
+                                }
+
+                                //Valida��o da data
+                                if (response.data[i].modified != null) {
+                                    dtAtualizacao = response.data[i].modified;                 
+                                }
+                            
+                                //Tratamento para não exibir eventos em noticias
+                                if(dsCategoria != "Próximos Eventos"){
+
+                                       listaNoticias.push({
+                                            "id": response.data[i].id,
+                                            "dsCategoria": dsCategoria,
+                                            "dsTitulo": dsTitulo,                          
+                                            "dtNoticia": dtNoticia,
+                                            "dsUrlImagem": dsUrlImagem
+                                        });
+
+                                      fiquePorDentroFactory.insert(response.data[i].id, dsCategoria, dsTitulo, dsNoticia, dtNoticiaBD, dsUrlImagem, 0, dsStatus, dtAtualizacao);
+                                    
+                                }
+                            
+                            }
+
+                            return listaNoticias;      
+
+
+            });
+
+        }
+    };
+        
+}])
+//Serviços para obter uma lsta de enquetes
 .service('getListaEnquete', ['$http', '$q', 'WEB_METODOS','LOCAL_STORAGE','enqueteFactory',  function ($http, $q, WEB_METODOS,LOCAL_STORAGE,enqueteFactory) {
 
     return {
@@ -1174,6 +1418,20 @@ angular.module('app.services', [])
         votar: function (id,id_answer) {    
 
             return $http.get(WEB_METODOS.urlVotarEnquete+"?id="+id+"&id_answer="+id_answer,{headers: {'Authorization': window.localStorage.getItem(LOCAL_STORAGE.local_token)}}).then(function (response) {
+              
+                return response;
+            });
+
+        }
+    };
+
+}]).service('obterTransmissaoAoVivo', ['$http', '$q', 'WEB_METODOS','LOCAL_STORAGE',  function ($http, $q, WEB_METODOS,LOCAL_STORAGE) {
+
+    return {
+
+        obter: function (url) {    
+
+            return $http.get(WEB_METODOS.urlServicoTransmissaoAoVivo+url,{headers: {'Authorization': window.localStorage.getItem(LOCAL_STORAGE.local_token)}}).then(function (response) {
               
                 return response;
             });

@@ -1,9 +1,9 @@
 ﻿angular.module('app.controllers', [])
   
-.controller('aMPEBCtrl', ['$scope', '$stateParams','$state','$q', '$cordovaCamera','$ionicPopup','LOCAL_STORAGE','$timeout','noticiasFactory','eventosFactory','obterNoticiasService','obterEventosService','atualizarFotoAssociado','$cordovaNetwork','$ionicLoading','$ionicHistory','fiquePorDentroFactory','obterFiquePorDentroService','obterFiquePorDentroServiceRefresh','getListaEnquete','enqueteFactory', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+.controller('aMPEBCtrl', ['$scope', '$stateParams','$state','$q', '$cordovaCamera','$ionicPopup','LOCAL_STORAGE','$timeout','noticiasFactory','eventosFactory','obterNoticiasService','obterEventosService','atualizarFotoAssociado','$cordovaNetwork','$ionicLoading','$ionicHistory','fiquePorDentroFactory','obterFiquePorDentroService','getListaEnquete','enqueteFactory', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $stateParams,$state, $q,$cordovaCamera, $ionicPopup, LOCAL_STORAGE,$timeout,noticiasFactory,eventosFactory,obterNoticiasService,obterEventosService,atualizarFotoAssociado,$cordovaNetwork,$ionicLoading,$ionicHistory,fiquePorDentroFactory,obterFiquePorDentroService,obterFiquePorDentroServiceRefresh,getListaEnquete,enqueteFactory) {
+function ($scope, $stateParams,$state, $q,$cordovaCamera, $ionicPopup, LOCAL_STORAGE,$timeout,noticiasFactory,eventosFactory,obterNoticiasService,obterEventosService,atualizarFotoAssociado,$cordovaNetwork,$ionicLoading,$ionicHistory,fiquePorDentroFactory,obterFiquePorDentroService,getListaEnquete,enqueteFactory) {
     
   
    /***************** Bloco para atualizações de notificações ********************/
@@ -93,7 +93,7 @@ function ($scope, $stateParams,$state, $q,$cordovaCamera, $ionicPopup, LOCAL_STO
                     return dadosEvento;
                 }); 
 
-                var fiquePorDentro = obterFiquePorDentroServiceRefresh.obterNoticiasOnlineRefresh().then(function (dadosFiquePorDentro) {    
+                var fiquePorDentro = obterFiquePorDentroService.obterNoticiasOnline().then(function (dadosFiquePorDentro) {    
                     return dadosFiquePorDentro;
                 });   
 
@@ -110,9 +110,7 @@ function ($scope, $stateParams,$state, $q,$cordovaCamera, $ionicPopup, LOCAL_STO
                     }
                  
                     if(retornos[0] != null && retornos[1] != null && retornos[2] != null && retornos[3] != null){
-                        //Setando a variavel de sessão para informar ao controller de cada tela para buscar a informação atualizada do banco.
-                        window.localStorage.setItem("eventos", true);                      
-                        window.localStorage.setItem("fiquePordentro", true);
+                        //Setando a variavel de sessão para informar ao controller de cada tela para buscar a informação atualizada do banco.                      
                         $scope.obterNotificacoes();
                     }
                 });
@@ -180,10 +178,7 @@ function ($scope, $stateParams,$state, $q,$cordovaCamera, $ionicPopup, LOCAL_STO
     $scope.logout = function () {
         //Removendo dados da sessão
         window.localStorage.removeItem(LOCAL_STORAGE.local_dados_key);
-        window.localStorage.removeItem(LOCAL_STORAGE.manter_logado);         
-    
-        window.localStorage.removeItem("eventos");
-        window.localStorage.removeItem("fiquePordentro");
+        window.localStorage.removeItem(LOCAL_STORAGE.manter_logado);   
         
         //Setando o token como vazio para permitir obter somente as noticias e eventos publicos
         window.localStorage.setItem(LOCAL_STORAGE.local_token, "");
@@ -383,32 +378,26 @@ function ($scope, $stateParams, $state, $http, $ionicPopup, $ionicLoading, Login
    
 }])
    
-.controller('notCiasCtrl', ['$scope', '$stateParams', 'obterNoticiasService','noticiasFactory', '$ionicPopup', 'LOCAL_STORAGE', '$ionicLoading','$cordovaNetwork','$ionicHistory', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+.controller('notCiasCtrl', ['$scope', '$stateParams', 'obterNoticiasService','noticiasFactory', '$ionicPopup', 'LOCAL_STORAGE', '$ionicLoading','$cordovaNetwork','$ionicHistory','obterNoticiasServiceObterMais', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $stateParams, obterNoticiasService, noticiasFactory, $ionicPopup, LOCAL_STORAGE, $ionicLoading, $cordovaNetwork, $ionicHistory) {
-   
-     
+function ($scope, $stateParams, obterNoticiasService, noticiasFactory, $ionicPopup, LOCAL_STORAGE, $ionicLoading, $cordovaNetwork, $ionicHistory,obterNoticiasServiceObterMais) {
+   //Variáveis declaradas para paginação
+     $scope.pagina = 1;
+     $scope.listaNoticias = [];
     //Verifica se estivar online pega dados via serviço 
     if ($cordovaNetwork.isOnline()) {
-        $ionicLoading.show({
-            template: 'Buscando...'
-        }).then(function () {
-         
-                obterNoticiasService.obterNoticiasOnline().then(function (dados) {
 
-                    $scope.listaNoticias = dados;
+        obterNoticiasService.obterNoticiasOnline().then(function (dados) {
+            
+            $scope.listaNoticias = dados;
 
-                    noticiasFactory.marcarNoticiasLidas().then(function (marcados) {
-                       
-                    });
+            noticiasFactory.marcarNoticiasLidas().then(function (marcados) {
+                
+            });
 
-                }).finally(function () {
-                    //em qualquer caso remove o spinner de loading
-                    $ionicLoading.hide();
-                });           
+        });     
 
-        });
     } else {
         //Pega dados do banco
         $ionicLoading.show({
@@ -451,58 +440,60 @@ function ($scope, $stateParams, obterNoticiasService, noticiasFactory, $ionicPop
    
    // Pegando dados do usuário da sessão
     $scope.dadosUsuario = JSON.parse(window.localStorage.getItem(LOCAL_STORAGE.local_dados_key));
+
+      //Função para obter mais noticias.
+    $scope.obterMais = function() { 
+
+        if ($cordovaNetwork.isOnline()) {  
+            //Contador para pedir proxima pagina ao seviço
+            $scope.pagina++; 
+        
+            obterNoticiasServiceObterMais.obter($scope.pagina).then(function (retorno) {
+                
+                //Concatenando as novas informações ao array existente de noticias
+                $scope.listaNoticias = $scope.listaNoticias.concat(retorno); 
+                //Encerra o loading
+                $scope.$broadcast('scroll.infiniteScrollComplete');
+
+            });
+        }else{
+            var alertPopup = $ionicPopup.alert({
+                    title: 'Sem conexão com a internet.',
+                    template: 'Para obter mais dados, conecte seu dispositivo a internet.',
+                    okText: 'Ok', // String (default: 'OK'). The text of the OK button.
+                    okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+                });
+        }           	
+            
+    };    
     
   
    
 }])
    
-.controller('prXimosEventosCtrl', ['$scope', '$stateParams', 'obterEventosService', '$ionicPopup', 'LOCAL_STORAGE', '$ionicLoading','$cordovaNetwork','$ionicHistory','eventosFactory', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+.controller('prXimosEventosCtrl', ['$scope', '$stateParams', 'obterEventosService', '$ionicPopup', 'LOCAL_STORAGE', '$ionicLoading','$cordovaNetwork','$ionicHistory','eventosFactory','obterEventosServiceObterMais', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $stateParams,obterEventosService, $ionicPopup, LOCAL_STORAGE, $ionicLoading, $cordovaNetwork, $ionicHistory,eventosFactory) {
+function ($scope, $stateParams,obterEventosService, $ionicPopup, LOCAL_STORAGE, $ionicLoading, $cordovaNetwork, $ionicHistory,eventosFactory,obterEventosServiceObterMais) {
 
+    //Variáveis declaradas para paginação
+    $scope.pagina = 1;
+    $scope.listaEventos = [];
  //Verifica se estivar online pega dados via serviço 
     if ($cordovaNetwork.isOnline()) {
-        $ionicLoading.show({
-            template: 'Buscando...'
-        }).then(function () {
+       
+          
+        obterEventosService.obterEventosOnline().then(function (dados) {
 
-            //Verifica se e pra buscar a informação que foi atualizada recente.
-            var atualizado = window.localStorage.getItem("eventos");
-            
-            //Caso verdadeiro busca a nova informação do contrario continua em cache
-            if(atualizado){
-
-                eventosFactory.selectListaNoticias().then(function (dadosArmazenados) {
-            
-                    $scope.listaEventos = dadosArmazenados;
-                    
-                    eventosFactory.marcarEventosLidos().then(function (marcados) {
-                        
-                    });           
-
-                }).finally(function () {
-                    //em qualquer caso remove o spinner de loading
-                    $ionicLoading.hide();
-                });
-
-            }else{
-                obterEventosService.obterEventosOnline().then(function (dados) {
-
-                    $scope.listaEventos = dados;
+            $scope.listaEventos = dados;
+        
+            eventosFactory.marcarEventosLidos().then(function (marcados) {
                 
-                    eventosFactory.marcarEventosLidos().then(function (marcados) {
-                        
-                    });     
-
-                }).finally(function () {
-                    //em qualquer caso remove o spinner de loading
-                    $ionicLoading.hide();
-                });
-            }
-            
+            });     
 
         });
+           
+            
     } else {
         //Pega dados do banco
         $ionicLoading.show({
@@ -526,7 +517,7 @@ function ($scope, $stateParams,obterEventosService, $ionicPopup, LOCAL_STORAGE, 
                     });
 
                 } else {
-                    $scope.listaEventos = dadosArmazenados;
+                   $scope.listaEventos = dadosArmazenados;
                     
                     marcarEventosLidos.marcar().then(function (marcados) {
                         
@@ -546,56 +537,54 @@ function ($scope, $stateParams,obterEventosService, $ionicPopup, LOCAL_STORAGE, 
    // Pegando dados do usuário da sessão
     $scope.dadosUsuario = JSON.parse(window.localStorage.getItem(LOCAL_STORAGE.local_dados_key));
 
-}])
-   
-.controller('meuMuralCtrl', ['$scope', '$stateParams', 'obterFiquePorDentroService', '$ionicPopup', 'LOCAL_STORAGE', '$ionicLoading','$cordovaNetwork','$ionicHistory','fiquePorDentroFactory', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
-// You can include any angular dependencies as parameters for this function
-// TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $stateParams,obterFiquePorDentroService, $ionicPopup, LOCAL_STORAGE, $ionicLoading, $cordovaNetwork, $ionicHistory,fiquePorDentroFactory) {
-
-    //Verifica se estivar online pega dados via serviço 
-        if ($cordovaNetwork.isOnline()) {
-            $ionicLoading.show({
-                template: 'Buscando...'
-            }).then(function () {
-
-                //Verifica se e pra buscar a informação que foi atualizada recente.
-                var atualizado = window.localStorage.getItem("fiquePordentro");
-             
-                //Caso verdadeiro busca a nova informação do contrario continua em cache
-                if(atualizado){
-
-                    fiquePorDentroFactory.selectListaNoticias().then(function (dadosArmazenados) {
+     //Função para obter mais noticias.
+    $scope.obterMais = function() { 
+        
+        if ($cordovaNetwork.isOnline()) {  
+            $scope.pagina++; 
+        
+            obterEventosServiceObterMais.obter($scope.pagina).then(function (retorno) {
                 
-                        $scope.fiquePorDentro = dadosArmazenados;
-                        
-                        fiquePorDentroFactory.marcarNoticiasLidas().then(function (marcados) {
-                            
-                        });           
+                $scope.listaEventos = $scope.listaEventos.concat(retorno); 
 
-                    }).finally(function () {
-                        //em qualquer caso remove o spinner de loading
-                        $ionicLoading.hide();
-                    });
-
-                }else{
-                    obterFiquePorDentroService.obterNoticiasOnline().then(function (dados) {
-
-                        $scope.fiquePorDentro = dados;
-                    
-                        fiquePorDentroFactory.marcarNoticiasLidas().then(function (marcados) {
-                            
-                        });     
-
-                    }).finally(function () {
-                        //em qualquer caso remove o spinner de loading
-                        $ionicLoading.hide();
-                    });
-                }
-                
+                $scope.$broadcast('scroll.infiniteScrollComplete');
 
             });
-        } else {
+        }else{
+            var alertPopup = $ionicPopup.alert({
+                    title: 'Sem conexão com a internet.',
+                    template: 'Para obter mais dados, conecte seu dispositivo a internet.',
+                    okText: 'Ok', // String (default: 'OK'). The text of the OK button.
+                    okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+                });
+        }   	
+            
+    };    
+    
+
+}])
+   
+.controller('meuMuralCtrl', ['$scope', '$stateParams', 'obterFiquePorDentroService', '$ionicPopup', 'LOCAL_STORAGE', '$ionicLoading','$cordovaNetwork','$ionicHistory','fiquePorDentroFactory','obterFiquePorDentroServiceObterMais', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+// You can include any angular dependencies as parameters for this function
+// TIP: Access Route Parameters for your page via $stateParams.parameterName
+function ($scope, $stateParams,obterFiquePorDentroService, $ionicPopup, LOCAL_STORAGE, $ionicLoading, $cordovaNetwork, $ionicHistory,fiquePorDentroFactory,obterFiquePorDentroServiceObterMais) {
+    //Variáveis declaradas para paginação
+     $scope.pagina = 1;
+     $scope.fiquePorDentro = [];
+    //Verifica se estivar online pega dados via serviço 
+        if ($cordovaNetwork.isOnline()) {
+          
+            obterFiquePorDentroService.obterNoticiasOnline().then(function (dados) {
+
+                $scope.fiquePorDentro = dados;
+            
+                fiquePorDentroFactory.marcarNoticiasLidas().then(function (marcados) {
+                    
+                });     
+
+            });
+
+        }else{
             //Pega dados do banco
             $ionicLoading.show({
                 template: 'Buscando...'
@@ -637,6 +626,30 @@ function ($scope, $stateParams,obterFiquePorDentroService, $ionicPopup, LOCAL_ST
     
     // Pegando dados do usuário da sessão
         $scope.dadosUsuario = JSON.parse(window.localStorage.getItem(LOCAL_STORAGE.local_dados_key));
+
+    //Função para obter mais noticias.
+    $scope.obterMais = function() { 
+        
+        if ($cordovaNetwork.isOnline()) {  
+            $scope.pagina++; 
+        
+            obterFiquePorDentroServiceObterMais.obter($scope.pagina).then(function (retorno) {
+               
+                $scope.fiquePorDentro = $scope.fiquePorDentro.concat(retorno); 
+
+                $scope.$broadcast('scroll.infiniteScrollComplete');
+
+            });
+        }else{
+            var alertPopup = $ionicPopup.alert({
+                    title: 'Sem conexão com a internet.',
+                    template: 'Para obter mais dados, conecte seu dispositivo a internet.',
+                    okText: 'Ok', // String (default: 'OK'). The text of the OK button.
+                    okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+                });
+        }   	
+            
+    };    
 }])
    
 .controller('notCiaCtrl', ['$scope', '$stateParams','$ionicLoading','noticiasFactory', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
@@ -1557,14 +1570,14 @@ function ($scope, $stateParams, $state, RecuperarSenhaService, $ionicPopup,$cord
 
 }])
    
-.controller('transmissOAoVivoCtrl', ['$scope', '$stateParams','getConfiguracaoPresencaAssembleia','$cordovaNetwork','$ionicPopup','$ionicHistory', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+.controller('transmissOAoVivoCtrl', ['$scope', '$stateParams','getConfiguracaoPresencaAssembleia','$cordovaNetwork','$ionicPopup','$ionicHistory','obterTransmissaoAoVivo','$sce', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $stateParams,getConfiguracaoPresencaAssembleia,$cordovaNetwork,$ionicPopup,$ionicHistory) {
+function ($scope, $stateParams,getConfiguracaoPresencaAssembleia,$cordovaNetwork,$ionicPopup,$ionicHistory,obterTransmissaoAoVivo,$sce) {
 
-    
+
     $scope.registarAssembleia = function () {
-
+         $scope.scriptVideo = {};
          if ($cordovaNetwork.isOnline()) {
 
                 getConfiguracaoPresencaAssembleia.obter().then(function (dados) {
@@ -1604,7 +1617,14 @@ function ($scope, $stateParams,getConfiguracaoPresencaAssembleia,$cordovaNetwork
                             });
 
                             alertPopup.then(function (res) {
-                                  console.log('Deleted !');
+
+                                obterTransmissaoAoVivo.obter(dados.data.data[0].url_dados_pagina_transmissao).then(function (dados) {
+                                    $scope.paginaTransmissao = dados.data;
+                                    $scope.scriptVideo = $sce.trustAsHtml("<div> </div>\n<div style=\"text-align: center;\">\n<h2 style=\"text-align: center;\">Assembleia Geral Ordinária (AGO) &#8211; Transmissão ao vivo &#8211; 30/01/2017</h2>\n<p> </p>\n<div id=\"lws-player\" data-lws-stream=\"37447156171\" data-lws-mode=\"video\" data-lws-server=\"//server-1.locaaovivo.com.br/\" data-lws-width=\"640\" data-lws-height=\"360\"> </div>\n<p> Transmissão da Assembléia Geral &#8211; encerrada em 29/01/2016. <a href=\"https://www.wetransfer.com/downloads/4c1399274a1a67e874e44482e757babe20160205174716/bb8ccc390f96a0ee866f45c2ac3b759720160205174716/9ef51d\" target=\"_blank\" rel=\"noopener noreferrer\">Baixe e assista o vídeo da Assembléia Geral de 29/01/2016, tamanho do arquivo de vídeo: 1GB.</a></div>\n");
+                                  
+                            
+                                });
+                              
                               
                             }); 
 

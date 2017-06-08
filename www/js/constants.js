@@ -12,14 +12,15 @@ angular.module('app.constants', [])
 .constant('WEB_METODOS', {
     urlServicosSistema: 'http://ampebteste.web2319.uni5.net/homologacao_sistema/index.php/ws/initWS',
     urlRecuperarSenha: 'http://ampebteste.web2319.uni5.net/homologacao_sistema/index.php/login/enviaEmail',    
-    urlServicosPortalEventos: 'http://www.ampeb.org.br/homologacao/wp-json/rest-api-ampeb/v1/posts?_embed&categories=50&per_page=15',
+    urlServicosPortalEventos: 'http://www.ampeb.org.br/homologacao/wp-json/rest-api-ampeb/v1/posts?_embed&categories=50&per_page=2',
     urlServicosPortalNoticias: 'http://www.ampeb.org.br/homologacao/wp-json/rest-api-ampeb/v1/posts?_embed&categories_exclude=50,196&per_page=15', 
-    urlServicosPortalFiquePorDentro: 'http://www.ampeb.org.br/homologacao/wp-json/rest-api-ampeb/v1/posts?_embed&categories=196&status=private&per_page=20',
+    urlServicosPortalFiquePorDentro: 'http://www.ampeb.org.br/homologacao/wp-json/rest-api-ampeb/v1/posts?_embed&categories=196&status=private&per_page=1',
     urlImagemTipoConvenio: 'http://ampebteste.web2319.uni5.net/homologacao_sistema/anexos/imagens_tipo_convenio/',
     urlImagemConvenio: 'http://ampebteste.web2319.uni5.net/homologacao_sistema/anexos/imagens_convenio/',
     urlObterToken: 'http://www.ampeb.org.br/homologacao/wp-json/jwt-auth/v1/token',
     urlObterEnquete: 'http://www.ampeb.org.br/homologacao/wp-json/rest-api-ampeb/v1/polls',
-    urlVotarEnquete: 'http://www.ampeb.org.br/homologacao/wp-json/rest-api-ampeb/v1/polls/vote/'
+    urlVotarEnquete: 'http://www.ampeb.org.br/homologacao/wp-json/rest-api-ampeb/v1/polls/vote/',
+    urlServicoTransmissaoAoVivo: 'http://www.ampeb.org.br/homologacao'
 
 
 }).constant('LOCAL_STORAGE', {
