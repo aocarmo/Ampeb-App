@@ -362,6 +362,9 @@ function ($scope, $stateParams, $state, $http, $ionicPopup, $ionicLoading, Login
                         okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
                         });
                     }
+                    }).finally(function () {
+                            //em qualquer caso remove o spinner de loading
+                        $ionicLoading.hide();            
                     });
                 });
             }else{
