@@ -321,50 +321,51 @@ function ($scope, $stateParams, $state, $http, $ionicPopup, $ionicLoading, Login
                       
             if ($cordovaNetwork.isOnline()) {
 
-                $ionicLoading.show({template: 'Autenticando...'}).then(function (){LoginService.logar(data).then(function (dados){
+                $ionicLoading.show({template: 'Autenticando...'}).then(function (){
+
+                    LoginService.logar(data).then(function (dados){
                  
-                    if (dados.data.result == true) {
+                        if (dados.data.result == true) {
 
-                        var dadosUsuarioObterToken = {
-                            username: data.usuario,
-                            password: data.senha
-                        };
+                            var dadosUsuarioObterToken = {
+                                username: data.usuario,
+                                password: data.senha
+                            };
 
-                        getToken.obter(dadosUsuarioObterToken).then(function (retornoToken){    
-                           
-                            //Guardando as informações do token pra serviços privados.
-                            window.localStorage.setItem(LOCAL_STORAGE.local_token, "Bearer "+retornoToken.data.token);
-                            window.localStorage.setItem(LOCAL_STORAGE.tipo_retorno_post, 'private');
-                            window.localStorage.setItem(LOCAL_STORAGE.filtro_retorno_post, '&status=private,publish');
+                            getToken.obter(dadosUsuarioObterToken).then(function (retornoToken){    
+                            
+                                //Guardando as informações do token pra serviços privados.
+                                window.localStorage.setItem(LOCAL_STORAGE.local_token, "Bearer "+retornoToken.data.token);
+                                window.localStorage.setItem(LOCAL_STORAGE.tipo_retorno_post, 'private');
+                                window.localStorage.setItem(LOCAL_STORAGE.filtro_retorno_post, '&status=private,publish');
 
-                            //Guardando as informações do usuario logado na sessão.
-                            window.localStorage.setItem(LOCAL_STORAGE.local_dados_key, JSON.stringify(dados.data.data));
-                        
-                            if (data.manterConectado == true) {
-                                window.localStorage.setItem(LOCAL_STORAGE.manter_logado, "true");
-                                
-                            }else{
-                                window.localStorage.setItem(LOCAL_STORAGE.manter_logado, "false");
-                                
-                            }              
-                            //Direciona para a tela inicial              
-                            $state.go('aMPEB');
-                        }).finally(function () {
-                            //em qualquer caso remove o spinner de loading
-                            $ionicLoading.hide();            
+                                //Guardando as informações do usuario logado na sessão.
+                                window.localStorage.setItem(LOCAL_STORAGE.local_dados_key, JSON.stringify(dados.data.data));
+                            
+                                if (data.manterConectado == true) {
+                                    window.localStorage.setItem(LOCAL_STORAGE.manter_logado, "true");
+                                    
+                                }else{
+                                    window.localStorage.setItem(LOCAL_STORAGE.manter_logado, "false");
+                                    
+                                }              
+                                //Direciona para a tela inicial              
+                                $state.go('aMPEB');
+                            }).finally(function () {
+                                //em qualquer caso remove o spinner de loading
+                                $ionicLoading.hide();            
                             });
 
-                     
-                    }else {
-                        var alertPopup = $ionicPopup.alert({
-                        title: 'Usuário ou senha inválidos!',
-                        okText: 'Ok', // String (default: 'OK'). The text of the OK button.
-                        okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
-                        });
-                    }
-                    }).finally(function () {
-                            //em qualquer caso remove o spinner de loading
-                        $ionicLoading.hide();            
+                        
+                        }else {
+
+                            $ionicLoading.hide();  
+                            var alertPopup = $ionicPopup.alert({
+                            title: 'Usuário ou senha inválidos!',
+                            okText: 'Ok', // String (default: 'OK'). The text of the OK button.
+                            okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+                            });
+                        }
                     });
                 });
             }else{
@@ -801,12 +802,19 @@ function ($scope, $stateParams, $ionicLoading,$ionicPopup,$cordovaNetwork,LOCAL_
                 }).then(function () {
 
                     getDadosContatosAssociado.obter(data).then(function (dadosContatos) {
-                    
+                        
+                        
                         $scope.contatos = dadosContatos.data.data;
+                       
+                      
 
                     //Definindo os icones que serão apresentados de acordo com o tipo de endereço 
                         for (var i = 0; i < $scope.contatos.length; i++) {
 
+                            //Descriptografando os dados
+                            $scope.contatos[i].numero_contato = decodeURIComponent(escape(atob($scope.contatos[i].numero_contato)));
+                            $scope.contatos[i].observacao = decodeURIComponent(escape(atob($scope.contatos[i].observacao)));
+                            
                             if ($scope.contatos[i].id_tipo_contatos_telefonicos == 1){
 
                                 $scope.contatos[i].icone_tipo_contato = "ion-iphone";
@@ -1015,9 +1023,14 @@ function ($scope, $stateParams, $ionicLoading,$ionicPopup,$cordovaNetwork,LOCAL_
                 getDadosEnderecoAssociado.obter(data).then(function (dadosEnderecos) {
                    
                     $scope.enderecos = dadosEnderecos.data.data;
-                     
+                   
                    //Definindo os icones e cores que serão apresentados de acordo com o tipo de endereço 
                     for (var i = 0; i < $scope.enderecos.length; i++) {
+                        
+                        $scope.enderecos[i].descricao_endereco = decodeURIComponent(escape(atob($scope.enderecos[i].descricao_endereco)));
+                        $scope.enderecos[i].ponto_de_referencia = decodeURIComponent(escape(atob($scope.enderecos[i].ponto_de_referencia)));
+                        $scope.enderecos[i].observacoes = decodeURIComponent(escape(atob($scope.enderecos[i].observacoes)));
+
                         //Tratamento para exibir a cor verde.
                         if($scope.enderecos[i].principal == "S"){
                              $scope.enderecos[i].cor_label_endereco = "balanced";
@@ -1620,13 +1633,8 @@ function ($scope, $stateParams,getConfiguracaoPresencaAssembleia,$cordovaNetwork
                             });
 
                             alertPopup.then(function (res) {
-
-                                obterTransmissaoAoVivo.obter(dados.data.data[0].url_dados_pagina_transmissao).then(function (dados) {
-                                    $scope.paginaTransmissao = dados.data;
-                                    $scope.scriptVideo = $sce.trustAsHtml("<div> </div>\n<div style=\"text-align: center;\">\n<h2 style=\"text-align: center;\">Assembleia Geral Ordinária (AGO) &#8211; Transmissão ao vivo &#8211; 30/01/2017</h2>\n<p> </p>\n<div id=\"lws-player\" data-lws-stream=\"37447156171\" data-lws-mode=\"video\" data-lws-server=\"//server-1.locaaovivo.com.br/\" data-lws-width=\"640\" data-lws-height=\"360\"> </div>\n<p> Transmissão da Assembléia Geral &#8211; encerrada em 29/01/2016. <a href=\"https://www.wetransfer.com/downloads/4c1399274a1a67e874e44482e757babe20160205174716/bb8ccc390f96a0ee866f45c2ac3b759720160205174716/9ef51d\" target=\"_blank\" rel=\"noopener noreferrer\">Baixe e assista o vídeo da Assembléia Geral de 29/01/2016, tamanho do arquivo de vídeo: 1GB.</a></div>\n");
-                                  
-                            
-                                });
+                          
+                                console.log(decodeURIComponent(escape(atob('SsO6bGlhIFNhbnRvcyBHb27Dp2FsdmVzIGFicmHDo28gdm9jw6o='))));
                               
                               
                             }); 
@@ -1682,7 +1690,7 @@ function ($scope, $stateParams,getTipoContatoTelefonicoService,getOperadorasTele
     if($stateParams.permitir_divulgar == "S"){
         toggleDivulgar = true;
     }   
-
+    
     $scope.dadosContato = { 
         cpf: $scope.dadosUsuario.cpf,       
         id_associados_contatos_telefonicos: $stateParams.id_associados_contatos_telefonicos,   
@@ -1692,7 +1700,7 @@ function ($scope, $stateParams,getTipoContatoTelefonicoService,getOperadorasTele
         numero_contato: $stateParams.numero_contato, 
         id_operadora_telefones: $stateParams.id_operadora_telefones,        
         id_usuario: $scope.dadosUsuario.id_usuario,
-        observacao: $stateParams.observacao, 
+        observacao:  $stateParams.observacao, 
         chave_externa: $scope.dadosUsuario.chave_externa
     }
     
@@ -1769,10 +1777,11 @@ function ($scope, $stateParams,getTipoContatoTelefonicoService,getOperadorasTele
        
         //Testando se para inserir ou alterar
         if(dadosContato.id_associados_contatos_telefonicos != null){
-
-            var data = { cpf: dadosContato.cpf, id_associados_contatos_telefonicos: dadosContato.id_associados_contatos_telefonicos, id_tipo_contatos_telefonicos: dadosContato.id_tipo_contatos_telefonicos, principal: contatoPrincipal, permitir_divulgar: permiteDivulgar, numero_contato: dadosContato.numero_contato, id_operadora_telefones: dadosContato.id_operadora_telefones, observacao: dadosContato.observacao, id_usuario: dadosContato.id_usuario}; 
+            //Criptografando os dados
+            var data = { cpf: dadosContato.cpf, id_associados_contatos_telefonicos: dadosContato.id_associados_contatos_telefonicos, id_tipo_contatos_telefonicos: dadosContato.id_tipo_contatos_telefonicos, principal: contatoPrincipal, permitir_divulgar: permiteDivulgar, numero_contato: btoa(dadosContato.numero_contato), id_operadora_telefones: dadosContato.id_operadora_telefones, observacao: btoa(dadosContato.observacao), id_usuario: dadosContato.id_usuario}; 
         }else{
-            var data = { cpf: dadosContato.cpf, id_tipo_contatos_telefonicos: dadosContato.id_tipo_contatos_telefonicos, principal: contatoPrincipal, permitir_divulgar: permiteDivulgar, numero_contato: dadosContato.numero_contato, id_operadora_telefones: dadosContato.id_operadora_telefones,  observacao: dadosContato.observacao, id_usuario: dadosContato.id_usuario, chave_externa:dadosContato.chave_externa};
+            //Criptografando os dados
+            var data = { cpf: dadosContato.cpf, id_tipo_contatos_telefonicos: dadosContato.id_tipo_contatos_telefonicos, principal: contatoPrincipal, permitir_divulgar: permiteDivulgar, numero_contato: btoa(dadosContato.numero_contato), id_operadora_telefones: dadosContato.id_operadora_telefones,  observacao: btoa(dadosContato.observacao), id_usuario: dadosContato.id_usuario, chave_externa:dadosContato.chave_externa};
         }
            
                
@@ -2023,9 +2032,9 @@ function ($scope, $stateParams, getTipoEndereco, getEstado, getMunicipios,$ionic
         //Testando se para inserir ou alterar
         if(dadosEndereco.id_associados_enderecos != null){
 
-            var data = { cpf: $scope.dadosEndereco.cpf, id_associados_enderecos: dadosEndereco.id_associados_enderecos, id_usuario: dadosEndereco.id_usuario, id_tipo_endereco: dadosEndereco.id_tipo_endereco, principal: enderecoPrincipal, descricao_endereco: dadosEndereco.descricao_endereco, id_estado: dadosEndereco.id_estado, id_municipio: dadosEndereco.id_municipio, ponto_de_referencia: dadosEndereco.ponto_de_referencia, observacoes: dadosEndereco.observacoes, chave_externa: dadosEndereco.chave_externa}; 
+            var data = { cpf: $scope.dadosEndereco.cpf, id_associados_enderecos: dadosEndereco.id_associados_enderecos, id_usuario: dadosEndereco.id_usuario, id_tipo_endereco: dadosEndereco.id_tipo_endereco, principal: enderecoPrincipal, descricao_endereco: btoa(dadosEndereco.descricao_endereco), id_estado: dadosEndereco.id_estado, id_municipio: dadosEndereco.id_municipio, ponto_de_referencia: btoa(dadosEndereco.ponto_de_referencia), observacoes: btoa(dadosEndereco.observacoes), chave_externa: dadosEndereco.chave_externa}; 
         }else{
-            var data = { cpf: $scope.dadosEndereco.cpf, id_usuario: dadosEndereco.id_usuario, id_tipo_endereco: dadosEndereco.id_tipo_endereco, principal: enderecoPrincipal, descricao_endereco: dadosEndereco.descricao_endereco, id_estado: dadosEndereco.id_estado, id_municipio: dadosEndereco.id_municipio, ponto_de_referencia: dadosEndereco.ponto_de_referencia, observacoes: dadosEndereco.observacoes, chave_externa: dadosEndereco.chave_externa}; 
+            var data = { cpf: $scope.dadosEndereco.cpf, id_usuario: dadosEndereco.id_usuario, id_tipo_endereco: dadosEndereco.id_tipo_endereco, principal: enderecoPrincipal, descricao_endereco: btoa(dadosEndereco.descricao_endereco), id_estado: dadosEndereco.id_estado, id_municipio: dadosEndereco.id_municipio, ponto_de_referencia: btoa(dadosEndereco.ponto_de_referencia), observacoes: btoa(dadosEndereco.observacoes), chave_externa: dadosEndereco.chave_externa}; 
         }
             
                
@@ -2089,10 +2098,22 @@ function ($scope, $stateParams,getDadosPessoaisAssociadoService,$ionicLoading,$i
             $ionicLoading.show({
                 template: 'Carregando...'
             }).then(function () {
+
+
                 getDadosPessoaisAssociadoService.obter($scope.dadosUsuario.cpf).then(function (dadosPessoais) {
-                    
-                    $scope.dadosPessoais = dadosPessoais.data.data[0];
-                 
+                    //Descriptografando os dados em base64
+                     $scope.dadosPessoais = { 
+                         id_associados_dados_pessoais: dadosPessoais.data.data[0].id_associados_dados_pessoais,
+                         nome_associado: decodeURIComponent(escape(atob(dadosPessoais.data.data[0].nome_associado))),
+                         cpf: decodeURIComponent(escape(atob(dadosPessoais.data.data[0].cpf))),
+                         identidade: decodeURIComponent(escape(atob(dadosPessoais.data.data[0].identidade))),
+                         dt_nascimento: decodeURIComponent(escape(atob(dadosPessoais.data.data[0].dt_nascimento))),
+                         email_associado: decodeURIComponent(escape(atob(dadosPessoais.data.data[0].email_associado))),
+                         email_alternativo_associado: decodeURIComponent(escape(atob(dadosPessoais.data.data[0].email_alternativo_associado))),
+                         chave_externa: dadosPessoais.data.data[0].chave_externa,
+                         matricula: decodeURIComponent(escape(atob(dadosPessoais.data.data[0].matricula)))
+                     };     
+                   
                     //Transformando a data em objeto
                     var dataNacimentoHora = $scope.dadosPessoais.dt_nascimento.split(" ");                   
                     var dt = new Date(dataNacimentoHora[0]);    
@@ -2110,16 +2131,16 @@ function ($scope, $stateParams,getDadosPessoaisAssociadoService,$ionicLoading,$i
 
         //Função paa ataulizar os dados pessoais.
       $scope.atualizaDadosPessoais = function(form,dadosPessoais) {
-           
-            var dados = { cpf: $scope.dadosUsuario.cpf, nome_associado: dadosPessoais.nome_associado, identidade: dadosPessoais.identidade, dt_nascimento: dadosPessoais.dt_nascimento, email_associado: dadosPessoais.email_associado, email_alternativo_associado: dadosPessoais.email_alternativo_associado, matricula: dadosPessoais.matricula, id_usuario: $scope.dadosUsuario.id_usuario}; 
-
+             //Criptografando os dados em base64             
+            var dados = { cpf: btoa($scope.dadosUsuario.cpf), nome_associado: btoa(dadosPessoais.nome_associado), identidade: btoa(dadosPessoais.identidade), dt_nascimento: btoa(dadosPessoais.dt_nascimento), email_associado: btoa(dadosPessoais.email_associado), email_alternativo_associado: btoa(dadosPessoais.email_alternativo_associado), matricula: btoa(dadosPessoais.matricula), id_usuario: $scope.dadosUsuario.id_usuario}; 
+         
             if(form.$valid) {   
                 $ionicLoading.show({
                     template: 'Atualizando...'
                     }).then(function () {
 
                         atualizarDadosPessoaisAssociado.atualizar(dados).then(function (retorno) {
-                            
+                         
                             if(retorno.data.result == true){
 
                                 var alertPopup = $ionicPopup.alert({
