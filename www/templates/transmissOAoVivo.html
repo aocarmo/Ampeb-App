@@ -1,16 +1,22 @@
 <ion-view title="Transmissão ao Vivo" id="page25">
   <ion-content padding="true" class="has-header">
-    <h4 id="transmissOAoVivo-heading23" style="color:#821723;font-weight:300;text-align:center;">{{paginaTransmissao.title.rendered}}</h4>
-    <hr class="hr-topoPagina">   
+    <h4 id="transmissOAoVivo-heading23" style="color:#821723;font-weight:300;text-align:center;">{{titulo}}</h4> 
+    <hr class="hr-topoPagina"> 
     <ion-list>
         <div class="card">
           <ion-item>
             <div class="video-container">
-              <iframe ng-src="https://www.youtube.com/embed/ZDZY_eTwRoI" frameborder="0" width="560c" height="315"></iframe>
+              <iframe ng-src="{{url}}" frameborder="0" width="560c" height="315"></iframe>
             </div>
           </ion-item>
         </div>
     </ion-list>
+     <hr class="hr-topoPagina"> 
+    <div align="center" class="row">
+      <div class="col col-99">
+        {{rodape}}
+      </div>
+    </div>
        
      
   </ion-content>

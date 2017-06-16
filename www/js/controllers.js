@@ -1,5 +1,8 @@
 ﻿angular.module('app.controllers', [])
-  
+.constant('$ionicLoadingConfig', {
+  template: '<ion-spinner icon="spiral" class="spinner-assertive"></ion-spinner>',
+  duration: 30000
+})
 .controller('aMPEBCtrl', ['$scope', '$stateParams','$state','$q', '$cordovaCamera','$ionicPopup','LOCAL_STORAGE','$timeout','noticiasFactory','eventosFactory','obterNoticiasService','obterEventosService','atualizarFotoAssociado','$cordovaNetwork','$ionicLoading','$ionicHistory','fiquePorDentroFactory','obterFiquePorDentroService','getListaEnquete','enqueteFactory', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
@@ -235,7 +238,7 @@ function ($scope, $stateParams,$state, $q,$cordovaCamera, $ionicPopup, LOCAL_STO
         //Pegando o cpf do associado e a foto.
             var data = {cpf: $scope.dadosUsuario.cpf, imagem: imageData};            
                  
-                $ionicLoading.show({template: 'Atualizando sua foto...'}).then(function (){
+                $ionicLoading.show({template: '<ion-spinner icon="spiral" class="spinner-assertive"></ion-spinner> <br/> Atualizando sua foto...'}).then(function (){
                     
                     atualizarFotoAssociado.atualizar(data).then(function (dados){ 
                                           
@@ -273,7 +276,7 @@ function ($scope, $stateParams,$state, $q,$cordovaCamera, $ionicPopup, LOCAL_STO
             //Pegando o cpf do associado e a foto.
             var data = {cpf: $scope.dadosUsuario.cpf, imagem: imageData};            
                  
-                $ionicLoading.show({template: 'Atualizando sua foto...'}).then(function (){
+                $ionicLoading.show({template: '<ion-spinner icon="spiral" class="spinner-assertive"></ion-spinner> <br/> Atualizando sua foto...'}).then(function (){
                     
                     atualizarFotoAssociado.atualizar(data).then(function (dados){ 
                                           
@@ -321,7 +324,7 @@ function ($scope, $stateParams, $state, $http, $ionicPopup, $ionicLoading, Login
                       
             if ($cordovaNetwork.isOnline()) {
 
-                $ionicLoading.show({template: 'Autenticando...'}).then(function (){
+                $ionicLoading.show({template: '<ion-spinner icon="spiral" class="spinner-assertive"></ion-spinner> <br/> Autenticando...'}).then(function (){
 
                     LoginService.logar(data).then(function (dados){
                  
@@ -404,9 +407,7 @@ function ($scope, $stateParams, obterNoticiasService, noticiasFactory, $ionicPop
 
     } else {
         //Pega dados do banco
-        $ionicLoading.show({
-            template: 'Buscando...'
-        }).then(function () {
+        $ionicLoading.show().then(function () {
              noticiasFactory.selectListaNoticias($stateParams.tipo).then(function (dados) {
              
                 if (dados[0] == null) {
@@ -500,9 +501,7 @@ function ($scope, $stateParams,obterEventosService, $ionicPopup, LOCAL_STORAGE, 
             
     } else {
         //Pega dados do banco
-        $ionicLoading.show({
-            template: 'Buscando...'
-        }).then(function () {
+        $ionicLoading.show().then(function () {
             eventosFactory.selectListaNoticias().then(function (dadosArmazenados) {
              
                 if (dadosArmazenados[0] == null) {
@@ -590,9 +589,7 @@ function ($scope, $stateParams,obterFiquePorDentroService, $ionicPopup, LOCAL_ST
 
         }else{
             //Pega dados do banco
-            $ionicLoading.show({
-                template: 'Buscando...'
-            }).then(function () {
+            $ionicLoading.show().then(function () {
                 fiquePorDentroFactory.selectListaNoticias().then(function (dadosArmazenados) {
                 
                     if (dadosArmazenados[0] == null) {
@@ -662,9 +659,7 @@ function ($scope, $stateParams,obterFiquePorDentroService, $ionicPopup, LOCAL_ST
 function ($scope, $stateParams, $ionicLoading, noticiasFactory) {
     $scope.noticia = {};
     //Pega dados do banco
-    $ionicLoading.show({
-        template: 'Buscando...'
-    }).then(function () {
+    $ionicLoading.show().then(function () {
 
         noticiasFactory.selectNoticia($stateParams.id).then(function (dados) {        
          
@@ -686,9 +681,7 @@ function ($scope, $stateParams,$ionicLoading, eventosFactory) {
 
     $scope.evento = {};
     //Pega dados do banco
-    $ionicLoading.show({
-        template: 'Buscando...'
-    }).then(function () {
+    $ionicLoading.show().then(function () {
         eventosFactory.selectNoticia($stateParams.id).then(function (eventoBD) {
                  
             $scope.evento = eventoBD;
@@ -711,9 +704,7 @@ function ($scope, $stateParams, $ionicLoading, conveniosFactory) {
      $scope.convenios = {};
 
      //Pega dados do banco
-    $ionicLoading.show({
-        template: 'Buscando...'
-    }).then(function () {
+    $ionicLoading.show().then(function () {
         conveniosFactory.selectConvenio(null,null,null,$stateParams.id).then(function (dados) {
                 
             $scope.convenios = dados;
@@ -735,9 +726,7 @@ function ($scope, $stateParams ,$ionicLoading, fiquePorDentroFactory) {
 
 $scope.noticia = {};
     //Pega dados do banco
-    $ionicLoading.show({
-        template: 'Buscando...'
-    }).then(function () {
+    $ionicLoading.show().then(function () {
 
         fiquePorDentroFactory.selectNoticia($stateParams.id).then(function (dados) {        
          
@@ -797,9 +786,7 @@ function ($scope, $stateParams, $ionicLoading,$ionicPopup,$cordovaNetwork,LOCAL_
 
             $scope.contatos = {};
                 
-                $ionicLoading.show({
-                    template: 'Carregando...'
-                }).then(function () {
+                $ionicLoading.show().then(function () {
 
                     getDadosContatosAssociado.obter(data).then(function (dadosContatos) {
                         
@@ -863,7 +850,7 @@ function ($scope, $stateParams, $ionicLoading,$ionicPopup,$cordovaNetwork,LOCAL_
         var data = { cpf: $scope.dadosUsuario.cpf, id: id_contato, id_usuario: $scope.dadosUsuario.id_usuario}; 
     
                 $ionicLoading.show({
-                    template: 'Excluindo...'
+                    template: '<ion-spinner icon="spiral" class="spinner-assertive"></ion-spinner> <br/> Excluindo...'
                     }).then(function () {
 
                         excluirDadosContatoAssociado.excluir(data).then(function (retorno) {
@@ -915,9 +902,7 @@ function ($scope, $stateParams, $ionicLoading, $ionicPopup, $cordovaNetwork, LOC
     var dataConfiguracao = {chave: "meu_cadastro_dependentes_inativos _texto"};   
     $scope.dependentes = {}; 
               
-            $ionicLoading.show({
-                template: 'Buscando...'
-            }).then(function () {
+            $ionicLoading.show().then(function () {
 
                 getDadosDependentesAssociado.obter(data).then(function (dadosDependentes) {
 
@@ -948,9 +933,7 @@ function ($scope, $stateParams,getContatosAMPEB,$cordovaNetwork,$ionicPopup,$ion
             
 
     if ($cordovaNetwork.isOnline()) {
-        $ionicLoading.show({
-            template: 'Buscando...'
-        }).then(function () {
+        $ionicLoading.show().then(function () {
             getContatosAMPEB.obter().then(function (dados) {
 
                 if (dados.data.result == true) {         
@@ -1020,9 +1003,7 @@ function ($scope, $stateParams, $ionicLoading,$ionicPopup,$cordovaNetwork,LOCAL_
 
         $scope.enderecos = {};
               
-            $ionicLoading.show({
-                template: 'Carregando...'
-            }).then(function () {
+            $ionicLoading.show().then(function () {
 
                 getDadosEnderecoAssociado.obter(data).then(function (dadosEnderecos) {
                    
@@ -1100,9 +1081,7 @@ function ($scope, $stateParams,$ionicLoading,conveniosFactory,$ionicHistory,$ion
 
     if(idTipoConvenio != 22){
         //Pega dados do banco
-        $ionicLoading.show({
-            template: 'Buscando...'
-        }).then(function () {
+        $ionicLoading.show().then(function () {
 
             conveniosFactory.selectConvenio(idTipoConvenio, nmConvenio, nmMunicipio, null).then(function (dados) {      
                 
@@ -1152,7 +1131,7 @@ function ($scope, $stateParams,$ionicLoading,conveniosFactory,$ionicHistory,$ion
 
             if ($cordovaNetwork.isOnline()) {
                 
-                $ionicLoading.show({template: 'Buscando...'}).then(function () {
+                $ionicLoading.show().then(function () {
                 
                     getDadosConvenioCONAMP.obter(data).then(function (dados) {
                                         
@@ -1250,7 +1229,7 @@ function ($scope, $stateParams, $cordovaNetwork, $ionicLoading, $ionicPopup, $io
 
         $scope.enquete = {};
 
-        $ionicLoading.show({template: 'Buscando...'}).then(function () {
+        $ionicLoading.show().then(function () {
         
             getEnquete.obter($stateParams.id).then(function (retorno) {  
             
@@ -1303,7 +1282,7 @@ function ($scope, $stateParams, $cordovaNetwork, $ionicLoading, $ionicPopup, $io
 
                 $scope.enquete = {};
 
-                $ionicLoading.show({template: 'Votando...'}).then(function () {
+                $ionicLoading.show({template: '<ion-spinner icon="spiral" class="spinner-assertive"></ion-spinner> <br/> Votando...'}).then(function () {
                 
                     votarEnquete.votar(id,respostaEnquete.answer).then(function (retorno) {  
                     
@@ -1376,7 +1355,7 @@ function ($scope, $stateParams,$cordovaNetwork,$ionicLoading,$ionicPopup,$ionicH
 
         $scope.enquetes = {};
 
-        $ionicLoading.show({template: 'Buscando...'}).then(function () {
+        $ionicLoading.show().then(function () {
         
             getListaEnquete.obter().then(function (retorno) {  
             
@@ -1420,7 +1399,7 @@ function ($scope, $stateParams, $cordovaNetwork, $ionicLoading, $ionicPopup, $io
 
         $scope.enquete = {};
 
-        $ionicLoading.show({template: 'Buscando...'}).then(function () {
+        $ionicLoading.show().then(function () {
         
             getEnquete.obter($stateParams.id).then(function (retorno) {  
             
@@ -1471,7 +1450,7 @@ function ($scope, $stateParams,alterarSenha,$cordovaNetwork,$ionicLoading,$ionic
                 };
                     if ($cordovaNetwork.isOnline()) {
                         
-                        $ionicLoading.show({template: 'Alterando...'}).then(function () {
+                        $ionicLoading.show({template: '<ion-spinner icon="spiral" class="spinner-assertive"></ion-spinner> <br/>Alterando...'}).then(function () {
                         
                             alterarSenha.alterar(dados).then(function (retorno) {  
 
@@ -1590,82 +1569,146 @@ function ($scope, $stateParams, $state, RecuperarSenhaService, $ionicPopup,$cord
 
 }])
    
-.controller('transmissOAoVivoCtrl', ['$scope', '$stateParams','getConfiguracaoPresencaAssembleia','$cordovaNetwork','$ionicPopup','$ionicHistory','obterTransmissaoAoVivo','$sce', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+.controller('transmissOAoVivoCtrl', ['$scope', '$stateParams','getConfiguracaoPresencaAssembleia','$cordovaNetwork','$ionicPopup','$ionicHistory','obterTransmissaoAoVivo','$q','getConfiguracaoAplicativo','$ionicLoading','verificarConfirmacaoPresencaAssembleia','LOCAL_STORAGE', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $stateParams,getConfiguracaoPresencaAssembleia,$cordovaNetwork,$ionicPopup,$ionicHistory,obterTransmissaoAoVivo,$sce) {
+function ($scope, $stateParams,getConfiguracaoPresencaAssembleia,$cordovaNetwork,$ionicPopup,$ionicHistory,obterTransmissaoAoVivo,$q,getConfiguracaoAplicativo,$ionicLoading,verificarConfirmacaoPresencaAssembleia,LOCAL_STORAGE) {
 
+    $scope.titulo = {};
+    $scope.url = {};
+    $scope.rodape = {};
+    $scope.dadosUsuario = JSON.parse(window.localStorage.getItem(LOCAL_STORAGE.local_dados_key));
+    var dataUser  = {cpf: $scope.dadosUsuario.cpf};
 
     $scope.registarAssembleia = function () {
-         $scope.scriptVideo = {};
-         if ($cordovaNetwork.isOnline()) {
+         
+        if ($cordovaNetwork.isOnline()) {
 
-                getConfiguracaoPresencaAssembleia.obter().then(function (dados) {
-                    
-                  
-                    //Verifica se é para exibir o alerta
-                    if(dados.data.data[0].exibir_alerta == 1){
-                        //Verifica o tipo do alerta 1 para confirm(sim , não) 2 para alert simples
-                        if(dados.data.data[0].id_tipo_alerta == 1){                        
+            var paramTitulo = {chave: "transmissao_ao_vivo_titulo"};
+            var getTitulo =  getConfiguracaoAplicativo.obter(paramTitulo).then(function (retornoTitulo) {    
+                return retornoTitulo;
+            });     
+           
+            var paramUrl = {chave: "transmissao_ao_vivo_url_video"};
+            var getUrl =  getConfiguracaoAplicativo.obter(paramUrl).then(function (retornoUrl) {    
+                return retornoUrl;
+            });  
 
-                            var confirmPopup = $ionicPopup.confirm({
-                                title: dados.data.data[0].texto_mensagem_alerta,                              
-                                okText: 'Sim', // String (default: 'OK'). The text of the OK button.
-                                okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
-                                cancelText: 'Não'
-                                
-                            });
+            var paramTextoRodape = {chave: "transmissao_ao_vivo_texto_abaixo_video"};
+            var getTextoRodape =  getConfiguracaoAplicativo.obter(paramTextoRodape).then(function (retornoTextoRodape) {    
+                return retornoTextoRodape;
+            });     
+              
+            var paramAlerta = {chave: "transmissao_ao_vivo_exibir_alerta"};
+            var getAlerta =  getConfiguracaoAplicativo.obter(paramAlerta).then(function (retornoAlerta) {    
+                return retornoAlerta;
+            });    
 
-                            confirmPopup.then(function(res) {
+            var paramTipoAlerta = {chave: "transmissao_ao_vivo_id_tipo_alerta"};
+            var getTipoAlerta =  getConfiguracaoAplicativo.obter(paramTipoAlerta).then(function (retornoTipoAlerta) {    
+                return retornoTipoAlerta;
+            });  
 
-                                if(res) {
-                                console.log('Email enviado!');
+            var paramTextoAlerta = {chave: "transmissao_ao_vivo_texto_mensagem_alerta"};
+            var getTextoAlerta =  getConfiguracaoAplicativo.obter(paramTextoAlerta).then(function (retornoTextoAlerta) {    
+                return retornoTextoAlerta;
+            });     
+            
+            
+            var paramEnviaConfirmacao = {chave: "transmissao_ao_vivo_enviar_email_confirmacao"};
+            var getEnviaConfirmacao =  getConfiguracaoAplicativo.obter(paramEnviaConfirmacao).then(function (retornoEnviaConfirmacao) {    
+                return retornoEnviaConfirmacao;
+            });     
+                 
+               
+              
+            var retornoTransmissao = [];
+            $ionicLoading.show().then(function () {
 
-                                } else {
-                                
-                                console.log('Email não enviado!');
+                    //Pega o retorno de forma sincrona do ajax.
+                    $q.all([getTitulo, getUrl, getTextoRodape, getAlerta, getTipoAlerta, getTextoAlerta, getEnviaConfirmacao]).then(function(result){
 
-                                }
-                            });
-
-                        }else if(dados.data.data[0].id_tipo_alerta == 2) {
-
-                             var alertPopup = $ionicPopup.alert({
-                                title: dados.data.data[0].texto_mensagem_alerta,                           
-                                okText: 'OK', // String (default: 'OK'). The text of the OK button.
-                                okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
-                            });
-
-                            alertPopup.then(function (res) {
-                          
-                                console.log(decodeURIComponent(escape(atob('SsO6bGlhIFNhbnRvcyBHb27Dp2FsdmVzIGFicmHDo28gdm9jw6o='))));
-                              
-                              
-                            }); 
-
+                        for (var i = 0; i < result.length; i++){
+                            retornoTransmissao.push(result[i]);
                         }
+                        $scope.titulo = retornoTransmissao[0].data.data[0].valor;
+                        $scope.url = retornoTransmissao[1].data.data[0].valor;
+                        $scope.rodape = retornoTransmissao[2].data.data[0].valor;
+                     
+                        if(retornoTransmissao[3].data.data[0].valor == "S" && retornoTransmissao[6].data.data[0].valor == "S" && retornoTransmissao[4].data.data[0].valor == "1" ){
+                             
+                             var confirmPopup = $ionicPopup.confirm({
+                                    title: retornoTransmissao[5].data.data[0].valor,                              
+                                    okText: 'Sim', // String (default: 'OK'). The text of the OK button.
+                                    okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+                                    cancelText: 'Não'
+                                    
+                                });
 
-                    }else {
+                                confirmPopup.then(function(res) {
 
-                    }                
+                                    if(res) {
+                                        //Enviando e-mail de confirmação
+                                         $scope.enviaEmailConfirmacao(dataUser);
 
-                });
+                                    } else {
+                                    
+                                    console.log('Email não enviado!');
 
-            }else{
-                var alertPopup = $ionicPopup.alert({
-                            title: 'Transmissão ao vivo indisponível.',
-                            template: 'Por favor, verifque sua conexão com a internet',
-                            okText: 'OK', // String (default: 'OK'). The text of the OK button.
-                            okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
-                });
+                                    }
+                                });
+                        }else if (retornoTransmissao[3].data.data[0].valor == "S" && retornoTransmissao[6].data.data[0].valor == "S" && retornoTransmissao[4].data.data[0].valor == "2"){
+                                
+                                var alertPopup = $ionicPopup.alert({
+                                    title:  retornoTransmissao[5].data.data[0].valor,                          
+                                    okText: 'OK', // String (default: 'OK'). The text of the OK button.
+                                    okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+                                });
 
-                alertPopup.then(function (res) {
+                                alertPopup.then(function (res) {
+                            
+                                     //Enviando e-mail de confirmação
+                                    $scope.enviaEmailConfirmacao(dataUser);
+                                                                
+                                }); 
+                        }else if(retornoTransmissao[3].data.data[0].valor == "N" && retornoTransmissao[6].data.data[0].valor == "S"){
+                                
+                            //Enviando e-mail de confirmação
+                            $scope.enviaEmailConfirmacao(dataUser);
+                        }
+                       
+
+                                
+
+                    }).finally(function () {
+                        //em qualquer caso remove o spinner de loading
+                        $ionicLoading.hide();                       
                     
-                    $backView = $ionicHistory.backView();
-                    $backView.go();
+                    });     
+            });
 
-                }); 
-            }           
+        }else{
+
+            var alertPopup = $ionicPopup.alert({
+                        title: 'Transmissão ao vivo indisponível.',
+                        template: 'Por favor, verifque sua conexão com a internet',
+                        okText: 'OK', // String (default: 'OK'). The text of the OK button.
+                        okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+            });
+
+            alertPopup.then(function (res) {
+                
+                $backView = $ionicHistory.backView();
+                $backView.go();
+
+            }); 
+        }           
+    }
+    $scope.enviaEmailConfirmacao = function (data){
+      
+        verificarConfirmacaoPresencaAssembleia.enviar(data).then(function (retornoEnvioConfirmacao) {
+            console.log(JSON.stringify(retornoEnvioConfirmacao));
+        });
     }
     //Chamando a função para registrar a assembléia
      $scope.registarAssembleia();
@@ -1734,9 +1777,7 @@ function ($scope, $stateParams,getTipoContatoTelefonicoService,getOperadorasTele
         
         var retornoCombos = [];
         
-        $ionicLoading.show({template: 'Carregando...'
-
-        }).then(function () {
+        $ionicLoading.show().then(function () {
             //Pega o retorno de forma sincrona do ajax.
             $q.all([tiposContatos, operadoras]).then(function(result){
                 for (var i = 0; i < result.length; i++){
@@ -1791,7 +1832,7 @@ function ($scope, $stateParams,getTipoContatoTelefonicoService,getOperadorasTele
                
             if(form.$valid) {   
                 $ionicLoading.show({
-                    template: 'Salvando...'
+                    template: '<ion-spinner icon="spiral" class="spinner-assertive"></ion-spinner> <br/> Salvando...'
                     }).then(function () {
 
                         salvarDadosContatoAssociado.salvar(data).then(function (retorno) {
@@ -1841,9 +1882,7 @@ function ($scope, $stateParams,getTipoConvenioService,$ionicLoading,getMunicipio
     
     if ($cordovaNetwork.isOnline()) {
         
-        $ionicLoading.show({
-            template: 'Buscando...'
-        }).then(function () {
+        $ionicLoading.show().then(function () {
             getMunicipiosConvenioService.getMunicipiosConvenio().then(function (dadosMunicipio) {
                 
                 $scope.municipiosConvenio = dadosMunicipio;
@@ -1890,9 +1929,7 @@ function ($scope, $stateParams,getTipoConvenioService,$ionicLoading,getMunicipio
         });
     }else{
 
-         $ionicLoading.show({
-            template: 'Buscando...'
-        }).then(function () {
+         $ionicLoading.show().then(function () {
 
             conveniosFactory.selectMunicipioConvenio().then(function  (dadosMunicipio) {
                            
@@ -1996,8 +2033,7 @@ function ($scope, $stateParams, getTipoEndereco, getEstado, getMunicipios,$ionic
       
         var retornoCombos = [];
 
-        $ionicLoading.show({template: 'Carregando...'
-        }).then(function () {
+        $ionicLoading.show().then(function () {
 
             //Pega o retorno de forma sincrona do ajax.
             $q.all([tiposEndereco, estados, municipios,textoRodape]).then(function(result){
@@ -2047,7 +2083,7 @@ function ($scope, $stateParams, getTipoEndereco, getEstado, getMunicipios,$ionic
                
             if(form.$valid) {   
                 $ionicLoading.show({
-                    template: 'Salvando...'
+                    template: '<ion-spinner icon="spiral" class="spinner-assertive"></ion-spinner> <br/> Salvando...'
                     }).then(function () {
 
                         salvarDadosEnderecoAssociado.salvar(data).then(function (retorno) {
@@ -2102,9 +2138,7 @@ function ($scope, $stateParams,getDadosPessoaisAssociadoService,$ionicLoading,$i
 
     $scope.dadosPessoais = {};     
               
-            $ionicLoading.show({
-                template: 'Carregando...'
-            }).then(function () {
+            $ionicLoading.show().then(function () {
 
 
                 getDadosPessoaisAssociadoService.obter($scope.dadosUsuario.cpf).then(function (dadosPessoais) {
@@ -2143,7 +2177,7 @@ function ($scope, $stateParams,getDadosPessoaisAssociadoService,$ionicLoading,$i
          
             if(form.$valid) {   
                 $ionicLoading.show({
-                    template: 'Atualizando...'
+                    template: '<ion-spinner icon="spiral" class="spinner-assertive"></ion-spinner> <br/>Atualizando...'
                     }).then(function () {
 
                         atualizarDadosPessoaisAssociado.atualizar(dados).then(function (retorno) {

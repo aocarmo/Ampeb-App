@@ -1458,4 +1458,18 @@ angular.module('app.services', [])
     };
 
 
+}]).service('verificarConfirmacaoPresencaAssembleia', ['$http', '$q', 'WEB_METODOS',  function ($http, $q, WEB_METODOS) {
+
+    return {
+
+        enviar: function (data) {    
+
+            return $http.get(WEB_METODOS.urlServicosSistema + "?m=verificarConfirmacaoPresencaAssembleia", {params: data}).then(function (response) {
+                return response;
+            });
+
+        }
+    };
+
+
 }]);

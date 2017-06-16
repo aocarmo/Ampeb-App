@@ -2,10 +2,10 @@
 <widget id="com.ionicframework.ampebapp914475" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>AMPEB</name>
     <description>
-        An Ionic Framework and Cordova project.
+        Desenvolvido por RanderNet.
     </description>
-    <author email="alex.carmo91@gmail.com" href="http://example.com/">
-      Alex Carmo
+    <author email="aplicativos@ampeb.org.br" href="http://www.ampeb.org.br//">
+     AMPEB
     </author>
     <content src="index.html" />
     <access origin="*" />
