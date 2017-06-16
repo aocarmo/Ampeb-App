@@ -1443,4 +1443,19 @@ angular.module('app.services', [])
         }
     };
 
+}])
+.service('getConfiguracaoAplicativo', ['$http', '$q', 'WEB_METODOS',  function ($http, $q, WEB_METODOS) {
+
+    return {
+
+        obter: function (data) {    
+
+            return $http.get(WEB_METODOS.urlServicosSistema + "?m=getConfiguracaoAplicativo", {params: data}).then(function (response) {
+                return response;
+            });
+
+        }
+    };
+
+
 }]);

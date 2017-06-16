@@ -902,17 +902,17 @@ function ($scope, $stateParams, $ionicLoading,$ionicPopup,$cordovaNetwork,LOCAL_
 
 }])
    
-.controller('dependentesAtivosCtrl', ['$scope', '$stateParams', '$ionicLoading','$ionicPopup','$cordovaNetwork','LOCAL_STORAGE','getDadosDependentesAssociado', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+.controller('dependentesAtivosCtrl', ['$scope', '$stateParams', '$ionicLoading','$ionicPopup','$cordovaNetwork','LOCAL_STORAGE','getDadosDependentesAssociado','getConfiguracaoAplicativo', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $stateParams, $ionicLoading, $ionicPopup, $cordovaNetwork, LOCAL_STORAGE, getDadosDependentesAssociado) {
+function ($scope, $stateParams, $ionicLoading, $ionicPopup, $cordovaNetwork, LOCAL_STORAGE, getDadosDependentesAssociado,getConfiguracaoAplicativo) {
 
   
 
     $scope.dadosUsuario = JSON.parse(window.localStorage.getItem(LOCAL_STORAGE.local_dados_key));
 
     var data = {cpf : $scope.dadosUsuario.cpf};
-
+    var dataConfiguracao = {chave: "meu_cadastro_dependentes_inativos _texto"};   
     $scope.dependentes = {}; 
               
             $ionicLoading.show({
@@ -921,6 +921,10 @@ function ($scope, $stateParams, $ionicLoading, $ionicPopup, $cordovaNetwork, LOC
 
                 getDadosDependentesAssociado.obter(data).then(function (dadosDependentes) {
 
+                        getConfiguracaoAplicativo.obter(dataConfiguracao).then(function (dadosTextoRodape) {
+                            $scope.textoRodape = dadosTextoRodape.data.data[0].valor;
+                          
+                        });
                  
                     $scope.dependentes = dadosDependentes.data.data;
                 
@@ -1930,10 +1934,10 @@ function ($scope, $stateParams,getTipoConvenioService,$ionicLoading,getMunicipio
     
 }])
    
-.controller('endereOCtrl', ['$scope', '$stateParams','getTipoEndereco','getEstado','getMunicipios','$ionicLoading','$q','$state','LOCAL_STORAGE','salvarDadosEnderecoAssociado','$ionicHistory','$ionicPopup', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+.controller('endereOCtrl', ['$scope', '$stateParams','getTipoEndereco','getEstado','getMunicipios','$ionicLoading','$q','$state','LOCAL_STORAGE','salvarDadosEnderecoAssociado','$ionicHistory','$ionicPopup','getConfiguracaoAplicativo', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $stateParams, getTipoEndereco, getEstado, getMunicipios,$ionicLoading,$q,$state,LOCAL_STORAGE,salvarDadosEnderecoAssociado,$ionicHistory,$ionicPopup) {
+function ($scope, $stateParams, getTipoEndereco, getEstado, getMunicipios,$ionicLoading,$q,$state,LOCAL_STORAGE,salvarDadosEnderecoAssociado,$ionicHistory,$ionicPopup,getConfiguracaoAplicativo) {
     $scope.dadosUsuario = JSON.parse(window.localStorage.getItem(LOCAL_STORAGE.local_dados_key));
 
     $scope.tiposEndereco = {};
@@ -1964,8 +1968,7 @@ function ($scope, $stateParams, getTipoEndereco, getEstado, getMunicipios,$ionic
     }
 
     
-  
-      
+ 
      //Funcao para obter os combos da tela 
     $scope.obterCombos = function() {          
       
@@ -1981,11 +1984,15 @@ function ($scope, $stateParams, getTipoEndereco, getEstado, getMunicipios,$ionic
 
         //Pega os municipios.
         var data = {id_estado: $scope.dadosEndereco.id_estado}; //Passando o estado como parametro.
-
         var municipios = getMunicipios.obter(data).then(function (retornoMunicipios) {    
             return retornoMunicipios;
         });     
-          
+        
+        //Retorna o texto de configgurção do aplicativo
+        var dataConfiguracao = {chave: "meu_cadastro_endereco_principal"};      
+        var textoRodape = getConfiguracaoAplicativo.obter(dataConfiguracao).then(function (retornoTextoRodape) {    
+            return retornoTextoRodape;
+        });  
       
         var retornoCombos = [];
 
@@ -1993,7 +2000,7 @@ function ($scope, $stateParams, getTipoEndereco, getEstado, getMunicipios,$ionic
         }).then(function () {
 
             //Pega o retorno de forma sincrona do ajax.
-            $q.all([tiposEndereco, estados, municipios]).then(function(result){
+            $q.all([tiposEndereco, estados, municipios,textoRodape]).then(function(result){
                 for (var i = 0; i < result.length; i++){
                     retornoCombos.push(result[i]);
                 }
@@ -2001,7 +2008,7 @@ function ($scope, $stateParams, getTipoEndereco, getEstado, getMunicipios,$ionic
             $scope.tiposEndereco = retornoCombos[0].data.data;
             $scope.estados = retornoCombos[1].data.data;
             $scope.municipios = retornoCombos[2].data.data;       
-
+            $scope.textoRodape = retornoCombos[3].data.data[0].valor;  
             }).finally(function () {
                             
                 $ionicLoading.hide();
