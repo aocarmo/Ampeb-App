@@ -25,8 +25,24 @@ angular.module('app', ['ionic', 'app.controllers', 'app.routes', 'app.directives
 
 .run(function($ionicPlatform, $cordovaSQLite) {
   $ionicPlatform.ready(function() {
+    // Enable to debug issues.
+    // window.plugins.OneSignal.setLogLevel({logLevel: 4, visualLevel: 4});
+    //Push notifications config
+    var notificationOpenedCallback = function(jsonData) {
+      console.log('notificationOpenedCallback: ' + JSON.stringify(jsonData));
+    };
+
+    window.plugins.OneSignal
+      .startInit("774c0150-e398-4ed0-a600-e9d32ac8a6b5")
+      .handleNotificationOpened(notificationOpenedCallback)
+      .endInit();
+      
+    // Call syncHashedEmail anywhere in your app if you have the user's email.
+    // This improves the effectiveness of OneSignal's "best-time" notification scheduling feature.
+    // window.plugins.OneSignal.syncHashedEmail(userEmail);
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
+
     if (window.cordova && window.cordova.plugins && window.cordova.plugins.Keyboard) {
       cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
       cordova.plugins.Keyboard.disableScroll(true);
@@ -60,6 +76,8 @@ angular.module('app', ['ionic', 'app.controllers', 'app.routes', 'app.directives
   
 
   });
+
+
 })
 
 /*
