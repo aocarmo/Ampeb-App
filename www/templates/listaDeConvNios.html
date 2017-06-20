@@ -22,7 +22,19 @@
 
         </div>
         <div align="center" class="item item-text-wrap bg-color-rodape-card">
-          {{convenio.dsDesconto}}
+          <div align="center" class="row">
+            <div class="col col-99">
+              {{convenio.dsDesconto}}
+            </div>
+          </div>
+           <div ng-if="convenio.urlAnexo != ''" align="center" class="row">
+             <div class="col col-99">
+              <a ng-click="openBrowserPdfConvenios(convenio.urlAnexo)" class="button button-icon">
+              <i class="icon ion-document-text">  Visualizar PDF</i>         
+            </a>
+            </div>
+          </div>
+     
         </div>
 
       </div>

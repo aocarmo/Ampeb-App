@@ -1135,8 +1135,7 @@ function ($scope, $stateParams,$ionicLoading,conveniosFactory,$ionicHistory,$ion
                 
                     getDadosConvenioCONAMP.obter(data).then(function (dados) {
                                         
-                        $scope.redirecionarConamp(dados); 
- 
+                        $scope.redirecionarConamp(dados);                        
 
                     }).finally(function () {
                         //em qualquer caso remove o spinner de loading
@@ -1155,7 +1154,7 @@ function ($scope, $stateParams,$ionicLoading,conveniosFactory,$ionicHistory,$ion
 
                 alertPopup.then(function (res) {
 
-                    $scope.redirecionarConamp();
+                   // $scope.redirecionarConamp();
                     $backView = $ionicHistory.backView();
                     $backView.go();
 
@@ -1203,17 +1202,19 @@ function ($scope, $stateParams,$ionicLoading,conveniosFactory,$ionicHistory,$ion
 
     var browserRef = window.cordova.InAppBrowser.open(
         pageContentUrl ,
-        "_blank",
+       "_blank",
         "hidden=no,location=yes,clearsessioncache=yes,clearcache=yes"
-    );
+    ); 
 
    
  
-    
-    
-
     };
-
+//Abrir o pdf com o google.
+$scope.openBrowserPdfConvenios = function (url){    
+    
+    var link = "http://docs.google.com/viewer?url=" +  encodeURIComponent(url) + "&embedded=true";
+    cordova.InAppBrowser.open(link,"_system", "location=no,toolbar=no,hardwareback=yes");
+};
 
 
 
@@ -1891,30 +1892,25 @@ function ($scope, $stateParams,getTipoConvenioService,$ionicLoading,getMunicipio
             //Apos carregar os municipios carregar os tipo de convenios
                 getTipoConvenioService.getTipoConvenio().then(function (dadosTipoConvenio) {
                     
-                    $scope.tiposConvenio = dadosTipoConvenio;
+                   
                     //Verificando a exibição de convenios privados (conamp)
-
-                    for (var i = 0; i < $scope.tiposConvenio.length; i++){
-                      
-                        if(dadosUsuario == null){
-
-                            if($scope.tiposConvenio[i].flPrivado == 1){
-
-                                $scope.tiposConvenio[i].display = "none";
-
+                    for (var i = 0; i < dadosTipoConvenio.length; i++){                      
+                     
+                        if(dadosTipoConvenio[i].flPrivado == 1){
+                        
+                            if(dadosUsuario == null){
+                                dadosTipoConvenio[i].display = "none";
                             }else{
-                                $scope.tiposConvenio[i].display = "block";
+                                dadosTipoConvenio[i].display = "block";
                             }
 
                         }else{
-
-                            $scope.tiposConvenio[i].display = "block";
+                             dadosTipoConvenio[i].display = "block";
                         }
-
-                   
+                      
                     }
               
-
+                    $scope.tiposConvenio = dadosTipoConvenio;
                 }).finally(function () {
 
                     getConvenioService.getConvenio().then(function (dadosConvenio) {

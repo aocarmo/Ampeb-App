@@ -21,10 +21,10 @@
           {{convenio.dsEndereco}}
         </a>
         <div ng-if="convenio.nmMunicipio != ''" class="item item-divider">
-          Cidade
+          Local
         </div>
         <a ng-if="convenio.nmMunicipio != ''" class="item item-text-wrap">
-         {{convenio.nmMunicipio}}
+         {{convenio.nmMunicipio}},  {{convenio.nmEstado}} - {{convenio.nmPais}} 
         </a>
         <div ng-if="convenio.dsTelefone != ''" class="item item-divider">
           Telefones

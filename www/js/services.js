@@ -188,8 +188,10 @@ angular.module('app.services', [])
                                     if(response.data.data[i].privado_tipo_convenio == true){
                                         flPrivado = 1;
                                     }                                    
+                                    var nmPais = response.data.data[i].nome_pais;
+                                    var urlAnexo = response.data.data[i].url_arquivo_anexo;
                                     
-                                    conveniosFactory.insertConvenio(id, nmConvenio, dsUrlImagem, dsConvenio, nmContato, dsTelefone, dsEmail, urlSite, dsEndereco, dtInicioVigencia, dtTerminoVigencia, dsDesconto,flPublicar, idTipoConvenio, nmMunicipio, nmEstado, flPrivado);
+                                    conveniosFactory.insertConvenio(id, nmConvenio, dsUrlImagem, dsConvenio, nmContato, dsTelefone, dsEmail, urlSite, dsEndereco, dtInicioVigencia, dtTerminoVigencia, dsDesconto,flPublicar, idTipoConvenio, nmMunicipio, nmEstado, flPrivado,nmPais,urlAnexo);
                                     
                                 }
 

@@ -520,22 +520,22 @@ sqlite.factory('conveniosFactory', function ($q, $cordovaSQLite) {
 
             return deferred.promise;
         },
-        insertConvenio: function (id, nmConvenio, dsUrlImagem, dsConvenio, nmContato, dsTelefone, dsEmail, urlSite, dsEndereco, dtInicioVigencia, dtTerminoVigencia, dsDesconto,flPublicar, idTipoConvenio, nmMunicipio, nmEstado, flPrivado) {
-            var query = "INSERT INTO convenio (id, nmConvenio, dsUrlImagem, dsConvenio, nmContato, dsTelefone, dsEmail, urlSite, dsEndereco, dtInicioVigencia, dtTerminoVigencia, dsDesconto,flPublicar, idTipoConvenio, nmMunicipio, nmEstado, flPrivado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            var values = [id, nmConvenio, dsUrlImagem, dsConvenio, nmContato, dsTelefone, dsEmail, urlSite, dsEndereco, dtInicioVigencia, dtTerminoVigencia, dsDesconto,flPublicar, idTipoConvenio, nmMunicipio, nmEstado, flPrivado];
+        insertConvenio: function (id, nmConvenio, dsUrlImagem, dsConvenio, nmContato, dsTelefone, dsEmail, urlSite, dsEndereco, dtInicioVigencia, dtTerminoVigencia, dsDesconto,flPublicar, idTipoConvenio, nmMunicipio, nmEstado, flPrivado, nmPais, urlAnexo) {
+            var query = "INSERT INTO convenio (id, nmConvenio, dsUrlImagem, dsConvenio, nmContato, dsTelefone, dsEmail, urlSite, dsEndereco, dtInicioVigencia, dtTerminoVigencia, dsDesconto,flPublicar, idTipoConvenio, nmMunicipio, nmEstado, flPrivado, nmPais, urlAnexo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            var values = [id, nmConvenio, dsUrlImagem, dsConvenio, nmContato, dsTelefone, dsEmail, urlSite, dsEndereco, dtInicioVigencia, dtTerminoVigencia, dsDesconto,flPublicar, idTipoConvenio, nmMunicipio, nmEstado, flPrivado, nmPais, urlAnexo];
             var outputs = [];
             //Usada para fazer o retorno do banco aguardar esta completa
             var deferred = $q.defer();
 
             $cordovaSQLite.execute(db, query, values).then(
               function (res) {
-                 
+               
                   outputs.push({ "retorno": res.insertId });
                   deferred.resolve(outputs);
                   
               },
               function (err) {
-                  
+                 
                   deferred.reject(err);                
                  
               }
@@ -567,7 +567,7 @@ sqlite.factory('conveniosFactory', function ($q, $cordovaSQLite) {
                filtroIdConvenio =  " AND id = " + idConvenio;
             }
 
-            var query = "SELECT id, nmConvenio, dsUrlImagem, dsConvenio, nmContato, dsTelefone, dsEmail, urlSite, dsEndereco, strftime('%d/%m/%Y', datetime(dtInicioVigencia)) as dtInicioVigencia, CASE WHEN dtTerminoVigencia IS NOT NULL THEN strftime('%d/%m/%Y', datetime(dtTerminoVigencia)) ELSE dtTerminoVigencia END as dtTerminoVigencia, dsDesconto,flPublicar, idTipoConvenio, nmMunicipio, nmEstado, flPrivado FROM convenio WHERE 1=1 " + filtroIdTipoConvenio + filtroNmConvenio + filtroNmMunicipio + filtroIdConvenio;
+            var query = "SELECT id, nmConvenio, dsUrlImagem, dsConvenio, nmContato, dsTelefone, dsEmail, urlSite, dsEndereco, strftime('%d/%m/%Y', datetime(dtInicioVigencia)) as dtInicioVigencia, CASE WHEN dtTerminoVigencia IS NOT NULL THEN strftime('%d/%m/%Y', datetime(dtTerminoVigencia)) ELSE dtTerminoVigencia END as dtTerminoVigencia, dsDesconto,flPublicar, idTipoConvenio, nmMunicipio, nmEstado, flPrivado, nmPais, urlAnexo FROM convenio WHERE 1=1 " + filtroIdTipoConvenio + filtroNmConvenio + filtroNmMunicipio + filtroIdConvenio;
          
             var outputs = [];
 
@@ -595,6 +595,9 @@ sqlite.factory('conveniosFactory', function ($q, $cordovaSQLite) {
                             "nmMunicipio":data.rows.item(i).nmMunicipio,
                             "nmEstado":data.rows.item(i).nmEstado,
                             "flPrivado":data.rows.item(i).flPrivado,
+                            "nmPais":data.rows.item(i).nmPais,
+                            "urlAnexo":data.rows.item(i).urlAnexo,
+                           
                         });
                     }
 
