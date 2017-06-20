@@ -9,7 +9,7 @@
 
         <div class="item item-body">
           
-          <img ion-img-cache class="full-image" ng-src="{{convenio.dsUrlImagem != '' && convenio.dsUrlImagem || 'img/img_not_found.jpg'}}" >
+          <img ion-img-cache class="full-image" ng-src="{{convenio.dsUrlImagem != '' && convenio.dsUrlImagem || 'img/img_not_found.jpg'}}" ui-sref="detalheDoConvNio({id: convenio.id})">
 
           <p align="center">
             <a ui-sref="detalheDoConvNio({id: convenio.id})">Mais detalhes</a>
