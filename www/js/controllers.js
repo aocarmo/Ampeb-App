@@ -1336,7 +1336,7 @@ function ($scope, $stateParams, $cordovaNetwork, $ionicLoading, $ionicPopup, $io
             }
       }else{
            var alertPopup = $ionicPopup.alert({
-                    title: 'Por favor, escolha uma resposta opção.',                    
+                    title: 'Por favor, escolha uma opção de resposta para votar.',                    
                     okText: 'Ok', // String (default: 'OK'). The text of the OK button.
                     okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
                 });
