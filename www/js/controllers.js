@@ -716,6 +716,15 @@ function ($scope, $stateParams, $ionicLoading, conveniosFactory) {
 
     });
 
+    //Abrir o pdf com o google.
+$scope.openBrowserPdfConvenios = function (url){    
+    
+    var link = "http://docs.google.com/viewer?url=" +  encodeURIComponent(url) + "&embedded=true";
+    cordova.InAppBrowser.open(link,"_system", "location=no,toolbar=no,hardwareback=yes");
+};
+
+
+
 
 }])
    
