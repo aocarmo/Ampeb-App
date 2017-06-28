@@ -36,12 +36,12 @@
           Contato
         </div>
         <a ng-if="convenio.nmContato != ''" class="item item-text-wrap">
-          Falar com: {{convenio.nmContato}}
+          {{convenio.nmContato}}
         </a>
         <div ng-if="convenio.urlSite != ''" class="item item-divider">
           Site
         </div>
-        <a ng-if="convenio.urlSite != ''" class="item item-text-wrap">
+        <a ng-if="convenio.urlSite != ''" ng-click="openBrowser(convenio.urlSite)" class="item item-text-wrap">
          {{convenio.urlSite}}
         </a>
       </div>

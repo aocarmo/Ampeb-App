@@ -723,6 +723,13 @@ $scope.openBrowserPdfConvenios = function (url){
     cordova.InAppBrowser.open(link,"_system", "location=no,toolbar=no,hardwareback=yes");
 };
 
+    //Abrir o pdf com o google.
+$scope.openBrowser = function (url){       
+  
+    cordova.InAppBrowser.open(url,"_system", "location=no,toolbar=no,hardwareback=yes");
+};
+
+
 
 
 
