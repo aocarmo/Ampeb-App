@@ -82,11 +82,11 @@ sqlite.factory('noticiasFactory', function ($q, $cordovaSQLite) {
         },
         selectListaNoticias: function (tipo) {
           
-            var query = "SELECT id, dsCategoria, dsTitulo, strftime('%d/%m/%Y %H:%M:%S', datetime(dtNoticia)) as dtNoticia, dsUrlImagem FROM noticia WHERE status = 'publish' ORDER BY date(dtNoticia) DESC";
+            var query = "SELECT id, dsCategoria, dsTitulo, strftime('%d/%m/%Y %H:%M:%S', datetime(dtNoticia)) as dtNoticia, dsUrlImagem FROM noticia WHERE status = 'publish' ORDER BY datetime(dtNoticia) DESC";
 
             if(tipo == "private"){
              
-                query = "SELECT id, dsCategoria, dsTitulo, strftime('%d/%m/%Y %H:%M:%S', datetime(dtNoticia)) as dtNoticia, dsUrlImagem FROM noticia ORDER BY date(dtNoticia) DESC";
+                query = "SELECT id, dsCategoria, dsTitulo, strftime('%d/%m/%Y %H:%M:%S', datetime(dtNoticia)) as dtNoticia, dsUrlImagem FROM noticia ORDER BY datetime(dtNoticia) DESC";
             }
           
             var outputs = [];
@@ -276,11 +276,11 @@ sqlite.factory('eventosFactory', function ($q, $cordovaSQLite) {
         },
         selectListaNoticias: function (tipo) {
           
-            var query = "SELECT id, dsCategoria, dsTitulo, strftime('%d/%m/%Y %H:%M:%S', datetime(dtNoticia)) as dtNoticia, dsUrlImagem FROM evento WHERE status = 'publish' ORDER BY date(dtNoticia) DESC";
+            var query = "SELECT id, dsCategoria, dsTitulo, strftime('%d/%m/%Y %H:%M:%S', datetime(dtNoticia)) as dtNoticia, dsUrlImagem FROM evento WHERE status = 'publish' ORDER BY datetime(dtNoticia) DESC";
 
             if(tipo == "private"){
              
-                query = "SELECT id, dsCategoria, dsTitulo, strftime('%d/%m/%Y %H:%M:%S', datetime(dtNoticia)) as dtNoticia, dsUrlImagem FROM evento ORDER BY date(dtNoticia) DESC";
+                query = "SELECT id, dsCategoria, dsTitulo, strftime('%d/%m/%Y %H:%M:%S', datetime(dtNoticia)) as dtNoticia, dsUrlImagem FROM evento ORDER BY datetime(dtNoticia) DESC";
             }
           
             var outputs = [];
@@ -682,7 +682,7 @@ sqlite.factory('fiquePorDentroFactory', function ($q, $cordovaSQLite) {
         },
         selectListaNoticias: function () {
 
-            query = "SELECT id, dsCategoria, dsTitulo, strftime('%d/%m/%Y %H:%M:%S', datetime(dtNoticia)) as dtNoticia, dsUrlImagem FROM fique_por_dentro ORDER BY date(dtNoticia) DESC";
+            query = "SELECT id, dsCategoria, dsTitulo, strftime('%d/%m/%Y %H:%M:%S', datetime(dtNoticia)) as dtNoticia, dsUrlImagem FROM fique_por_dentro ORDER BY datetime(dtNoticia) DESC";
            
        
             var outputs = [];
@@ -835,7 +835,7 @@ sqlite.factory('enqueteFactory', function ($q, $cordovaSQLite) {
         },
         selectListaEnquetes: function () {
 
-            query = "SELECT id, dsEnquete, totalVotos, totalVotantes, strftime('%d/%m/%Y %H:%M:%S', datetime(dtCadastro)) as dtCadastro, strftime('%d/%m/%Y %H:%M:%S', datetime(dtExpiracao)) as dtExpiracao, flAtivo FROM enquetes ORDER BY date(dtCadastro) DESC";
+            query = "SELECT id, dsEnquete, totalVotos, totalVotantes, strftime('%d/%m/%Y %H:%M:%S', datetime(dtCadastro)) as dtCadastro, strftime('%d/%m/%Y %H:%M:%S', datetime(dtExpiracao)) as dtExpiracao, flAtivo FROM enquetes ORDER BY datetime(dtCadastro) DESC";
                   
             var outputs = [];
 

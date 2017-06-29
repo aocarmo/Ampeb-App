@@ -44,7 +44,7 @@
       <button class="button button-assertive  button-block" type="submit">Entrar</button>
       <!--<a ng-click="login(data)" id="aMPEBAPP-button2" style="border-radius:0px 0px 0px 0px;" class="button button-assertive  button-block">Entrar</a>-->
       <div align="center">      
-            <input type="checkbox" name="ckbMantenha" ng-model="data.manterConectado"> Mantenha-me conectado
+            <input type="checkbox" ng-init="data.manterConectado=true" name="ckbMantenha" ng-model="data.manterConectado"> Mantenha-me conectado
       </div>
         <a ui-sref="esqueceuASenha" id="aMPEBAPP-button5" class="button button-positive  button-block button-clear">Esqueceu a senha?</a>
 </form>
