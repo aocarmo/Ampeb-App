@@ -327,7 +327,7 @@ function ($scope, $stateParams, $state, $http, $ionicPopup, $ionicLoading, Login
                 $ionicLoading.show({template: '<ion-spinner icon="spiral" class="spinner-assertive"></ion-spinner> <br/> Autenticando...'}).then(function (){
 
                     LoginService.logar(data).then(function (dados){
-                 
+                     
                         if (dados.data.result == true) {
 
                             var dadosUsuarioObterToken = {
@@ -336,7 +336,7 @@ function ($scope, $stateParams, $state, $http, $ionicPopup, $ionicLoading, Login
                             };
 
                             getToken.obter(dadosUsuarioObterToken).then(function (retornoToken){    
-                            
+                                
                                 //Guardando as informações do token pra serviços privados.
                                 window.localStorage.setItem(LOCAL_STORAGE.local_token, "Bearer "+retornoToken.data.token);
                                 window.localStorage.setItem(LOCAL_STORAGE.tipo_retorno_post, 'private');
@@ -1546,30 +1546,37 @@ function ($scope, $stateParams, $state, RecuperarSenhaService, $ionicPopup,$cord
 
                 RecuperarSenhaService.enviarEmailRecuperarSenha(data).then(function (dados) {
             
-                if (dados.data == "Confirmação executada com sucesso.") {
-                    var alertPopup = $ionicPopup.alert({
-                        title: 'Solicitação enviada com sucesso.',
-                        template: 'Foi enviado um e-mail para redefinição de senha',
-                        okText: 'OK', // String (default: 'OK'). The text of the OK button.
-                        okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
-                    });
+                    if (dados.data == "Confirmação executada com sucesso.") {
+                        var alertPopup = $ionicPopup.alert({
+                            title: 'Solicitação enviada com sucesso.',
+                            template: 'Foi enviado um e-mail para redefinição de senha',
+                            okText: 'OK', // String (default: 'OK'). The text of the OK button.
+                            okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+                        });
 
-                    alertPopup.then(function (res) {
+                        alertPopup.then(function (res) {
 
-                        $state.go('aMPEBAPP');
+                            $state.go('aMPEBAPP');
 
-                    });             
-                
-                }else if(dados.data == "Seu email não existe na base de dados."){
-                    var alertPopup = $ionicPopup.alert({
-                        title: dados.data,
-                        template: 'Verifique o CPF informado.',
-                        okText: 'OK', // String (default: 'OK'). The text of the OK button.
-                        okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
-                    });
-                }
+                        });             
+                    
+                    }else if(dados.data == "Seu email não existe na base de dados."){
+                        var alertPopup = $ionicPopup.alert({
+                            title: dados.data,
+                            template: 'Verifique o CPF informado.',
+                            okText: 'OK', // String (default: 'OK'). The text of the OK button.
+                            okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+                        });
+                    }else{
+                        var alertPopup = $ionicPopup.alert({
+                            title: dados.data,
+                            template: 'Falha na solicitação, favor entrar em contato com a administração.',
+                            okText: 'OK', // String (default: 'OK'). The text of the OK button.
+                            okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+                        });
+                    }
 
-            });
+                });
             }else{
                var alertPopup = $ionicPopup.alert({
                     title: 'Não foi possível enviar o e-mail de recuperação de senha.',
