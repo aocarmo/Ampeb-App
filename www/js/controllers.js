@@ -369,6 +369,14 @@ function ($scope, $stateParams, $state, $http, $ionicPopup, $ionicLoading, Login
                             okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
                             });
                         }
+                    }, function(rejected){
+                        $ionicLoading.hide();//Validando se a rede está disponivel.
+                         var alertPopup = $ionicPopup.alert({
+                            title: 'Tente novamente',
+                            template: 'Rede apresentando lentidão ou indisponível!',
+                            okText: 'Ok', // String (default: 'OK'). The text of the OK button.
+                            okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+                            });
                     });
                 });
             }else{

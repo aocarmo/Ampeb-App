@@ -236,7 +236,7 @@ angular.module('app.services', [])
             var dados = { cpf: data.usuario, senha: data.senha };
             //Usado em requisi��es POSR ($httpParamSerializerJQLike)
             $http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
-            return $http.post(WEB_METODOS.urlServicosSistema + "?m=loginAssociado", $httpParamSerializerJQLike(dados)).then(function (response) {
+            return $http.post(WEB_METODOS.urlServicosSistema + "?m=loginAssociado", $httpParamSerializerJQLike(dados), {timeout: 10000}).then(function (response) {
                 return response;
             });
 
