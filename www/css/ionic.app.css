@@ -9857,6 +9857,20 @@ a.button {
   box-shadow: 0 0 0 0;
   border: 0 none;
   outline: 0; }
+
+.categoria_post{
+	
+	font-size: small;
+
+}
+
+.titulo_post{
+	
+  font-weight:bold;
+
+}
+
+
 /** Styling for the username field **/
 label.item.has-error {  
   border-bottom: 2px solid red;

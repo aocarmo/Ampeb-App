@@ -236,7 +236,7 @@ angular.module('app.services', [])
             var dados = { cpf: data.usuario, senha: data.senha };
             //Usado em requisi��es POSR ($httpParamSerializerJQLike)
             $http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
-            return $http.post(WEB_METODOS.urlServicosSistema + "?m=loginAssociado", $httpParamSerializerJQLike(dados), {timeout: 10000}).then(function (response) {
+            return $http.post(WEB_METODOS.urlServicosSistema + "?m=loginAssociado", $httpParamSerializerJQLike(dados), {timeout: 30000}).then(function (response) {
                 return response;
             });
 
@@ -1067,7 +1067,7 @@ angular.module('app.services', [])
         obter: function (data) {
                                  
             $http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
-            return $http.post(WEB_METODOS.urlObterToken, $httpParamSerializerJQLike(data)).then(function (response) {
+            return $http.post(WEB_METODOS.urlObterToken, $httpParamSerializerJQLike(data), {timeout: 30000}).then(function (response) {
                 return response;
             });
 
@@ -1081,7 +1081,7 @@ angular.module('app.services', [])
         obterNoticiasOnline: function () {
           
          return  $http.get(WEB_METODOS.urlServicosPortalFiquePorDentro,{headers: {'Authorization': window.localStorage.getItem(LOCAL_STORAGE.local_token)}}).then(function (response) {
-           
+ 
             //Loop para verificar e exluir todos os post que sofreram modificações
             for (var i = 0; i < response.data.length; i++) {
                 fiquePorDentroFactory.deleteNoticiasDesatualizadas(response.data[i].id, response.data[i].modified);

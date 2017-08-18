@@ -29,6 +29,9 @@ angular.module('app.constants', [])
     url_foto:   'https://ssl-369102.uni5.net/sistema/',
     local_token: 'token',
     tipo_retorno_post: 'tipo',
-    filtro_retorno_post: 'filtroRetornoPost'
+    filtro_retorno_post: 'filtroRetornoPost',
+    usuarioObterToken: 'usuario',
+    senhaObterToken: 'senha',
+
 });
 

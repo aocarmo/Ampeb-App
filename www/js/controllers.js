@@ -182,12 +182,14 @@ function ($scope, $stateParams,$state, $q,$cordovaCamera, $ionicPopup, LOCAL_STO
         //Removendo dados da sessão
         window.localStorage.removeItem(LOCAL_STORAGE.local_dados_key);
         window.localStorage.removeItem(LOCAL_STORAGE.manter_logado);   
+        window.localStorage.removeItem(LOCAL_STORAGE.usuarioObterToken);
+        window.localStorage.removeItem(LOCAL_STORAGE.senhaObterToken);   
         
         //Setando o token como vazio para permitir obter somente as noticias e eventos publicos
         window.localStorage.setItem(LOCAL_STORAGE.local_token, "");
         window.localStorage.setItem(LOCAL_STORAGE.tipo_retorno_post, 'publish');
         window.localStorage.setItem(LOCAL_STORAGE.filtro_retorno_post, '&status=publish');   
-        
+        //Redireciona para pagina de login
         $state.go('aMPEBAPP');
     }
         
@@ -306,17 +308,45 @@ function ($scope, $stateParams,$state, $q,$cordovaCamera, $ionicPopup, LOCAL_STO
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
 function ($scope, $stateParams, $state, $http, $ionicPopup, $ionicLoading, LoginService,LOCAL_STORAGE,$cordovaNetwork,getToken) {
   
-    //Setando o token como vazio para permitir obter as noticias e eventos publicos
-    window.localStorage.setItem(LOCAL_STORAGE.local_token, "");
-    window.localStorage.setItem(LOCAL_STORAGE.tipo_retorno_post, 'publish');
-    window.localStorage.setItem(LOCAL_STORAGE.filtro_retorno_post, '&status=publish');   
-    
     $scope.data = {};    
     var manteLogado =  window.localStorage.getItem(LOCAL_STORAGE.manter_logado);
   
     if(manteLogado == "true"){
-        $state.go('aMPEB');
-    }
+
+        //Pegando usuario e senha da sessão para obter um novo token
+
+         var dadosUsuarioObterToken = {
+                username: window.localStorage.getItem(LOCAL_STORAGE.usuarioObterToken),
+                password: window.localStorage.getItem(LOCAL_STORAGE.senhaObterToken)
+        };
+        //Pegando um novo token
+        $ionicLoading.show({template: '<ion-spinner icon="spiral" class="spinner-assertive"></ion-spinner> <br/> Aguarde...'}).then(function (){
+
+             getToken.obter(dadosUsuarioObterToken).then(function (retornoToken){                  
+               
+                //Guardando as informações do token pra serviços privados.
+                window.localStorage.setItem(LOCAL_STORAGE.local_token, "Bearer "+retornoToken.data.token);           
+                
+            }, function(rejected){
+                    
+                    $ionicLoading.hide();
+                       
+                }).finally(function () {
+
+                    //Em qualquer caso remove o spinner de loading
+                    $ionicLoading.hide(); 
+                    $state.go('aMPEB');                
+            });
+
+        });
+    }else{
+        //Setando o token como vazio para permitir obter as noticias e eventos publicos
+        window.localStorage.setItem(LOCAL_STORAGE.local_token, "");
+        window.localStorage.setItem(LOCAL_STORAGE.tipo_retorno_post, 'publish');
+        window.localStorage.setItem(LOCAL_STORAGE.filtro_retorno_post, '&status=publish');   
+    }  
+    
+  
    
     $scope.login = function (form,data) {
 
@@ -342,11 +372,18 @@ function ($scope, $stateParams, $state, $http, $ionicPopup, $ionicLoading, Login
                                 window.localStorage.setItem(LOCAL_STORAGE.tipo_retorno_post, 'private');
                                 window.localStorage.setItem(LOCAL_STORAGE.filtro_retorno_post, '&status=private,publish');
 
+                              
                                 //Guardando as informações do usuario logado na sessão.
                                 window.localStorage.setItem(LOCAL_STORAGE.local_dados_key, JSON.stringify(dados.data.data));
-                            
+                                
+                                //Testa se manter logado é true e grava no storage.
                                 if (data.manterConectado == true) {
+
                                     window.localStorage.setItem(LOCAL_STORAGE.manter_logado, "true");
+
+                                    //Guardando credenciais para obter o token caso manter logado for true
+                                    window.localStorage.setItem(LOCAL_STORAGE.usuarioObterToken, data.usuario);
+                                    window.localStorage.setItem(LOCAL_STORAGE.senhaUsuario, data.senha);
                                     
                                 }else{
                                     window.localStorage.setItem(LOCAL_STORAGE.manter_logado, "false");
