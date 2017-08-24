@@ -10,7 +10,7 @@
           <h2assertive>
             <span class="categoria_post">{{noticia.dsCategoria}}</span>
             <p style="white-space:normal;">{{noticia.dtNoticia}}</p>
-            <p class="titulo_post" style="white-space:normal;">{{noticia.dsTitulo}}</p>
+            <p ng-bind-html="noticia.dsTitulo" class="titulo_post" style="white-space:normal;"></p>
             <i class="icon ion-ios-arrow-right"></i>
           </h2assertive>
         </ion-item>
