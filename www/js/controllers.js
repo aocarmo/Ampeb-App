@@ -437,6 +437,7 @@ function ($scope, $stateParams, obterNoticiasService, noticiasFactory, $ionicPop
    //Variáveis declaradas para paginação
      $scope.pagina = 1;
      $scope.listaNoticias = [];
+     $scope.moreDataCanBeLoaded = true; 
     //Verifica se estivar online pega dados via serviço 
     if ($cordovaNetwork.isOnline()) {
 
@@ -464,7 +465,6 @@ function ($scope, $stateParams, obterNoticiasService, noticiasFactory, $ionicPop
                     });
 
                     alertPopup.then(function (res) {
-
 
                         $backView = $ionicHistory.backView();
                         $backView.go();
@@ -502,6 +502,11 @@ function ($scope, $stateParams, obterNoticiasService, noticiasFactory, $ionicPop
                 
                 //Concatenando as novas informações ao array existente de noticias
                 $scope.listaNoticias = $scope.listaNoticias.concat(retorno); 
+                
+                //Teste para verificar quando tem mais posts para carregar, caso não tenha faz com que o loading do infinte scroll pare de rodar
+                if(retorno.length == 0){   
+                    $scope.moreDataCanBeLoaded = false; 
+                 }      
                 //Encerra o loading
                 $scope.$broadcast('scroll.infiniteScrollComplete');
 
@@ -529,6 +534,8 @@ function ($scope, $stateParams,obterEventosService, $ionicPopup, LOCAL_STORAGE, 
     //Variáveis declaradas para paginação
     $scope.pagina = 1;
     $scope.listaEventos = [];
+    $scope.moreDataCanBeLoaded = true; 
+      
  //Verifica se estivar online pega dados via serviço 
     if ($cordovaNetwork.isOnline()) {
        
@@ -594,6 +601,11 @@ function ($scope, $stateParams,obterEventosService, $ionicPopup, LOCAL_STORAGE, 
             obterEventosServiceObterMais.obter($scope.pagina).then(function (retorno) {
                 
                 $scope.listaEventos = $scope.listaEventos.concat(retorno); 
+                
+                //Teste para verificar quando tem mais posts para carregar, caso não tenha faz com que o loading do infinte scroll pare de rodar
+                if(retorno.length == 0){   
+                    $scope.moreDataCanBeLoaded = false; 
+                }   
 
                 $scope.$broadcast('scroll.infiniteScrollComplete');
 
@@ -612,13 +624,14 @@ function ($scope, $stateParams,obterEventosService, $ionicPopup, LOCAL_STORAGE, 
 
 }])
    
-.controller('meuMuralCtrl', ['$scope', '$stateParams', 'obterFiquePorDentroService', '$ionicPopup', 'LOCAL_STORAGE', '$ionicLoading','$cordovaNetwork','$ionicHistory','fiquePorDentroFactory','obterFiquePorDentroServiceObterMais', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+.controller('meuMuralCtrl', ['$scope', '$stateParams', 'obterFiquePorDentroService', '$ionicPopup', 'LOCAL_STORAGE', '$ionicLoading','$cordovaNetwork','$ionicHistory','fiquePorDentroFactory','obterFiquePorDentroServiceObterMais','$timeout', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $stateParams,obterFiquePorDentroService, $ionicPopup, LOCAL_STORAGE, $ionicLoading, $cordovaNetwork, $ionicHistory,fiquePorDentroFactory,obterFiquePorDentroServiceObterMais) {
+function ($scope, $stateParams,obterFiquePorDentroService, $ionicPopup, LOCAL_STORAGE, $ionicLoading, $cordovaNetwork, $ionicHistory,fiquePorDentroFactory,obterFiquePorDentroServiceObterMais,$timeout) {
     //Variáveis declaradas para paginação
      $scope.pagina = 1;
      $scope.fiquePorDentro = [];
+     $scope.moreDataCanBeLoaded = true;
     //Verifica se estivar online pega dados via serviço 
         if ($cordovaNetwork.isOnline()) {
           
@@ -682,9 +695,12 @@ function ($scope, $stateParams,obterFiquePorDentroService, $ionicPopup, LOCAL_ST
             obterFiquePorDentroServiceObterMais.obter($scope.pagina).then(function (retorno) {
                
                 $scope.fiquePorDentro = $scope.fiquePorDentro.concat(retorno); 
-
+                
+                //Teste para verificar quando tem mais posts para carregar, caso não tenha faz com que o loading do infinte scroll pare de rodar
+                if(retorno.length == 0){   
+                   $scope.moreDataCanBeLoaded = false; 
+                }               
                 $scope.$broadcast('scroll.infiniteScrollComplete');
-
             });
         }else{
             var alertPopup = $ionicPopup.alert({
