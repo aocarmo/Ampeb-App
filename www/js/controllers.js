@@ -440,16 +440,22 @@ function ($scope, $stateParams, obterNoticiasService, noticiasFactory, $ionicPop
      $scope.moreDataCanBeLoaded = true; 
     //Verifica se estivar online pega dados via serviço 
     if ($cordovaNetwork.isOnline()) {
-
-        obterNoticiasService.obterNoticiasOnline().then(function (dados) {
-            
-            $scope.listaNoticias = dados;
-
-            noticiasFactory.marcarNoticiasLidas().then(function (marcados) {
+        
+        $ionicLoading.show({template: '<ion-spinner icon="spiral" class="spinner-assertive"></ion-spinner> <br/> Buscando...'}).then(function (){
+        
+            obterNoticiasService.obterNoticiasOnline().then(function (dados) {
                 
-            });
+                $scope.listaNoticias = dados;
 
-        });     
+                noticiasFactory.marcarNoticiasLidas().then(function (marcados) {
+                    
+                }).finally(function () {
+                    //em qualquer caso remove o spinner de loading
+                    $ionicLoading.hide();
+                });
+
+            });  
+        });   
 
     } else {
         //Pega dados do banco
@@ -539,15 +545,19 @@ function ($scope, $stateParams,obterEventosService, $ionicPopup, LOCAL_STORAGE, 
  //Verifica se estivar online pega dados via serviço 
     if ($cordovaNetwork.isOnline()) {
        
-          
-        obterEventosService.obterEventosOnline().then(function (dados) {
+        $ionicLoading.show({template: '<ion-spinner icon="spiral" class="spinner-assertive"></ion-spinner> <br/> Buscando...'}).then(function (){   
+            obterEventosService.obterEventosOnline().then(function (dados) {
 
-            $scope.listaEventos = dados;
-        
-            eventosFactory.marcarEventosLidos().then(function (marcados) {
-                
-            });     
+                $scope.listaEventos = dados;
+            
+                eventosFactory.marcarEventosLidos().then(function (marcados) {
+                    
+                }).finally(function () {
+                    //em qualquer caso remove o spinner de loading
+                    $ionicLoading.hide();
+                });     
 
+            });
         });
            
             
@@ -635,16 +645,20 @@ function ($scope, $stateParams,obterFiquePorDentroService, $ionicPopup, LOCAL_ST
     //Verifica se estivar online pega dados via serviço 
         if ($cordovaNetwork.isOnline()) {
           
-            obterFiquePorDentroService.obterNoticiasOnline().then(function (dados) {
+            $ionicLoading.show({template: '<ion-spinner icon="spiral" class="spinner-assertive"></ion-spinner> <br/> Buscando...'}).then(function (){
+                obterFiquePorDentroService.obterNoticiasOnline().then(function (dados) {
 
-                $scope.fiquePorDentro = dados;
-            
-                fiquePorDentroFactory.marcarNoticiasLidas().then(function (marcados) {
-                    
-                });     
-
+                    $scope.fiquePorDentro = dados;
+                
+                    fiquePorDentroFactory.marcarNoticiasLidas().then(function (marcados) {
+                        
+                    }).finally(function () {
+                        //em qualquer caso remove o spinner de loading
+                        $ionicLoading.hide();
+                    });
+         
+                });
             });
-
         }else{
             //Pega dados do banco
             $ionicLoading.show().then(function () {
