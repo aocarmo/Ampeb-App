@@ -740,7 +740,7 @@ function ($scope, $stateParams, $ionicLoading, noticiasFactory,$sce) {
          
             var str = dados[0].dsNoticia;      
             //Fazendo replace com expressão regular para abrir os links no ionic
-            var newNoticia =   str.replace(/<a href(.*?)/g, "<a onclick=\"window.open(this.href, '_blank'); return false;\" href");            
+            var newNoticia =   str.replace(/<a href(.*?)/g, "<a onclick=\"window.open(this.href, '_system'); return false;\" href");            
             $scope.noticia = dados;         
             $scope.noticia[0].dsNoticia = newNoticia;   
 
@@ -770,7 +770,7 @@ function ($scope, $stateParams,$ionicLoading, eventosFactory,$sce) {
          
             var str = eventoBD[0].dsNoticia;      
             //Fazendo replace com expressão regular para abrir os links no ionic
-            var newNoticia =   str.replace(/<a href(.*?)/g, "<a onclick=\"window.open(this.href, '_blank'); return false;\" href");            
+            var newNoticia =   str.replace(/<a href(.*?)/g, "<a onclick=\"window.open(this.href, '_system'); return false;\" href");            
             $scope.evento = eventoBD;         
             $scope.evento[0].dsNoticia = newNoticia;   
 
@@ -839,10 +839,10 @@ $scope.noticia = {};
         fiquePorDentroFactory.selectNoticia($stateParams.id).then(function (dados) {       
 
             var str = dados[0].dsNoticia;            
-            //var newNoticia =   str.replace(/rel="(.*?)"/g, "onclick=\"window.open(this.href, '_blank'); return false;\""); Segunda opção.
+            //var newNoticia =   str.replace(/rel="(.*?)"/g, "onclick=\"window.open(this.href, '_system'); return false;\""); Segunda opção.
 
             //Fazendo replace com expressão regular para abrir os links no ionic
-            var newNoticia =   str.replace(/<a href(.*?)/g, "<a onclick=\"window.open(this.href, '_blank'); return false;\" href");            
+            var newNoticia =   str.replace(/<a href(.*?)/g, "<a onclick=\"window.open(this.href, '_system'); return false;\" href");            
             $scope.noticia = dados;         
             $scope.noticia[0].dsNoticia = newNoticia;     
 
