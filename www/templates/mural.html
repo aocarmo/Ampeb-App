@@ -4,7 +4,7 @@
     <hr class="hr-topoPagina">
     <h5 id="notCia-heading12" style="color:#454545;font-weight:400;">{{noticia[0].dtNoticia}}</h5>
     <h4 ng-bind-html="noticia[0].dsTitulo" id="notCia-heading11" style="color:#821723;font-weight:400;"></h4>
-    <ion-slides disable-side-menu-drag="" options="{'loop': false}" slider="slider1" delegate-handle="slider1" id="notCia-slider1" style="width:100%;height:200px;">
+    <ion-slides ng-if="noticia[0].dsUrlImagem != 'img/img_not_found.jpg'"  disable-side-menu-drag="" options="{'loop': false}" slider="slider1" delegate-handle="slider1" id="notCia-slider1" style="width:100%;height:200px;">
       <!--ion-slide-page id="notCia-slide24" style="background:url({{noticia[0].dsUrlImagem}}) no-repeat center;background-size:cover;" class="padding">-->
       <ion-slide-page ion-img-cache-bg id="notCia-slide24" style="background:url({{noticia[0].dsUrlImagem}}) no-repeat center;background-size:contain;" class="padding">
         <div style="display:table;width:100%;height:100%;">
@@ -16,7 +16,7 @@
     </ion-slides>
     <div class="spacer" style="width: 300px; height: 32px;"></div>
     <div id="notCia-markdown5" style="text-align:justify;" class="show-list-numbers-and-dots">
-      <p ng-bind-html="noticia[0].dsNoticia"></p>      
+      <p ng-bind-html="trustAsHtml(noticia[0].dsNoticia)"></p>      
     </div>
     </ion-content>
 </ion-view>

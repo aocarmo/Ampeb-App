@@ -728,17 +728,51 @@ function ($scope, $stateParams,obterFiquePorDentroService, $ionicPopup, LOCAL_ST
     };    
 }])
    
-.controller('notCiaCtrl', ['$scope', '$stateParams','$ionicLoading','noticiasFactory', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+.controller('notCiaCtrl', ['$scope', '$stateParams','$ionicLoading','noticiasFactory','$sce', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $stateParams, $ionicLoading, noticiasFactory) {
+function ($scope, $stateParams, $ionicLoading, noticiasFactory,$sce) {
     $scope.noticia = {};
     //Pega dados do banco
     $ionicLoading.show().then(function () {
 
         noticiasFactory.selectNoticia($stateParams.id).then(function (dados) {        
          
-            $scope.noticia = dados;
+            var str = dados[0].dsNoticia;      
+            //Fazendo replace com expressão regular para abrir os links no ionic
+            var newNoticia =   str.replace(/<a href(.*?)/g, "<a onclick=\"window.open(this.href, '_blank'); return false;\" href");            
+            $scope.noticia = dados;         
+            $scope.noticia[0].dsNoticia = newNoticia;   
+
+        }).finally(function () {
+            //em qualquer caso remove o spinner de loading
+            $ionicLoading.hide();
+        });
+
+    });
+
+    $scope.trustAsHtml = function(html) {
+        return $sce.trustAsHtml(html);
+    }
+    
+}])
+   
+.controller('detalheDoEventoCtrl', ['$scope', '$stateParams', '$ionicLoading','eventosFactory','$sce', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+// You can include any angular dependencies as parameters for this function
+// TIP: Access Route Parameters for your page via $stateParams.parameterName
+function ($scope, $stateParams,$ionicLoading, eventosFactory,$sce) {
+
+    $scope.evento = {};
+    //Pega dados do banco
+    $ionicLoading.show().then(function () {
+        eventosFactory.selectNoticia($stateParams.id).then(function (eventoBD) {
+                 
+         
+            var str = eventoBD[0].dsNoticia;      
+            //Fazendo replace com expressão regular para abrir os links no ionic
+            var newNoticia =   str.replace(/<a href(.*?)/g, "<a onclick=\"window.open(this.href, '_blank'); return false;\" href");            
+            $scope.evento = eventoBD;         
+            $scope.evento[0].dsNoticia = newNoticia;   
 
         }).finally(function () {
             //em qualquer caso remove o spinner de loading
@@ -747,26 +781,9 @@ function ($scope, $stateParams, $ionicLoading, noticiasFactory) {
 
     });
     
-}])
-   
-.controller('detalheDoEventoCtrl', ['$scope', '$stateParams', '$ionicLoading','eventosFactory', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
-// You can include any angular dependencies as parameters for this function
-// TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $stateParams,$ionicLoading, eventosFactory) {
-
-    $scope.evento = {};
-    //Pega dados do banco
-    $ionicLoading.show().then(function () {
-        eventosFactory.selectNoticia($stateParams.id).then(function (eventoBD) {
-                 
-            $scope.evento = eventoBD;
-
-        }).finally(function () {
-            //em qualquer caso remove o spinner de loading
-            $ionicLoading.hide();
-        });
-
-    });
+   $scope.trustAsHtml = function(html) {
+       return $sce.trustAsHtml(html);
+   }
 
 
 }])
@@ -810,18 +827,24 @@ $scope.openBrowser = function (url){
 
 }])
    
-.controller('muralCtrl', ['$scope', '$stateParams','$ionicLoading','fiquePorDentroFactory', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+.controller('muralCtrl', ['$scope', '$stateParams','$ionicLoading','fiquePorDentroFactory','$sce', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $stateParams ,$ionicLoading, fiquePorDentroFactory) {
+function ($scope, $stateParams ,$ionicLoading, fiquePorDentroFactory,$sce) {
 
 $scope.noticia = {};
     //Pega dados do banco
     $ionicLoading.show().then(function () {
 
-        fiquePorDentroFactory.selectNoticia($stateParams.id).then(function (dados) {        
-         
-            $scope.noticia = dados;
+        fiquePorDentroFactory.selectNoticia($stateParams.id).then(function (dados) {       
+
+            var str = dados[0].dsNoticia;            
+            //var newNoticia =   str.replace(/rel="(.*?)"/g, "onclick=\"window.open(this.href, '_blank'); return false;\""); Segunda opção.
+
+            //Fazendo replace com expressão regular para abrir os links no ionic
+            var newNoticia =   str.replace(/<a href(.*?)/g, "<a onclick=\"window.open(this.href, '_blank'); return false;\" href");            
+            $scope.noticia = dados;         
+            $scope.noticia[0].dsNoticia = newNoticia;     
 
         }).finally(function () {
             //em qualquer caso remove o spinner de loading
@@ -829,6 +852,10 @@ $scope.noticia = {};
         });
 
     });
+
+    $scope.trustAsHtml = function(html) {
+        return $sce.trustAsHtml(html);
+      }
 
 }])
    
