@@ -81,6 +81,8 @@
     </platform>
     <icon src="resources/android/icon/drawable-xhdpi-icon.png" />
     <allow-navigation href="http://192.168.0.14:8100" />
+    <engine name="android" spec="~6.1.2" />
+    <engine name="ios" spec="^4.5.0" />
     <plugin name="cordova-plugin-actionsheet" spec="~2.3.3" />
     <plugin name="cordova-plugin-camera" spec="~2.4.0" />
     <plugin name="cordova-plugin-device" spec="~1.1.5" />
@@ -99,6 +101,4 @@
     <plugin name="cordova-sqlite-storage" spec="~2.0.3" />
     <plugin name="ionic-plugin-keyboard" spec="~2.2.1" />
     <plugin name="onesignal-cordova-plugin" spec="~2.1.2" />
-    <engine name="android" spec="~6.1.2" />
-    <engine name="ios" spec="^4.5.0" />
 </widget>
