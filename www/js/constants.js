@@ -32,6 +32,7 @@ angular.module('app.constants', [])
     filtro_retorno_post: 'filtroRetornoPost',
     usuarioObterToken: 'usuario',
     senhaObterToken: 'senha',
+    statusToken: 'statusToken'
 
 });
 
