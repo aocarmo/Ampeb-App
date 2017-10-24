@@ -71,8 +71,8 @@ angular.module('app', ['ionic', 'app.controllers', 'app.routes', 'app.directives
 
               //Pegando usuar803io e senha da sessão para obter um novo token
               var alertPopup = $ionicPopup.alert({
-                title: 'Prezado, seu login expirou',
-                template: 'Você será redirecionado(a) a tela de login.',
+                title: 'Prezado(a), seu login expirou',
+                template: 'Você será redirecionado(a) para a tela de login.',
                 okText: 'Ok', // String (default: 'OK'). The text of the OK button.
                 okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
               });
