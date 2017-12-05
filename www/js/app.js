@@ -96,6 +96,42 @@ angular.module('app', ['ionic', 'app.controllers', 'app.routes', 'app.directives
               });
             }
 
+          }else if (rejection.data.code.indexOf("incorrect_password") != -1) {
+
+            var statusToken = window.localStorage.getItem(LOCAL_STORAGE.statusToken);
+          
+            if (statusToken == "true") {              
+
+              //Para não exibir o alert mais de uma vez
+              window.localStorage.setItem(LOCAL_STORAGE.statusToken, "false");
+              //Remove o spinig que estasendo exibido na tela
+              $ionicLoading.hide();
+
+              var alertPopup = $ionicPopup.alert({
+                title: 'Prezado(a), sua senha está incorreta para acessar o aplicativo.',
+                template: 'Você será redirecionado(a) para a tela de login.',
+                okText: 'Ok', // String (default: 'OK'). The text of the OK button.
+                okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+              });
+            
+              alertPopup.then(function (res) {
+              
+                //Removendo dados da sessão
+                window.localStorage.removeItem(LOCAL_STORAGE.local_dados_key);
+                window.localStorage.removeItem(LOCAL_STORAGE.manter_logado);
+                window.localStorage.removeItem(LOCAL_STORAGE.usuarioObterToken);
+                window.localStorage.removeItem(LOCAL_STORAGE.senhaObterToken);
+
+                //Setando o token como vazio para permitir obter somente as noticias e eventos publicos
+                window.localStorage.setItem(LOCAL_STORAGE.local_token, "");
+                window.localStorage.setItem(LOCAL_STORAGE.tipo_retorno_post, 'publish');
+                window.localStorage.setItem(LOCAL_STORAGE.filtro_retorno_post, '&status=publish');
+                
+                //Redireciona para pagina de login
+                $state.go('aMPEBAPP');
+
+              });
+            }
           }else{
 
               //Pegando usuar803io e senha da sessão para obter um novo token

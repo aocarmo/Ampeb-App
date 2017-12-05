@@ -1594,6 +1594,9 @@
 
                                     if (retorno.data.result == true) {
 
+                                        //Setanto nova senha para obter token
+                                        window.localStorage.setItem(LOCAL_STORAGE.senhaObterToken, data.novaSenha);
+
                                         var alertPopup = $ionicPopup.alert({
                                             title: retorno.data.data.mensagem,
                                             okText: 'Ok', // String (default: 'OK'). The text of the OK button.
@@ -1667,10 +1670,10 @@
 
                         RecuperarSenhaService.enviarEmailRecuperarSenha(data).then(function (dados) {
 
-                            if (dados.data == "Confirmação executada com sucesso.") {
+                            if (dados.data.indexOf("sucesso") != -1) {
                                 var alertPopup = $ionicPopup.alert({
-                                    title: 'Solicitação enviada com sucesso.',
-                                    template: 'Foi enviado um e-mail para redefinição de senha',
+                                    title: dados.data,
+                                    //template: 'Foi enviado um e-mail para redefinição de senha',
                                     okText: 'OK', // String (default: 'OK'). The text of the OK button.
                                     okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
                                 });
