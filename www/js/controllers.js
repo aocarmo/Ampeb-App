@@ -1356,15 +1356,16 @@
 
         }])
 
-    .controller('enqueteCtrl', ['$scope', '$stateParams', '$cordovaNetwork', '$ionicLoading', '$ionicPopup', '$ionicHistory', 'LOCAL_STORAGE', 'getEnquete', 'votarEnquete',// The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+    .controller('enqueteCtrl', ['$scope', '$stateParams', '$cordovaNetwork', '$ionicLoading', '$ionicPopup', '$ionicHistory', 'LOCAL_STORAGE', 'getEnquete', 'votarEnquete','enqueteFactory','$state',// The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
         // You can include any angular dependencies as parameters for this function
         // TIP: Access Route Parameters for your page via $stateParams.parameterName
-        function ($scope, $stateParams, $cordovaNetwork, $ionicLoading, $ionicPopup, $ionicHistory, LOCAL_STORAGE, getEnquete, votarEnquete) {
+        function ($scope, $stateParams, $cordovaNetwork, $ionicLoading, $ionicPopup, $ionicHistory, LOCAL_STORAGE, getEnquete, votarEnquete, enqueteFactory,$state) {
 
 
             if ($cordovaNetwork.isOnline()) {
 
                 $scope.enquete = {};
+                $scope.flVotada = $stateParams.flVotada;//Verifica se a enquete ja foi votada para exibir ou não o botão de votar         
 
                 $ionicLoading.show().then(function () {
 
@@ -1403,7 +1404,7 @@
                 });
 
                 alertPopup.then(function (res) {
-
+                    
                     $backView = $ionicHistory.backView();
                     $backView.go();
 
@@ -1433,11 +1434,16 @@
                                     });
 
                                     alertPopup.then(function (res) {
-
-                                        $backView = $ionicHistory.backView();
-                                        $backView.go();
-
-                                    });
+                                        //Marcando enquetes
+                                       
+                                        enqueteFactory.marcarEnquetesVotadas(id).then(function (marcados) {
+                                           //$state.go('aMPEB');
+                                             $backView = $ionicHistory.backView();
+                                            $backView.go();                          
+                                        });
+                                       
+                                    });                                   
+                                   
                                 } else {
 
                                     var alertPopup = $ionicPopup.alert({
@@ -1488,42 +1494,66 @@
         // TIP: Access Route Parameters for your page via $stateParams.parameterName
         function ($scope, $stateParams, $cordovaNetwork, $ionicLoading, $ionicPopup, $ionicHistory, LOCAL_STORAGE, getListaEnquete, enqueteFactory) {
 
-            if ($cordovaNetwork.isOnline()) {
+            $scope.$on('$ionicView.beforeEnter', function () {
 
-                $scope.enquetes = {};
+                if ($cordovaNetwork.isOnline()) {
 
-                $ionicLoading.show().then(function () {
-
-                    getListaEnquete.obter().then(function (retorno) {
-
-                        $scope.enquetes = retorno;
-                        //Marcando noticias ja lidas
-                        enqueteFactory.marcarEnquetesLidas().then(function (marcados) {
-
+                    $scope.enquetes = {};
+                    $scope.qtdEnquete = "";
+                    
+    
+                    $ionicLoading.show().then(function () {
+    
+                        getListaEnquete.obter().then(function (retorno) {                    
+                         
+                            if(retorno != ""){
+                                //console.log(JSON.stringify(retorno));
+                                $scope.qtdEnquete = retorno.length + " Enquete(s)"; //Total de enquetes
+                                $scope.enquetes = retorno;                     
+                                //Marcando enquetes
+                                enqueteFactory.marcarEnquetesLidas().then(function (marcados) {
+        
+                                });
+                            }else{
+    
+                                var alertPopup = $ionicPopup.alert({
+                                    title: 'Não existem enquetes disponíveis.',                         
+                                    okText: 'Ok', // String (default: 'OK'). The text of the OK button.
+                                    okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+                                });
+                
+                                alertPopup.then(function (res) {            
+                                    $backView = $ionicHistory.backView();
+                                    $backView.go();            
+                                });
+                            }             
+    
+                        }).finally(function () {
+                            //em qualquer caso remove o spinner de loading
+                            $ionicLoading.hide();
+    
                         });
-
-                    }).finally(function () {
-                        //em qualquer caso remove o spinner de loading
-                        $ionicLoading.hide();
-
                     });
-                });
+    
+                } else {
+                    var alertPopup = $ionicPopup.alert({
+                        title: 'Não foi possível obter a lista de enquetes.',
+                        template: 'Verifique sua conexão com ineternet.',
+                        okText: 'Ok', // String (default: 'OK'). The text of the OK button.
+                        okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+                    });
+    
+                    alertPopup.then(function (res) {
+    
+                        $backView = $ionicHistory.backView();
+                        $backView.go();
+    
+                    });
+                }
 
-            } else {
-                var alertPopup = $ionicPopup.alert({
-                    title: 'Não foi possível obter a lista de enquetes.',
-                    template: 'Verifique sua conexão com ineternet.',
-                    okText: 'Ok', // String (default: 'OK'). The text of the OK button.
-                    okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
-                });
+            });
 
-                alertPopup.then(function (res) {
-
-                    $backView = $ionicHistory.backView();
-                    $backView.go();
-
-                });
-            }
+          
 
         }])
     .controller('resultadoDaEnqueteCtrl', ['$scope', '$stateParams', '$cordovaNetwork', '$ionicLoading', '$ionicPopup', '$ionicHistory', 'LOCAL_STORAGE', 'getEnquete', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
@@ -1534,6 +1564,8 @@
 
             if ($cordovaNetwork.isOnline()) {
 
+                $scope.flVotada = $stateParams.flVotada;
+                console.log($scope.flVotada);
                 $scope.enquete = {};
 
                 $ionicLoading.show().then(function () {
@@ -2358,3 +2390,120 @@
             };
 
         }])
+    .controller('novidadesConveniosCtrl', ['$scope', '$stateParams', 'obterNoticiasService', 'noticiasFactory', '$ionicPopup', 'LOCAL_STORAGE', '$ionicLoading', '$cordovaNetwork', '$ionicHistory', 'obterNoticiasServiceObterMais', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+        // You can include any angular dependencies as parameters for this function
+        // TIP: Access Route Parameters for your page via $stateParams.parameterName
+        function ($scope, $stateParams, obterNoticiasService, noticiasFactory, $ionicPopup, LOCAL_STORAGE, $ionicLoading, $cordovaNetwork, $ionicHistory, obterNoticiasServiceObterMais) {
+            //Variáveis declaradas para paginação
+            $scope.pagina = 1;
+            $scope.listaNoticias = [];
+            $scope.moreDataCanBeLoaded = true;
+            //Verifica se estivar online pega dados via serviço 
+            if ($cordovaNetwork.isOnline()) {
+
+                $ionicLoading.show({ template: '<ion-spinner icon="spiral" class="spinner-assertive"></ion-spinner> <br/> Buscando...' }).then(function () {
+
+                    obterNoticiasService.obterNoticiasOnline().then(function (dados) {
+
+                        $scope.listaNoticias = dados;
+
+                        noticiasFactory.marcarNoticiasLidas().then(function (marcados) {
+
+                        }).finally(function () {
+                            //em qualquer caso remove o spinner de loading
+                            $ionicLoading.hide();
+                        });
+
+                    });
+                });
+
+            } else {
+                //Pega dados do banco
+                $ionicLoading.show().then(function () {
+                    noticiasFactory.selectListaNoticias($stateParams.tipo).then(function (dados) {
+
+                        if (dados[0] == null) {
+                            var alertPopup = $ionicPopup.alert({
+                                title: 'Sem dados offline',
+                                template: 'Por favor, conecte seu dispositivo a internet',
+                                okText: 'Ok', // String (default: 'OK'). The text of the OK button.
+                                okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+                            });
+
+                            alertPopup.then(function (res) {
+
+                                $backView = $ionicHistory.backView();
+                                $backView.go();
+
+                            });
+
+                        } else {
+                            $scope.listaNoticias = dados;
+                            noticiasFactory.marcarNoticiasLidas().then(function (marcados) {
+
+                            });
+                        }
+
+
+                    }).finally(function () {
+                        //em qualquer caso remove o spinner de loading
+                        $ionicLoading.hide();
+                    });
+
+                });
+            }
+
+
+            // Pegando dados do usuário da sessão
+            $scope.dadosUsuario = JSON.parse(window.localStorage.getItem(LOCAL_STORAGE.local_dados_key));
+
+            //Função para obter mais noticias.
+            $scope.obterMais = function () {
+
+                if ($cordovaNetwork.isOnline()) {
+                    //Contador para pedir proxima pagina ao seviço
+                    $scope.pagina++;
+
+                    obterNoticiasServiceObterMais.obter($scope.pagina).then(function (retorno) {
+
+                        //Concatenando as novas informações ao array existente de noticias
+                        $scope.listaNoticias = $scope.listaNoticias.concat(retorno);
+
+                        //Teste para verificar quando tem mais posts para carregar, caso não tenha faz com que o loading do infinte scroll pare de rodar
+                        if (retorno.length == 0) {
+                            $scope.moreDataCanBeLoaded = false;
+                        }
+                        //Encerra o loading
+                        $scope.$broadcast('scroll.infiniteScrollComplete');
+
+                    });
+                } else {
+                    var alertPopup = $ionicPopup.alert({
+                        title: 'Sem conexão com a internet.',
+                        template: 'Para obter mais dados, conecte seu dispositivo a internet.',
+                        okText: 'Ok', // String (default: 'OK'). The text of the OK button.
+                        okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+                    });
+                }
+
+            };
+
+
+
+        }])
+    .controller('novidadesConveniosDetalheCtrl', ['$scope', '$stateParams', 'obterNoticiasService', 'noticiasFactory', '$ionicPopup', 'LOCAL_STORAGE', '$ionicLoading', '$cordovaNetwork', '$ionicHistory', 'obterNoticiasServiceObterMais', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+        // You can include any angular dependencies as parameters for this function
+        // TIP: Access Route Parameters for your page via $stateParams.parameterName
+        function ($scope, $stateParams, obterNoticiasService, noticiasFactory, $ionicPopup, LOCAL_STORAGE, $ionicLoading, $cordovaNetwork, $ionicHistory, obterNoticiasServiceObterMais) {
+            //Variáveis declaradas para paginação
+
+            //Abrir o pdf com o google.
+            $scope.openBrowserPdfConvenios = function (url) {
+
+                var link = url;
+                cordova.InAppBrowser.open(link, "_system", "location=no,toolbar=no,hardwareback=yes");
+            };
+
+        }])
+
+

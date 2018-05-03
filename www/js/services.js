@@ -1364,9 +1364,18 @@ angular.module('app.services', [])
             return $http.get(WEB_METODOS.urlObterEnquete,{headers: {'Authorization': window.localStorage.getItem(LOCAL_STORAGE.local_token)}}).then(function (response) {
                 //Inserindo as enquetes no banco de dados.  
                 var idEnquetes = [];
+                var enqueteVotada = 0;                
+                
                 for (var i = 0; i < response.data.length; i++) {
+                   
+                    //Setando a enquete votada
+                    if(response.data[i].pollq_voted_user){                      
+                        enqueteVotada = 1;
+                    }else{                      
+                        enqueteVotada = 0;
+                    }
 
-                    enqueteFactory.insert(response.data[i].pollq_id, response.data[i].pollq_question, response.data[i].pollq_totalvotes, response.data[i].pollq_totalvoters, response.data[i].pollq_date, response.data[i].pollq_expiry, response.data[i].pollq_active, 0);
+                    enqueteFactory.insert(response.data[i].pollq_id, response.data[i].pollq_question, response.data[i].pollq_totalvotes, response.data[i].pollq_totalvoters, response.data[i].pollq_date, response.data[i].pollq_expiry, response.data[i].pollq_active, 0, enqueteVotada);
                     
                     idEnquetes.push(response.data[i].pollq_id);
                 }

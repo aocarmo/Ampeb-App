@@ -7,5 +7,7 @@
     </div>
     <div class="spacer" style="width: 300px; height: 18px;"></div>
     <h4  ng-repeat="resposta in enquete[0].answers" id="resultadoDaEnquete-heading29" style="color:#000000;font-weight:300;">{{resposta.polla_answers}} ({{resposta.polla_percentage}}%, {{resposta.polla_votes}} Votos)</h4>  
+    <h5 align="center" ng-if="flVotada == 1" class="enqueteVotada">Você já votou nesta enquete</h5>
+    <h5 align="center" ng-if="flVotada == 0" class="enqueteNaoVotada">Você ainda não votou nesta enquete</h5>
   </ion-content>
 </ion-view>

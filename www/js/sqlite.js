@@ -811,9 +811,9 @@ sqlite.factory('fiquePorDentroFactory', function ($q, $cordovaSQLite) {
 
 sqlite.factory('enqueteFactory', function ($q, $cordovaSQLite) {
     return {
-        insert: function (id, dsEnquete, totalVotos, totalVotantes, dtCadastro, dtExpiracao, flAtivo, flLido) {
-            var query = "INSERT INTO enquetes (id, dsEnquete, totalVotos, totalVotantes, dtCadastro, dtExpiracao, flAtivo, flLido) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-            var values = [id, dsEnquete, totalVotos, totalVotantes, dtCadastro, dtExpiracao, flAtivo, flLido];
+        insert: function (id, dsEnquete, totalVotos, totalVotantes, dtCadastro, dtExpiracao, flAtivo, flLido, flVotada) {
+            var query = "INSERT INTO enquetes (id, dsEnquete, totalVotos, totalVotantes, dtCadastro, dtExpiracao, flAtivo, flLido, flVotada) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            var values = [id, dsEnquete, totalVotos, totalVotantes, dtCadastro, dtExpiracao, flAtivo, flLido, flVotada];
             var outputs = [];
             //Usada para fazer o retorno do banco aguardar esta completa
             var deferred = $q.defer();
@@ -835,7 +835,7 @@ sqlite.factory('enqueteFactory', function ($q, $cordovaSQLite) {
         },
         selectListaEnquetes: function () {
 
-            query = "SELECT id, dsEnquete, totalVotos, totalVotantes, strftime('%d/%m/%Y %H:%M:%S', datetime(dtCadastro)) as dtCadastro, strftime('%d/%m/%Y %H:%M:%S', datetime(dtExpiracao)) as dtExpiracao, flAtivo FROM enquetes ORDER BY datetime(dtCadastro) DESC";
+            query = "SELECT id, dsEnquete, totalVotos, totalVotantes, strftime('%d/%m/%Y %H:%M:%S', datetime(dtCadastro)) as dtCadastro, strftime('%d/%m/%Y %H:%M:%S', datetime(dtExpiracao)) as dtExpiracao, flAtivo, flVotada FROM enquetes ORDER BY datetime(dtCadastro) DESC";
                   
             var outputs = [];
 
@@ -852,10 +852,11 @@ sqlite.factory('enqueteFactory', function ($q, $cordovaSQLite) {
                             "totalVotantes": data.rows.item(i).totalVotantes,
                             "dtCadastro": data.rows.item(i).dtCadastro,
                             "dtExpiracao": data.rows.item(i).dtExpiracao,
-                            "flAtivo": data.rows.item(i).flAtivo
+                            "flAtivo": data.rows.item(i).flAtivo,
+                            "flVotada": data.rows.item(i).flVotada
                         });
                     }
-
+            
                    deferred.resolve(outputs);
 
                 } else {
@@ -908,6 +909,26 @@ sqlite.factory('enqueteFactory', function ($q, $cordovaSQLite) {
             //Usada para fazer o retorno do banco aguardar esta completa
             var deferred = $q.defer();
             $cordovaSQLite.execute(db, query).then(function (data) {
+                    outputs.push({ "atualizado": data});
+                    deferred.resolve(outputs);
+               
+            }, function (error) {
+
+                outputs.push({ "retorno": error });
+                deferred.reject(error);
+            });
+
+            return deferred.promise;
+        },
+        marcarEnquetesVotadas: function (id) {
+           
+            var query = "UPDATE enquetes SET flVotada = 1 WHERE id = ?";
+            var values = [id];
+            var outputs = [];
+
+            //Usada para fazer o retorno do banco aguardar esta completa
+            var deferred = $q.defer();
+            $cordovaSQLite.execute(db, query, values).then(function (data) {
                     outputs.push({ "atualizado": data});
                     deferred.resolve(outputs);
                

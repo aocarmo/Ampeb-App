@@ -9914,3 +9914,27 @@ label.item.valid-lr {
     width: 100%;
     height: 100%;
 }
+
+.enquete-votada {
+  color: #3c763d;
+  background-color: #dff0d8;
+  border-color: #d6e9c6;
+}
+
+.enquete-nao-votada  {
+  color: #a94442;
+  background-color: #f2dede;
+  border-color: #ebccd1;
+}
+
+.item .item-content {
+  background-color: transparent !important;
+}
+
+.enqueteVotada {
+  color: #25CB6A;
+}
+
+.enqueteNaoVotada {
+  color: #F6403E;
+}

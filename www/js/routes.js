@@ -115,7 +115,7 @@ angular.module('app.routes', [])
     url: '/enquete',
     templateUrl: 'templates/enquete.html',
     controller: 'enqueteCtrl',
-    params: { id: null, dataExpiracao: null },
+    params: { id: null, dataExpiracao: null, flVotada: null },
 
   })
 
@@ -123,7 +123,7 @@ angular.module('app.routes', [])
     url: '/resultadoEnquete',
     templateUrl: 'templates/resultadoDaEnquete.html',
     controller: 'resultadoDaEnqueteCtrl',
-    params: { id: null, }
+    params: { id: null, flVotada: null }
   })
 
   .state('alterarASenha', {
@@ -169,7 +169,17 @@ angular.module('app.routes', [])
     templateUrl: 'templates/dadosPessoais.html',
     controller: 'dadosPessoaisCtrl'
   })
-
+  .state('novidadesConvenios', {
+    url: '/novidadesConvenios',
+    templateUrl: 'templates/novidadesConvenios.html',
+    controller: 'novidadesConveniosCtrl'
+  })
+  .state('novidadesConveniosDetalhe', {
+    url: '/novidadesConveniosDetalhe',
+    templateUrl: 'templates/novidadesConveniosDetalhe.html',
+    controller: 'novidadesConveniosDetalheCtrl'
+  })
+  
 $urlRouterProvider.otherwise('/login')
 
   

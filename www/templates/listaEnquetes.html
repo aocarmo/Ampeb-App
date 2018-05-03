@@ -2,10 +2,11 @@
   <ion-content padding="true" class="has-header">
     <h2 id="listaEnquetes-heading2" style="color:#821723;font-weight:300;">Enquetes</h2>
     <hr class="hr-topoPagina">
+    <h5 align="center">{{qtdEnquete}}</h5>
     <div class="item item-body" id="listaEnquetes-list-item-container1">
-
+      
       <ion-list id="listaEnquetes-list6">         
-        <ion-item ng-repeat="enquete in enquetes" class="item-left item-icon-right item-text-wrap dark" id="listaEnquetes-list-item5" ui-sref="enquete({id: enquete.id, dataExpiracao: enquete.dtExpiracao})">                
+        <ion-item ng-repeat="enquete in enquetes" ng-class="enquete.flVotada == 1 ? 'item-left item-icon-right item-text-wrap dark enquete-votada' : 'item-left item-icon-right item-text-wrap dark enquete-nao-votada'"  id="listaEnquetes-list-item5" ui-sref="enquete({id: enquete.id, dataExpiracao: enquete.dtExpiracao, flVotada: enquete.flVotada})">                
           <p style="text-align:justify;font-size:14px;">{{enquete.dsEnquete}}</p>
           <i class="icon ion-ios-arrow-right icon-accessory"></i>                 
         </ion-item>
