@@ -812,7 +812,7 @@ sqlite.factory('fiquePorDentroFactory', function ($q, $cordovaSQLite) {
 sqlite.factory('enqueteFactory', function ($q, $cordovaSQLite) {
     return {
         insert: function (id, dsEnquete, totalVotos, totalVotantes, dtCadastro, dtExpiracao, flAtivo, flLido, flVotada) {
-            var query = "INSERT INTO enquetes (id, dsEnquete, totalVotos, totalVotantes, dtCadastro, dtExpiracao, flAtivo, flLido, flVotada) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            var query = "INSERT INTO enquete (id, dsEnquete, totalVotos, totalVotantes, dtCadastro, dtExpiracao, flAtivo, flLido, flVotada) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
             var values = [id, dsEnquete, totalVotos, totalVotantes, dtCadastro, dtExpiracao, flAtivo, flLido, flVotada];
             var outputs = [];
             //Usada para fazer o retorno do banco aguardar esta completa
@@ -835,7 +835,7 @@ sqlite.factory('enqueteFactory', function ($q, $cordovaSQLite) {
         },
         selectListaEnquetes: function () {
 
-            query = "SELECT id, dsEnquete, totalVotos, totalVotantes, strftime('%d/%m/%Y %H:%M:%S', datetime(dtCadastro)) as dtCadastro, strftime('%d/%m/%Y %H:%M:%S', datetime(dtExpiracao)) as dtExpiracao, flAtivo, flVotada FROM enquetes ORDER BY datetime(dtCadastro) DESC";
+            query = "SELECT id, dsEnquete, totalVotos, totalVotantes, strftime('%d/%m/%Y %H:%M:%S', datetime(dtCadastro)) as dtCadastro, strftime('%d/%m/%Y %H:%M:%S', datetime(dtExpiracao)) as dtExpiracao, flAtivo, flVotada FROM enquete ORDER BY datetime(dtCadastro) DESC";
                   
             var outputs = [];
 
@@ -874,7 +874,7 @@ sqlite.factory('enqueteFactory', function ($q, $cordovaSQLite) {
            
         },
         obterQtdEnqueteNaoLida: function () {
-            var query = "SELECT count(*) as qtd FROM enquetes WHERE flLido = 0";
+            var query = "SELECT count(*) as qtd FROM enquete WHERE flLido = 0";
            
             var outputs = [];
 
@@ -902,7 +902,7 @@ sqlite.factory('enqueteFactory', function ($q, $cordovaSQLite) {
             return deferred.promise;
         },
         marcarEnquetesLidas: function () {
-            var query = "UPDATE enquetes SET flLido = 1 WHERE flLido = 0";
+            var query = "UPDATE enquete SET flLido = 1 WHERE flLido = 0";
            
             var outputs = [];
 
@@ -922,7 +922,7 @@ sqlite.factory('enqueteFactory', function ($q, $cordovaSQLite) {
         },
         marcarEnquetesVotadas: function (id) {
            
-            var query = "UPDATE enquetes SET flVotada = 1 WHERE id = ?";
+            var query = "UPDATE enquete SET flVotada = 1 WHERE id = ?";
             var values = [id];
             var outputs = [];
 
@@ -941,7 +941,7 @@ sqlite.factory('enqueteFactory', function ($q, $cordovaSQLite) {
             return deferred.promise;
         },
         deleteEnquetes: function (id) {
-            var query = "DELETE FROM enquetes WHERE id NOT IN ("+id+")";
+            var query = "DELETE FROM enquete WHERE id NOT IN ("+id+")";
             var outputs = [];
 
             //Usada para fazer o retorno do banco aguardar esta completa

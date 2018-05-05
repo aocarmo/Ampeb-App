@@ -136,7 +136,7 @@ angular.module('app', ['ionic', 'app.controllers', 'app.routes', 'app.directives
 
               //Pegando usuar803io e senha da sessão para obter um novo token
               var alertPopup = $ionicPopup.alert({
-                title: 'Ocorreu um erro, entre contado com a administração do aplicativo',
+                title: 'Ocorreu um erro, entre contato com a administração do aplicativo',
                 template: JSON.stringify(rejection),
                 okText: 'Ok', // String (default: 'OK'). The text of the OK button.
                 okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
@@ -196,8 +196,8 @@ angular.module('app', ['ionic', 'app.controllers', 'app.routes', 'app.directives
       $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS municipio_convenio (id integer primary key, nmMunicipioConvenio varchar(100))");
       $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS tipo_convenio (id integer primary key, nmTipoConvenio varchar(50), flPrivado integer, dsUrlImagem text)");
       $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS convenio (id integer primary key, nmConvenio varchar(100), dsUrlImagem text, dsConvenio text, nmContato varchar(100), dsTelefone text, dsEmail varchar(100), urlSite varchar(100), dsEndereco varchar(200), dtInicioVigencia text, dtTerminoVigencia text NULL, dsDesconto varchar(100),flPublicar integer, idTipoConvenio integer, nmMunicipio varchar(100), nmEstado varchar(50), flPrivado integer, nmPais varchar(50), urlAnexo text)");
-      $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS enquetes (id integer primary key, dsEnquete varchar(250), totalVotos integer, totalVotantes integer, dtCadastro text, dtExpiracao text, flAtivo int, flLido integer, flVotada integer)");
-
+      $cordovaSQLite.execute(db, "DROP TABLE IF EXISTS enquetes");
+      $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS enquete (id integer primary key, dsEnquete varchar(250), totalVotos integer, totalVotantes integer, dtCadastro text, dtExpiracao text, flAtivo int, flLido integer, flVotada integer)");
       //Apagando dados sempre que inicializar o app   
       $cordovaSQLite.execute(db, "DELETE FROM municipio_convenio");
       $cordovaSQLite.execute(db, "DELETE FROM tipo_convenio");
