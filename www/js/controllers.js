@@ -2505,5 +2505,75 @@
             };
 
         }])
+        .controller('chatsCtrl', ['$scope',"Rooms", "Message", "$state", "$ionicPopup",  // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+        // You can include any angular dependencies as parameters for this function
+        // TIP: Access Route Parameters for your page via $stateParams.parameterName
+        function ($scope, Rooms, Message, $state, $ionicPopup) {
+            var vm = $scope.vm = {};
+           
+            angular.extend(vm, {
+              room: {},
+              rooms: Rooms.all()            
+            });
+        
+            $scope.openChatRoom = function(roomId) {
+             
+              $state.go('chat', {roomId: roomId});
+            }
+                
+           // console.log(vm.rooms)
+        
+           $scope.createRoom = function() {
+              
+              // An elaborate, custom popup
+              var myPopup = $ionicPopup.show({
+                templateUrl: './templates/create-chat.html',
+                title: 'Enter Room Name',
+                scope: $scope,
+                buttons: [
+                  { text: 'Cancel' },
+                  {
+                    text: '<b>Save</b>',
+                    type: 'button-positive',
+                    onTap: function(e) {
+                      if (!vm.room.name) {
+                        e.preventDefault();
+                      } else {
+                        Rooms.save(vm.room);
+                      }
+                    }
+                  }
+                ]
+              });
+            }
+          }])
+        .controller('chatCtrl', ['$scope', '$stateParams', "Message", "Rooms", "UserService", "$state", "$ionicScrollDelegate",  // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+        // You can include any angular dependencies as parameters for this function
+        // TIP: Access Route Parameters for your page via $stateParams.parameterName
+        function ($scope, $stateParams, Message, Rooms, UserService, $state, $ionicScrollDelegate) {
+            var vm = $scope.vm = {};
+           console.log($stateParams.roomId);
+        
+            angular.extend(vm, {
+              newMessage: "",
+              messages: Message.get($stateParams.roomId),
+              room: Rooms.get($stateParams.roomId),
+              currentUser: UserService.getProfile(),
+        
+              sendMessage: $scope.sendMessage,
+              remove: $scope.remove
+            });
+        /*
+            function sendMessage(message) {
+              Message.send(message).then(function(){
+                $ionicScrollDelegate.$getByHandle('chatScroll').scrollBottom(true);
+              });
+              vm.newMessage = "";
+            }
+        
+            function remove(chat) {
+              Message.remove(chat);
+            }*/
+          }])
 
 

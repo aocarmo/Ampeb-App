@@ -179,6 +179,17 @@ angular.module('app.routes', [])
     templateUrl: 'templates/novidadesConveniosDetalhe.html',
     controller: 'novidadesConveniosDetalheCtrl'
   })
+  .state('chats', {
+    url: '/chats',
+    templateUrl: 'templates/chats.html',
+    controller: 'chatsCtrl'
+  })
+  .state('chat', {
+    url: '/chat',
+    templateUrl: 'templates/chat.html',
+    controller: 'chatCtrl',
+    params: { roomId: null }
+  })
   
 $urlRouterProvider.otherwise('/login')
 

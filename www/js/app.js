@@ -7,7 +7,7 @@
 // 'starter.controllers' is found in controllers.js
 
 
-angular.module('app', ['ionic', 'app.controllers', 'app.routes', 'app.directives', 'app.services', 'ngCordova', 'app.constants', 'ngMask', 'sqlite', 'ionicImgCache', 'ngMessages'])
+angular.module('app', ['ionic', 'app.controllers', 'app.routes', 'app.directives', 'app.services', 'ngCordova', 'app.constants', 'ngMask', 'sqlite', 'ionicImgCache', 'ngMessages', 'firebase','angular-md5', 'Chat.configs', 'Chat.services'])
 
   .config(function ($ionicConfigProvider, $sceDelegateProvider) {
 
@@ -152,7 +152,7 @@ angular.module('app', ['ionic', 'app.controllers', 'app.routes', 'app.directives
     $httpProvider.interceptors.push('MyHttpInterceptor');
 
   })
-  .run(function ($ionicPlatform, $cordovaSQLite) {
+  .run(function ($ionicPlatform, $cordovaSQLite, Auth, $rootScope, $ionicLoading, $location, UserService, firebase) {
     $ionicPlatform.ready(function () {
       // Enable to debug issues.
       // window.plugins.OneSignal.setLogLevel({logLevel: 4, visualLevel: 4});
@@ -180,6 +180,32 @@ angular.module('app', ['ionic', 'app.controllers', 'app.routes', 'app.directives
         // org.apache.cordova.statusbar required
         StatusBar.styleDefault();
       }
+      //FireBase
+      Auth.$onAuthStateChanged(function (authData) {
+        if (authData) {
+          console.log("Logged in as:", authData.uid);
+          var ref = firebase.database().ref();
+          ref.child("users").child(authData.uid).once('value', function (snapshot) {
+            var user = snapshot.val();
+            $rootScope.currentUser = user;
+            UserService.saveProfile(user);
+            UserService.trackPresence()
+          });
+        } else {
+          $ionicLoading.hide();
+          $location.path('/login');
+        }
+      });
+
+      $rootScope.$on("$stateChangeError", function (event, toState, toParams, fromState, fromParams, error) {
+        // We can catch the error thrown when the $requireAuth promise is rejected
+        // and redirect the user back to the home page
+        if (error === "AUTH_REQUIRED") {
+          $location.path("/login");
+        }
+      });
+
+      //Banco
       var db = null;
       if (window.cordova) {
         // used in cell phones
