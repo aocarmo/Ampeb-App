@@ -7,7 +7,7 @@
     </div>
     <form name="enqueteForm" id="enquete-form10" class="list" ng-submit="votar(enqueteForm,enquete[0].pollq_id,respostaEnquete)">
        
-      <ion-radio ng-repeat="resposta in enquete[0].answers" id="enquete-radio1"  ng-model="respostaEnquete.answer" ng-value="resposta.polla_aid" required>{{resposta.polla_answers}}</ion-radio>      
+      <ion-radio class="item-text-wrap" ng-repeat="resposta in enquete[0].answers" id="enquete-radio1"  ng-model="respostaEnquete.answer" ng-value="resposta.polla_aid" required>{{resposta.polla_answers}}</ion-radio>      
        <div ng-if="flVotada == 0"  align="center" class="row">
           <div class="col col-50">
            <button type="submit" id="enquete-button18" style="font-size:18px;" ng-disabled="habilitarVoto == 'true'" class="button button-assertive  button-block">Votar</button>
