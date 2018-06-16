@@ -1486,4 +1486,77 @@ angular.module('app.services', [])
     };
 
 
+}]).service('getEventos', ['$http', '$q', 'WEB_METODOS',  function ($http, $q, WEB_METODOS) {
+
+    return {
+
+        obter: function () {  
+            
+            return $http.get(WEB_METODOS.urlServicosSistema + "?m=getEventos").then(function (response) {
+                return response;
+            });
+        }
+    };
+
+
+}]).service('getListaConfirmacaoPresencaEvento', ['$http', '$q', 'WEB_METODOS',  function ($http, $q, WEB_METODOS) {
+
+    return {
+
+        obter: function (data) {  
+
+            return $http.get(WEB_METODOS.urlServicosSistema + "?m=getListaConfirmacaoPresencaEvento", {params: data}).then(function (response) {              
+                return response;
+            });
+        }
+    };
+
+}]).service('getDetalheEvento', ['$http', '$q', 'WEB_METODOS',  function ($http, $q, WEB_METODOS) {
+
+    return {
+
+        obter: function (data) {  
+            
+            return $http.get(WEB_METODOS.urlServicosSistema + "?m=getEventos", {params: data}).then(function (response) {
+                return response;
+            });
+        }
+    };
+
+}]).service('getQtdPresencaConfirmadaEvento', ['$http', '$q', 'WEB_METODOS',  function ($http, $q, WEB_METODOS) {
+
+    return {
+
+        obter: function (data) {  
+            
+            return $http.get(WEB_METODOS.urlServicosSistema + "?m=getQtdPresencaConfirmadaEvento", {params: data}).then(function (response) {
+                return response;
+            });
+        }
+    };
+
+}]).service('enviarEmailListaPresencaConfirmadaEvento', ['$http', '$q', 'WEB_METODOS',  function ($http, $q, WEB_METODOS) {
+
+    return {
+
+        obter: function (data) {  
+            
+            return $http.get(WEB_METODOS.urlServicosSistema + "?m=enviarEmailListaPresencaConfirmadaEvento", {params: data}).then(function (response) {
+                return response;
+            });
+        }
+    };
+
+}]).service('verificarPresencaConfirmadaEvento', ['$http', '$q', 'WEB_METODOS',  function ($http, $q, WEB_METODOS) {
+
+    return {
+
+        obter: function (data) {  
+            
+            return $http.get(WEB_METODOS.urlServicosSistema + "?m=verificarPresencaConfirmadaEvento", {params: data}).then(function (response) {
+                return response;
+            });
+        }
+    };
+
 }]);

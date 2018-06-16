@@ -1,0 +1,17 @@
+<ion-view title="" id="page17">
+    <ion-content padding="true" class="has-header">
+        <h4 align="center" id="prXimosEventos-heading18" style="color:#821723;font-weight:300;text-align:center;">Lista de Eventos - Presenças Confirmadas</h5>        
+        <hr class="hr-topoPagina">  
+        <h5 align="center">{{qtdEventos}}</h5>    
+            <div style="background-color: #821723;" class="row light">
+                <div align="center" class="col col-33"><b>Data</b></div>
+                <div align="center" class="col col-50"><b>Evento</b></div>
+                <div align="center" class="col col-20"><b>Qtd</b></div>
+            </div>
+            <div class="row" ng-click="alert()" ng-class="{corGrid: cor == evento.color}" ng-repeat="evento in listaEventos" ui-sref="listaPresencaConfirmada({ id_evento: evento.id_evento})">
+                <div align="center" class="col col-33">{{evento.data_inicio_evento}}</div>
+                <div align="center" class="col col-50">{{evento.nome_evento}}</div>
+                <div align="center" class="col col-20">{{evento.qtd_presenca_confirmada}}</div>
+            </div>            
+    </ion-content>
+</ion-view>

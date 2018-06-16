@@ -3,12 +3,12 @@
         template: '<ion-spinner icon="spiral" class="spinner-assertive"></ion-spinner>',
         duration: 30000
     })
-    .controller('aMPEBCtrl', ['$scope', '$stateParams', '$state', '$q', '$cordovaCamera', '$ionicPopup', 'LOCAL_STORAGE', '$timeout', 'noticiasFactory', 'eventosFactory', 'obterNoticiasService', 'obterEventosService', 'atualizarFotoAssociado', '$cordovaNetwork', '$ionicLoading', '$ionicHistory', 'fiquePorDentroFactory', 'obterFiquePorDentroService', 'getListaEnquete', 'enqueteFactory', 'getToken', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+    .controller('aMPEBCtrl', ['$scope', '$stateParams', '$state', '$q', '$cordovaCamera', '$ionicPopup', 'LOCAL_STORAGE', '$timeout', 'noticiasFactory', 'eventosFactory', 'obterNoticiasService', 'obterEventosService', 'atualizarFotoAssociado', '$cordovaNetwork', '$ionicLoading', '$ionicHistory', 'fiquePorDentroFactory', 'obterFiquePorDentroService', 'getListaEnquete', 'enqueteFactory', 'getToken','getConfiguracaoAplicativo', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
         // You can include any angular dependencies as parameters for this function
         // TIP: Access Route Parameters for your page via $stateParams.parameterName
-        function ($scope, $stateParams, $state, $q, $cordovaCamera, $ionicPopup, LOCAL_STORAGE, $timeout, noticiasFactory, eventosFactory, obterNoticiasService, obterEventosService, atualizarFotoAssociado, $cordovaNetwork, $ionicLoading, $ionicHistory, fiquePorDentroFactory, obterFiquePorDentroService, getListaEnquete, enqueteFactory, getToken) {
+        function ($scope, $stateParams, $state, $q, $cordovaCamera, $ionicPopup, LOCAL_STORAGE, $timeout, noticiasFactory, eventosFactory, obterNoticiasService, obterEventosService, atualizarFotoAssociado, $cordovaNetwork, $ionicLoading, $ionicHistory, fiquePorDentroFactory, obterFiquePorDentroService, getListaEnquete, enqueteFactory, getToken, getConfiguracaoAplicativo) {
 
-
+            $scope.exibirBtnLista = false;
             /***************** Bloco para atualizações de notificações ********************/
             /* $scope.$on('$ionicView.beforeLeave', function() {
                   //do your stuff after leaving
@@ -17,7 +17,19 @@
            });*/
             //Função para sempre fazer algo apos entrar na pagina.
             $scope.$on('$ionicView.beforeEnter', function () {
-                $scope.obterNotificacoes();
+
+                //Verificando a configuração do botão lista de presença sempre que entrar na página principal
+                var paramEnviaConfirmacao = { chave: "obterConfiguracaoListaUsuarioRestritoVerPresenca" };
+                getConfiguracaoAplicativo.obter(paramEnviaConfirmacao).then(function (retornoEnviaConfirmacao) {
+
+                    $scope.obterNotificacoes();
+                    var str = retornoEnviaConfirmacao.data.data[0].valor;
+                    var n = str.indexOf($stateParams.user.username);
+                    if(n != -1){
+                        $scope.exibirBtnLista = true;
+                    }   
+                });
+                
             });
 
             //Funcao para obter as notificacoes de noticias
@@ -315,10 +327,10 @@
 
 
         }])
-    .controller('aMPEBAPPCtrl', ['$scope', '$stateParams', '$state', '$http', '$ionicPopup', '$ionicLoading', 'LoginService', 'LOCAL_STORAGE', '$cordovaNetwork', 'getToken',// The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+    .controller('aMPEBAPPCtrl', ['$scope', '$stateParams', '$state', '$http', '$ionicPopup', '$ionicLoading', 'LoginService', 'LOCAL_STORAGE', '$cordovaNetwork', 'getToken','getConfiguracaoAplicativo',// The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
         // You can include any angular dependencies as parameters for this function
         // TIP: Access Route Parameters for your page via $stateParams.parameterName
-        function ($scope, $stateParams, $state, $http, $ionicPopup, $ionicLoading, LoginService, LOCAL_STORAGE, $cordovaNetwork, getToken) {
+        function ($scope, $stateParams, $state, $http, $ionicPopup, $ionicLoading, LoginService, LOCAL_STORAGE, $cordovaNetwork, getToken, getConfiguracaoAplicativo) {
 
             //Variavel que indica qual a situação do token, por padrão true significa que o token esta ok, ou sera obtido após o login         
             $scope.$on('$ionicView.beforeEnter', function () {
@@ -353,7 +365,7 @@
                     }).finally(function () {
                         //Em qualquer caso remove o spinner de loading
                         $ionicLoading.hide();
-                        $state.go('aMPEB');
+                        $state.go('aMPEB',   {user:dadosUsuarioObterToken});
                     });
 
                 });
@@ -407,8 +419,9 @@
                                             window.localStorage.setItem(LOCAL_STORAGE.manter_logado, "false");
 
                                         }
+                                 
                                         //Direciona para a tela inicial              
-                                        $state.go('aMPEB');
+                                        $state.go('aMPEB',  {user:dadosUsuarioObterToken});
                                     }).finally(function () {
                                         //em qualquer caso remove o spinner de loading
                                         $ionicLoading.hide();
@@ -1749,16 +1762,42 @@
 
         }])
 
-    .controller('transmissOAoVivoCtrl', ['$scope', '$stateParams', 'getConfiguracaoPresencaAssembleia', '$cordovaNetwork', '$ionicPopup', '$ionicHistory', 'obterTransmissaoAoVivo', '$q', 'getConfiguracaoAplicativo', '$ionicLoading', 'verificarConfirmacaoPresencaAssembleia', 'LOCAL_STORAGE', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+    .controller('transmissOAoVivoCtrl', ['$scope', '$stateParams', 'getConfiguracaoPresencaAssembleia', '$cordovaNetwork', '$ionicPopup', '$ionicHistory', 'obterTransmissaoAoVivo', '$q', 'getConfiguracaoAplicativo', '$ionicLoading', 'verificarConfirmacaoPresencaAssembleia', 'LOCAL_STORAGE',  '$interval','getQtdPresencaConfirmadaEvento','verificarPresencaConfirmadaEvento', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
         // You can include any angular dependencies as parameters for this function
         // TIP: Access Route Parameters for your page via $stateParams.parameterName
-        function ($scope, $stateParams, getConfiguracaoPresencaAssembleia, $cordovaNetwork, $ionicPopup, $ionicHistory, obterTransmissaoAoVivo, $q, getConfiguracaoAplicativo, $ionicLoading, verificarConfirmacaoPresencaAssembleia, LOCAL_STORAGE) {
+        function ($scope, $stateParams, getConfiguracaoPresencaAssembleia, $cordovaNetwork, $ionicPopup, $ionicHistory, obterTransmissaoAoVivo, $q, getConfiguracaoAplicativo, $ionicLoading, verificarConfirmacaoPresencaAssembleia, LOCAL_STORAGE, $interval, getQtdPresencaConfirmadaEvento, verificarPresencaConfirmadaEvento) {
 
             $scope.titulo = {};
             $scope.url = {};
             $scope.rodape = {};
+            $scope.idEvento = {};
+            $scope.exibirBotao = {};
+            $scope.lblBtnPresenca = "Presença(s) Confirmada(s)";
             $scope.dadosUsuario = JSON.parse(window.localStorage.getItem(LOCAL_STORAGE.local_dados_key));
-            var dataUser = { cpf: $scope.dadosUsuario.cpf };
+            var dataUser = { 
+                cpf: $scope.dadosUsuario.cpf ,
+                origem_acesso: "a"
+            };           
+
+
+            var textoBotao = "";
+            var qtdPresenca = 0;
+
+            $scope.$on('$ionicView.beforeEnter', function () {
+                 //Chamando a função para registrar a assembléia
+                $scope.registarAssembleia();                         
+            });
+
+            //Função que chama o serviço para verificar a quantidade de presenças
+            function verificaQuantidadePresencas () {
+                var dataEvento = {
+                    'id_evento': $scope.idEvento
+                }
+                getQtdPresencaConfirmadaEvento.obter(dataEvento).then(function (retornoQtdPresenca) {                    
+                    textoBotao = textoBotao.replace("{QTD_PRESENCA}", "");                        
+                    $scope.lblBtnPresenca = retornoQtdPresenca.data.data[0].qtd_presenca_confirmada + textoBotao;       
+                });                   
+            }
 
             $scope.registarAssembleia = function () {
 
@@ -1800,65 +1839,107 @@
                         return retornoEnviaConfirmacao;
                     });
 
+                    var paramIdEventoTransmissao = { chave: "id_evento_transmissao_ao_vivo" };
+                    var getIdEventoTransmissao = getConfiguracaoAplicativo.obter(paramIdEventoTransmissao).then(function (retornoIdEventoTransmissao) {
+                        return retornoIdEventoTransmissao;
+                    });
+
+                    var paramLabelBotaoPresencaConfirmada = { chave: "label_botao_presenca_confirmada" };
+                    var getLabelBotaoPresencaConfirmada = getConfiguracaoAplicativo.obter(paramLabelBotaoPresencaConfirmada).then(function (retornoLabelBotaoPresencaConfirmada) {
+                        return retornoLabelBotaoPresencaConfirmada;
+                    });
+
+                    var paramExibirBotaoPresencaConfirmada = { chave: "exibir_botao_presenca_confirmada" };
+                    var getExibirBotaoPresencaConfirmada = getConfiguracaoAplicativo.obter(paramExibirBotaoPresencaConfirmada).then(function (retornoExibirBotaoPresencaConfirmada) {
+                        return retornoExibirBotaoPresencaConfirmada;
+                    });
+
+                    var paramTempoAtualizaLabelQtdPresencaBotao = { chave: "tempo_atualizar_qtd_label_presenca_confirmada" };
+                    var getTempoAtualizaLabelQtdPresencaBotao = getConfiguracaoAplicativo.obter(paramTempoAtualizaLabelQtdPresencaBotao).then(function (retornoTempoAtualizaLabelQtdPresencaBotao) {
+                        return retornoTempoAtualizaLabelQtdPresencaBotao;
+                    });
 
 
                     var retornoTransmissao = [];
                     $ionicLoading.show().then(function () {
 
                         //Pega o retorno de forma sincrona do ajax.
-                        $q.all([getTitulo, getUrl, getTextoRodape, getAlerta, getTipoAlerta, getTextoAlerta, getEnviaConfirmacao]).then(function (result) {
+                        $q.all([getTitulo, getUrl, getTextoRodape, getAlerta, getTipoAlerta, getTextoAlerta, getEnviaConfirmacao,getIdEventoTransmissao, getLabelBotaoPresencaConfirmada, getExibirBotaoPresencaConfirmada, getTempoAtualizaLabelQtdPresencaBotao]).then(function (result) {
 
                             for (var i = 0; i < result.length; i++) {
                                 retornoTransmissao.push(result[i]);
                             }
+                            //Setando as configurações nas variaveis de escopo
                             $scope.titulo = retornoTransmissao[0].data.data[0].valor;
                             $scope.url = retornoTransmissao[1].data.data[0].valor;
                             $scope.rodape = retornoTransmissao[2].data.data[0].valor;
+                            $scope.idEvento = retornoTransmissao[7].data.data[0].valor;
+                            textoBotao = retornoTransmissao[8].data.data[0].valor;
+                            $scope.exibirBotao = retornoTransmissao[9].data.data[0].valor;
+                            var tempoAtualizaQtdPresencaLabelBotao = parseInt(retornoTransmissao[10].data.data[0].valor);
+                            var dataVerificarConfimacao = { 
+                                cpf: $scope.dadosUsuario.cpf ,
+                                id_evento: $scope.idEvento
+                            };   
+                            
+                            verificarPresencaConfirmadaEvento.obter(dataVerificarConfimacao).then(function (retornoVerificarPresencaConfirmadaEvento) {    
+                 
+                                if(retornoVerificarPresencaConfirmadaEvento.data.data[0].presenca_confirmada == 0){
 
-                            if (retornoTransmissao[3].data.data[0].valor == "S" && retornoTransmissao[6].data.data[0].valor == "S" && retornoTransmissao[4].data.data[0].valor == "1") {
-
-                                var confirmPopup = $ionicPopup.confirm({
-                                    title: retornoTransmissao[5].data.data[0].valor,
-                                    okText: 'Sim', // String (default: 'OK'). The text of the OK button.
-                                    okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
-                                    cancelText: 'Não'
-
-                                });
-
-                                confirmPopup.then(function (res) {
-
-                                    if (res) {
+                                    if (retornoTransmissao[3].data.data[0].valor == "S" && retornoTransmissao[6].data.data[0].valor == "S" && retornoTransmissao[4].data.data[0].valor == "1") {
+                               
+                                        var confirmPopup = $ionicPopup.confirm({
+                                            title: retornoTransmissao[5].data.data[0].valor,
+                                            okText: 'Sim', // String (default: 'OK'). The text of the OK button.
+                                            okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+                                            cancelText: 'Não'
+        
+                                        });
+        
+                                        confirmPopup.then(function (res) {
+        
+                                            if (res) {
+                                                //Enviando e-mail de confirmação
+                                                $scope.enviaEmailConfirmacao(dataUser);
+        
+                                            } else {
+        
+                                                // console.log('Email não enviado!');
+                                            }
+                                        });
+        
+        
+                                    } else if (retornoTransmissao[3].data.data[0].valor == "S" && retornoTransmissao[6].data.data[0].valor == "S" && retornoTransmissao[4].data.data[0].valor == "2") {
+        
+                                        var alertPopup = $ionicPopup.alert({
+                                            title: retornoTransmissao[5].data.data[0].valor,
+                                            okText: 'OK', // String (default: 'OK'). The text of the OK button.
+                                            okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+                                        });
+        
+                                        alertPopup.then(function (res) {
+        
+                                            //Enviando e-mail de confirmação
+                                            $scope.enviaEmailConfirmacao(dataUser);
+        
+                                        });
+                                    } else if (retornoTransmissao[3].data.data[0].valor == "N" && retornoTransmissao[6].data.data[0].valor == "S") {
+        
                                         //Enviando e-mail de confirmação
                                         $scope.enviaEmailConfirmacao(dataUser);
-
-                                    } else {
-
-                                        // console.log('Email não enviado!');
-
                                     }
-                                });
-                            } else if (retornoTransmissao[3].data.data[0].valor == "S" && retornoTransmissao[6].data.data[0].valor == "S" && retornoTransmissao[4].data.data[0].valor == "2") {
 
-                                var alertPopup = $ionicPopup.alert({
-                                    title: retornoTransmissao[5].data.data[0].valor,
-                                    okText: 'OK', // String (default: 'OK'). The text of the OK button.
-                                    okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
-                                });
-
-                                alertPopup.then(function (res) {
-
-                                    //Enviando e-mail de confirmação
-                                    $scope.enviaEmailConfirmacao(dataUser);
-
-                                });
-                            } else if (retornoTransmissao[3].data.data[0].valor == "N" && retornoTransmissao[6].data.data[0].valor == "S") {
-
-                                //Enviando e-mail de confirmação
-                                $scope.enviaEmailConfirmacao(dataUser);
+                                }
+                               
+                            });
+                         
+                            //Chamando a função recursiva para exibir a quantidade de registros no botao, so chamará caso seja para exibir o obotãona tela e seja para exibir a quantidade de presencas
+                            if($scope.exibirBotao == 'S'){
+                                var n = textoBotao.indexOf("{QTD_PRESENCA}");
+                                if(n != -1){
+                                    $interval(verificaQuantidadePresencas, tempoAtualizaQtdPresencaLabelBotao);  
+                                }   
                             }
-
-
-
 
                         }).finally(function () {
                             //em qualquer caso remove o spinner de loading
@@ -1890,8 +1971,7 @@
                     // console.log(JSON.stringify(retornoEnvioConfirmacao));
                 });
             }
-            //Chamando a função para registrar a assembléia
-            $scope.registarAssembleia();
+           
         }])
 
     .controller('contatoCtrl', ['$scope', '$stateParams', 'getTipoContatoTelefonicoService', 'getOperadorasTelefoneService', '$q', 'LOCAL_STORAGE', '$ionicLoading', '$ionicHistory', '$ionicPopup', 'salvarDadosContatoAssociado', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
@@ -2505,5 +2585,172 @@
             };
 
         }])
+        .controller('listaEventosCtrl', ['$scope', '$stateParams', 'getEventos','$cordovaNetwork','$ionicLoading','$ionicPopup', // You can include any angular dependencies as parameters for this function
+        // TIP: Access Route Parameters for your page via $stateParams.parameterName
+        function ($scope, $stateParams, getEventos, $cordovaNetwork, $ionicLoading, $ionicPopup) {
+
+            $scope.listaEventos = [];
+            $scope.qtdEventos = "";
+            $scope.cor = 'true';
+            $scope.$on('$ionicView.beforeEnter', function () {
+
+                if ($cordovaNetwork.isOnline()) {
+                    $scope.obterListaEventos();
+                }else{
+                    var alertPopup = $ionicPopup.alert({
+                        title: 'Sem conexão com a internet',
+                        template: 'Por favor, conecte seu dispositivo a uma rede WIFI ou dados móveis.',
+                        okText: 'Ok',
+                        okType: 'button-assertive',
+                    });
+
+                    alertPopup.then(function (res) {
+                        $backView = $ionicHistory.backView();
+                        $backView.go();
+                    });
+                }
+            });
+
+            $scope.obterListaEventos= function () {
+                //Pega dados do banco
+                $ionicLoading.show().then(function () {
+                    getEventos.obter().then(function (retornoEventos) {
+                       
+                        $scope.listaEventos = retornoEventos.data.data;  
+                        var i;
+                        for (i = 0; i < $scope.listaEventos.length; i++) { 
+                            if(i % 2 == 0){
+                                $scope.listaEventos[i].color = 'true';
+                            }                           
+                        }
+                        $scope.qtdEventos = retornoEventos.data.data.length + " Evento(s)"; 
+
+
+
+                    }).finally(function () {
+                        //em qualquer caso remove o spinner de loading
+                        $ionicLoading.hide();
+                    });
+                });
+            };
+
+
+        }]).controller('listaPresencaConfirmadaCtrl', ['$scope', '$stateParams', 'getListaConfirmacaoPresencaEvento','$cordovaNetwork','$ionicLoading','$ionicPopup','getDetalheEvento','enviarEmailListaPresencaConfirmadaEvento','LOCAL_STORAGE', // You can include any angular dependencies as parameters for this function
+        // TIP: Access Route Parameters for your page via $stateParams.parameterName
+        function ($scope, $stateParams, getListaConfirmacaoPresencaEvento, $cordovaNetwork, $ionicLoading, $ionicPopup,getDetalheEvento, enviarEmailListaPresencaConfirmadaEvento,LOCAL_STORAGE) {
+            
+            $scope.listaPresencas = [];
+            $scope.lblQtdPresencas= "";
+            $scope.qtdPresencas = 0;
+            $scope.cor = 'true';
+            $scope.data_evento = "";
+            $scope.nome_evento = "";
+
+            $scope.dadosUsuario = JSON.parse(window.localStorage.getItem(LOCAL_STORAGE.local_dados_key));             
+           
+            $scope.$on('$ionicView.beforeEnter', function () {
+
+                if ($cordovaNetwork.isOnline()) {
+                    $scope.obterListaPresencas($stateParams.id_evento);
+                }else{
+                    var alertPopup = $ionicPopup.alert({
+                        title: 'Sem conexão com a internet',
+                        template: 'Por favor, conecte seu dispositivo a uma rede WIFI ou dados móveis.',
+                        okText: 'Ok',
+                        okType: 'button-assertive',
+                    });
+
+                    alertPopup.then(function (res) {
+                        $backView = $ionicHistory.backView();
+                        $backView.go();
+                    });
+                }
+            });
+
+            $scope.obterListaPresencas = function (id_evento) {
+                var data = {
+                    'id_evento': id_evento
+                }
+             
+                $ionicLoading.show().then(function () {
+
+                    getDetalheEvento.obter(data).then(function (retornoDetalheEvento) {
+                        
+                        $scope.data_evento = retornoDetalheEvento.data.data[0].data_inicio_evento;
+                        $scope.nome_evento = retornoDetalheEvento.data.data[0].nome_evento;
+
+                        getListaConfirmacaoPresencaEvento.obter(data).then(function (retornoPresencas) {
+                      
+                            $scope.listaPresencas = retornoPresencas.data.data;  
+                            var i;
+                            for (i = 0; i < $scope.listaPresencas.length; i++) { 
+                                if(i % 2 == 0){
+                                    $scope.listaPresencas[i].color = 'true';                           
+                                }     
+                                $scope.listaPresencas[i].nuOrden = i + 1;                      
+                            }
+                                   
+                            $scope.lblQtdPresencas = retornoPresencas.data.data.length + " registro(s) de presença confirmada."; 
+                            $scope.qtdPresencas = retornoPresencas.data.data.length;
+    
+                        });
+
+                    }).finally(function () {
+                        //em qualquer caso remove o spinner de loading
+                        $ionicLoading.hide();
+                    });
+                });
+            };
+            
+            $scope.enviarPdf= function () {
+                var data = { 
+                    cpf: $scope.dadosUsuario.cpf ,
+                    id_evento: $stateParams.id_evento,
+                    tipo: 'pdf',
+                    origem_acesso:'a'
+                };   
+
+                $ionicLoading.show().then(function () {
+
+                    enviarEmailListaPresencaConfirmadaEvento.obter(data).then(function (retorno) {                        
+                        var alertPopup = $ionicPopup.alert({
+                            title: retorno.data.data,
+                            okText: 'Ok', // String (default: 'OK'). The text of the OK button.
+                            okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+                        });
+                    }).finally(function () {
+                        //em qualquer caso remove o spinner de loading
+                        $ionicLoading.hide();
+                    });
+                });
+                
+            };
+
+            $scope.enviarExcel= function () {
+                var data = { 
+                    cpf: $scope.dadosUsuario.cpf ,
+                    id_evento: $stateParams.id_evento,
+                    tipo: 'planilha',
+                    origem_acesso:'a'
+                };  
+
+                $ionicLoading.show().then(function () {
+
+                    enviarEmailListaPresencaConfirmadaEvento.obter(data).then(function (retorno) {
+                        var alertPopup = $ionicPopup.alert({
+                            title: retorno.data.data,
+                            okText: 'Ok', // String (default: 'OK'). The text of the OK button.
+                            okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+                        });
+
+                    }).finally(function () {
+                        //em qualquer caso remove o spinner de loading
+                        $ionicLoading.hide();
+                    });
+                });
+            };
+
+        }])
+
 
 

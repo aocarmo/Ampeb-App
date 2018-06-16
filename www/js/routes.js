@@ -13,7 +13,8 @@ angular.module('app.routes', [])
   .state('aMPEB', {
     url: '/paginaInicial',
     templateUrl: 'templates/aMPEB.html',
-    controller: 'aMPEBCtrl'
+    controller: 'aMPEBCtrl',
+    params: { user: null }
   })
 
   .state('aMPEBAPP', {
@@ -179,9 +180,19 @@ angular.module('app.routes', [])
     templateUrl: 'templates/novidadesConveniosDetalhe.html',
     controller: 'novidadesConveniosDetalheCtrl'
   })
+  .state('listaEventos', {
+    url: '/listaEventos',
+    templateUrl: 'templates/listaEventos.html',
+    controller: 'listaEventosCtrl'
+  })
+  .state('listaPresencaConfirmada', {
+    url: '/listaPresencaConfirmada',
+    templateUrl: 'templates/listaPresencaConfirmada.html',
+    controller: 'listaPresencaConfirmadaCtrl',
+    params: { id_evento: null }
+  })
   
 $urlRouterProvider.otherwise('/login')
 
-  
 
 });

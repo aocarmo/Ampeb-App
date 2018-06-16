@@ -1,0 +1,44 @@
+<ion-view title="" id="page17">
+    <ion-content padding="true" class="has-header">
+        <h4 align="center" id="prXimosEventos-heading18" style="color:#821723;font-weight:300;">Lista de Presença Confirmada</h5>
+        <hr class="hr-topoPagina">
+        <h5 align="left">
+            <b>Evento: </b>{{nome_evento}}</h5>
+        <h5 align="left">
+            <b>Data: </b>{{data_evento}}</h5>
+        <h5 align="center" style="color:#821723;font-weight:500;">{{lblQtdPresencas}}</h5>
+        <div ng-if="qtdPresencas > 0">
+            <div style="background-color: #821723;" class="row light">
+                <div align="center" class="col col-20">
+                    <b></b>
+                </div>
+                <div align="center" class="col col-50">
+                    <b>Nome</b>
+                </div>
+                <div align="center" class="col col-33">
+                    <b>Data</b>
+                </div>
+            </div>
+            <div class="row" ng-class="{corGrid: cor == presenca.color}" ng-repeat="presenca in listaPresencas">
+                <div align="center" class="col col-20">{{presenca.nuOrden}}</div>
+                <div align="center" class="col col-50">{{presenca.nome_usuario}}</div>
+                <div align="center" class="col col-33">{{presenca.data_confirmacao}}</div>
+            </div>
+            <br>
+            <div class="row">
+                <div align="center" class="col col-99">
+                    <button class="button button-full button-balanced" ng-click="enviarExcel()">
+                        Enviar Excel por E-mail
+                    </button>
+                </div>              
+            </div>
+            <div class="row">
+                <div align="center" class="col col-99">
+                    <button class="button button-full button-assertive" ng-click="enviarPdf()">
+                        Enviar PDF por E-mail
+                    </button>
+                </div>
+            </div>
+        </div>
+    </ion-content>
+</ion-view>

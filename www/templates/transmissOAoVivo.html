@@ -12,12 +12,13 @@
         </div>
     </ion-list>
      <hr class="hr-topoPagina"> 
+     <a  ng-if="exibirBotao == 'S'" class="button button-full button-assertive" ui-sref="listaPresencaConfirmada({id_evento: idEvento})">
+     {{lblBtnPresenca}}
+     </a>
     <div align="center" class="row">
       <div class="col col-99">
         {{rodape}}
       </div>
-    </div>
-       
-     
+    </div>    
   </ion-content>
 </ion-view>
