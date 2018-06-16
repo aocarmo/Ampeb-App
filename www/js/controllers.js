@@ -18,16 +18,20 @@
             //Função para sempre fazer algo apos entrar na pagina.
             $scope.$on('$ionicView.beforeEnter', function () {
 
-                //Verificando a configuração do botão lista de presença sempre que entrar na página principal
+                //Verificando a configuração para exibir o botão lista de presença sempre que entrar na página principal
                 var paramEnviaConfirmacao = { chave: "obterConfiguracaoListaUsuarioRestritoVerPresenca" };
                 getConfiguracaoAplicativo.obter(paramEnviaConfirmacao).then(function (retornoEnviaConfirmacao) {
 
                     $scope.obterNotificacoes();
-                    var str = retornoEnviaConfirmacao.data.data[0].valor;
+                    var str = retornoEnviaConfirmacao.data.data[0].valor;                    
                     var n = str.indexOf($stateParams.user.username);
-                    if(n != -1){
+
+                    //Caso a lista esteja vazia exibir para todos ou caso o cpf esteja na lista
+                    if(n != -1 || str == ""){
                         $scope.exibirBtnLista = true;
-                    }   
+                    }
+                  
+
                 });
                 
             });
