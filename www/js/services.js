@@ -190,8 +190,10 @@ angular.module('app.services', [])
                                     }                                    
                                     var nmPais = response.data.data[i].nome_pais;
                                     var urlAnexo = response.data.data[i].url_arquivo_anexo;
+                                    var latitude = response.data.data[i].latitude;
+                                    var longitude = response.data.data[i].longitude;
                                     
-                                    conveniosFactory.insertConvenio(id, nmConvenio, dsUrlImagem, dsConvenio, nmContato, dsTelefone, dsEmail, urlSite, dsEndereco, dtInicioVigencia, dtTerminoVigencia, dsDesconto,flPublicar, idTipoConvenio, nmMunicipio, nmEstado, flPrivado,nmPais,urlAnexo);
+                                    conveniosFactory.insertConvenio(id, nmConvenio, dsUrlImagem, dsConvenio, nmContato, dsTelefone, dsEmail, urlSite, dsEndereco, dtInicioVigencia, dtTerminoVigencia, dsDesconto,flPublicar, idTipoConvenio, nmMunicipio, nmEstado, flPrivado,nmPais,urlAnexo,latitude,longitude);
                                     
                                 }
 
@@ -1559,4 +1561,115 @@ angular.module('app.services', [])
         }
     };
 
-}]);
+}]).service('getEstadoEnderecoAssociados', ['$http', '$q', 'WEB_METODOS',  function ($http, $q, WEB_METODOS) {
+
+    return {
+
+        obter: function () {    
+
+            return $http.get(WEB_METODOS.urlServicosSistema + "?m=getEstadoEnderecoAssociados").then(function (response) {
+                return response;
+            });
+
+        }
+    };
+
+
+}]).service('getMunicipiosEnderecoAssociados', ['$http', '$q', 'WEB_METODOS',  function ($http, $q, WEB_METODOS) {
+
+    return {
+
+        obter: function (data) {    
+
+            return $http.get(WEB_METODOS.urlServicosSistema + "?m=getMunicipiosEnderecoAssociados",  {params: data}).then(function (response) {
+                return response;
+            });
+
+        }
+    };
+
+
+}]).service('getListaAnoPosseAssociados', ['$http', '$q', 'WEB_METODOS',  function ($http, $q, WEB_METODOS) {
+
+    return {
+
+        obter: function () {    
+
+            return $http.get(WEB_METODOS.urlServicosSistema + "?m=getListaAnoPosseAssociados").then(function (response) {
+                return response;
+            });
+
+        }
+    };
+
+}]).service('getCatalogoAssociados', ['$http', '$q', 'WEB_METODOS','$httpParamSerializerJQLike',  function ($http, $q, WEB_METODOS,$httpParamSerializerJQLike) {
+
+    return {
+
+     
+        obter: function (data) {    
+            $http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
+            return $http.post(WEB_METODOS.urlServicosSistema + "?m=getCatalogoAssociados", $httpParamSerializerJQLike(data),{timeout: 30000}).then(function (response) {
+                return response;
+            });
+
+        }
+    };
+
+}]).service('getInformacoesAssociado', ['$http', '$q', 'WEB_METODOS','$httpParamSerializerJQLike',  function ($http, $q, WEB_METODOS,$httpParamSerializerJQLike) {
+
+    return {
+
+     
+        obter: function (data) {    
+            $http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
+            return $http.post(WEB_METODOS.urlServicosSistema + "?m=getInformacoesAssociado", $httpParamSerializerJQLike(data),{timeout: 30000}).then(function (response) {
+                return response;
+            });
+
+        }
+    };
+
+}]).service('getListaDocumentosAssociado', ['$http', '$q', 'WEB_METODOS',  function ($http, $q, WEB_METODOS) {
+
+    return {
+
+        obter: function (data) {    
+
+            return $http.get(WEB_METODOS.urlServicosSistema + "?m=getListaDocumentosAssociado",  {params: data}).then(function (response) {
+                return response;
+            });
+
+        }
+    };
+
+
+}]).service('getDocumentoAssociado', ['$http', '$q', 'WEB_METODOS',  function ($http, $q, WEB_METODOS) {
+
+    return {
+
+        obter: function (data) {    
+
+            return $http.get(WEB_METODOS.urlServicosSistema + "?m=getDocumentoAssociado",  {params: data}).then(function (response) {
+                return response;
+            });
+
+        }
+    };
+
+
+}]).service('getConveniosProximos', ['$http', '$q', 'WEB_METODOS','$httpParamSerializerJQLike',  function ($http, $q, WEB_METODOS,$httpParamSerializerJQLike) {
+
+    return {
+
+     
+        obter: function (data) {    
+            $http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
+            return $http.post(WEB_METODOS.urlServicosSistema + "?m=getConveniosProximos", $httpParamSerializerJQLike(data),{timeout: 30000}).then(function (response) {
+                return response;
+            });
+
+        }
+    };
+
+}])

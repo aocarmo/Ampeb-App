@@ -1,0 +1,21 @@
+<ion-view title="Fique por dentro" id="page16">
+  <ion-content padding="true" class="has-header">
+    <h2 id="meuMural-heading14" style="color:#821723;font-weight:300;">Fique por dentro</h2>
+    <hr class="hr-topoPagina">
+    <div class="item item-body" id="meuMural-list-item-container6">
+      <ion-list id="meuMural-list11">
+        <ion-item ng-repeat="noticia in fiquePorDentro" class="item-thumbnail-left item-icon-right assertive" id="meuMural-list-item22"
+          ui-sref="menu.mural({id: noticia.id})">          
+          <img ion-img-cache ionic ng-src="{{noticia.dsUrlImagem != '' && noticia.dsUrlImagem || 'img/img_not_found.jpg'}}" style="height:40%" />
+          <h2assertive>
+            <span class="categoria_post">{{noticia.dsCategoria}}</span>
+            <p style="white-space:normal;">{{noticia.dtNoticia}}</p>
+            <p ng-bind-html="noticia.dsTitulo" class="titulo_post" style="white-space:normal;"></p>
+            <i class="icon ion-ios-arrow-right"></i>
+          </h2assertive>
+        </ion-item>
+      </ion-list>
+    </div>
+    <ion-infinite-scroll ng-if="moreDataCanBeLoaded" on-infinite="obterMais()" distance="5%"></ion-infinite-scroll>
+  </ion-content>
+</ion-view>

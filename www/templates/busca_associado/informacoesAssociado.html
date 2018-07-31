@@ -1,0 +1,56 @@
+<ion-view title="Informações do Associado" id="page26">
+        <ion-content padding="true" class="has-header">
+          <div>
+            <div align="center">
+              <img ion-img-cache class="imagem-perfil-informacoes-associado" src="{{dadosAssociado.foto_associado != '' ? url_sistema_foto+dadosAssociado.foto_associado: 'img/icone_foto.png'}}" >        
+      
+            </div>
+            <div class="spacer" style="width: 300px; height: 38px;"></div>
+            <div class="list">
+              <div ng-if="dadosAssociado.nome_associado != ''" class="item item-divider">
+                Nome
+              </div>
+              <a ng-if="dadosAssociado.nome_associado != ''" class="item item-text-wrap">
+              {{dadosAssociado.nome_associado}}
+              </a>
+            
+              <div ng-if="dadosAssociado.aniversario != ''" class="item item-divider">
+                Aniversário
+              </div>
+              <a ng-if="dadosAssociado.aniversario != ''" class="item item-text-wrap">
+               {{dadosAssociado.aniversario}}
+              </a>
+              <div ng-if="dadosAssociado.telefones.numero_contato != ''" class="item item-divider">
+                Telefones
+              </div>
+              <a href="tel:{{dadosAssociado.telefones.numero_contato}}" ng-if="dadosAssociado.telefones.numero_contato != ''" class="item item-text-wrap">
+               {{dadosAssociado.telefones.numero_contato}}
+              </a>                   
+               <div ng-if="dadosAssociado.email_associado != ''" class="item item-divider">
+                E-mail
+              </div>
+              <a href="mailto:{{dadosAssociado.email_associado}}" ng-if="dadosAssociado.email_associado != ''" class="item item-text-wrap">
+                {{dadosAssociado.email_associado}}
+               </a>        
+               <div ng-if="dadosAssociado.email_alternativo_associado != null" class="item item-divider">
+                  E-mail alternativo
+                </div>
+                <a href="mailto:{{dadosAssociado.email_alternativo_associado}}" ng-if="dadosAssociado.email_alternativo_associado != null" class="item item-text-wrap">
+                  {{dadosAssociado.email_alternativo_associado}}
+                 </a>        
+              <div ng-if="dadosAssociado.ano_posse != ''" class="item item-divider">
+                Ano da posse
+              </div>
+              <a ng-if="dadosAssociado.ano_posse != ''" class="item item-text-wrap">
+              {{dadosAssociado.ano_posse}}
+              </a>
+              <div ng-if="dadosAssociado.data_inscricao != ''" class="item item-divider">
+                  Associado desde
+              </div>
+              <a ng-if="dadosAssociado.data_inscricao != ''"  class="item item-text-wrap">
+                {{dadosAssociado.data_inscricao}}
+              </a>
+            </div>          
+          </div>
+        </ion-content>
+      </ion-view>

@@ -1,0 +1,53 @@
+<ion-view title="Busca de Associado" id="page1">
+  <ion-content padding="true" class="has-header">
+      <h2 id="meuCadastroNaAMPEB-heading9" style="color:#821723;font-weight:300;">Busca de Associado</h2>
+    <hr class="hr-topoPagina">
+    <form id="buscaDeAssociado-form1" class="list">
+      <label class="item item-input" id="buscaDeAssociado-input3">
+        <span class="input-label">Nome</span>
+        <input type="text" placeholder="" ng-model="filtro.nome">
+      </label> 
+      <label class="item item-select" name="sctEstado">
+        <span class="input-label">Estado</span>
+        <select ng-model="filtro.estado" ng-change="obterComboCidade()">
+          <option selected value="">Todos</option>
+         <option ng-repeat="estado in estadosAssociados" value="{{estado.id_estado}}">{{estado.nome_estado}}</option>
+        </select>
+      </label>
+      <label class="item item-select" id="buscaDeAssociado-select2" name="sctCidade">
+        <span class="input-label">Cidade</span>
+        <select ng-model="filtro.cidade">   
+            <option selected value="">Todas</option>     
+          <option ng-repeat="cidade in municipiosAssociados" value="{{cidade.id_municipio}}">{{cidade.nome_municipio}}</option>     
+          
+        </select>
+      </label>
+      <label class="item item-select" id="buscaDeAssociado-select2" name="sctMesAniversario">
+        <span class="input-label">Aniversário</span>
+        <select ng-model="filtro.mesAniversario">
+            <option selected value="">Todos</option>
+          <option value="1">Janeiro</option>
+          <option value="2">Fevereiro</option>
+          <option value="3">Março</option>
+          <option value="4">Abril</option>
+          <option value="5">Maio</option>
+          <option value="6">Junho</option>
+          <option value="7">Julho</option>
+          <option value="8">Agosto</option>
+          <option value="9">Setembro</option>
+          <option value="10">Outubro</option>
+          <option value="11">Novembro</option>
+          <option value="12">Dezembro</option>         
+        </select>
+      </label>     
+      <label class="item item-select" name="sctEstado">
+        <span class="input-label">Ano da Posse</span>
+        <select ng-model="filtro.anoPosse">
+          <option selected value="">Todos</option>
+         <option ng-repeat="anoPosse in listaAnoPosseAssociados" value="{{anoPosse.ano_posse}}">{{anoPosse.ano_posse}}</option>
+        </select>
+      </label>
+      <a ui-sref="menu.catalogoDeAssociado({nome: filtro.nome, id_estado: filtro.estado, id_cidade: filtro.cidade, mes_anivesario: filtro.mesAniversario, ano_posse: filtro.anoPosse})" id="buscaDeAssociado-button1" class="button button-assertive button-block">Buscar</a>
+    </form>
+  </ion-content>
+</ion-view>

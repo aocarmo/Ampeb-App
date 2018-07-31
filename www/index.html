@@ -61,7 +61,8 @@
     <script src="js/directives.js"></script>
      
     <script src="js/services.js"></script>
-    
+      <!-- load google map api -->
+  
 
     <!-- Only required for Tab projects w/ pages in multiple tabs 
     <script src="lib/ionicuirouter/ionicUIRouter.js"></script>
@@ -69,6 +70,7 @@
 
   </head>
   <body ng-app="app" animation="slide-left-right-ios7">
+    
   <div>
   <div>
     <ion-nav-bar class="bar-stable">
@@ -82,5 +84,6 @@
   <div class="form-error" ng-message="minlength">This field is must be at least 5 characters.</div>
   <div class="form-error" ng-message="maxlength">This field is must be less than 50 characters</div>
 </script>  
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAG1PV-6fyvhTs-_l2Ddv2DX8p35dn-WZA" type="text/javascript"></script>
   </body>
 </html>

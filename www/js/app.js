@@ -152,7 +152,7 @@ angular.module('app', ['ionic', 'app.controllers', 'app.routes', 'app.directives
     $httpProvider.interceptors.push('MyHttpInterceptor');
 
   })
-  .run(function ($ionicPlatform, $cordovaSQLite) {
+  .run(function ($ionicPlatform, $cordovaSQLite,$ionicPopup) {
     $ionicPlatform.ready(function () {
       // Enable to debug issues.
       // window.plugins.OneSignal.setLogLevel({logLevel: 4, visualLevel: 4});
@@ -195,14 +195,85 @@ angular.module('app', ['ionic', 'app.controllers', 'app.routes', 'app.directives
       $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS evento (id integer primary key, dsCategoria varchar(50), dsTitulo varchar(250), dsNoticia text, dtNoticia text, dsUrlImagem text, flLido integer, status varchar(25), dtAtualizacao text, tpConsulta integer)");
       $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS municipio_convenio (id integer primary key, nmMunicipioConvenio varchar(100))");
       $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS tipo_convenio (id integer primary key, nmTipoConvenio varchar(50), flPrivado integer, dsUrlImagem text)");
-      $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS convenio (id integer primary key, nmConvenio varchar(100), dsUrlImagem text, dsConvenio text, nmContato varchar(100), dsTelefone text, dsEmail varchar(100), urlSite varchar(100), dsEndereco varchar(200), dtInicioVigencia text, dtTerminoVigencia text NULL, dsDesconto varchar(100),flPublicar integer, idTipoConvenio integer, nmMunicipio varchar(100), nmEstado varchar(50), flPrivado integer, nmPais varchar(50), urlAnexo text)");
-      $cordovaSQLite.execute(db, "DROP TABLE IF EXISTS enquetes");
+      
+      $cordovaSQLite.execute(db, "DROP TABLE IF EXISTS convenio"); //Tratamento para atualizar novas colunas nas tabelas em dispositivos que ja tem o app instalado
+      $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS convenios (id integer primary key, nmConvenio varchar(100), dsUrlImagem text, dsConvenio text, nmContato varchar(100), dsTelefone text, dsEmail varchar(100), urlSite varchar(100), dsEndereco varchar(200), dtInicioVigencia text, dtTerminoVigencia text NULL, dsDesconto varchar(100),flPublicar integer, idTipoConvenio integer, nmMunicipio varchar(100), nmEstado varchar(50), flPrivado integer, nmPais varchar(50), urlAnexo text, latitude varchar(50), longitude varchar(50))");
+      $cordovaSQLite.execute(db, "DROP TABLE IF EXISTS enquetes"); //Tratamento para atualizar novas colunas nas tabelas em dispositivos que ja tem o app instalado
       $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS enquete (id integer primary key, dsEnquete varchar(250), totalVotos integer, totalVotantes integer, dtCadastro text, dtExpiracao text, flAtivo int, flLido integer, flVotada integer)");
+      
       //Apagando dados sempre que inicializar o app   
       $cordovaSQLite.execute(db, "DELETE FROM municipio_convenio");
       $cordovaSQLite.execute(db, "DELETE FROM tipo_convenio");
       $cordovaSQLite.execute(db, "DELETE FROM convenio");
 
+
+      //Iniciando a solicitação de permissão para acessar a localização
+      var currentPlatform = ionic.Platform.platform();  
+      if(currentPlatform == 'ios'){
+
+          cordova.plugins.diagnostic.requestLocationAuthorization(function(status){
+            switch(status){              
+                case cordova.plugins.diagnostic.permissionStatus.DENIED:
+                
+                  var confirmPopup = $ionicPopup.confirm({
+                    title: 'O AMPEB App precisa acessar a sua localização, para exibir convênios próximos.',
+                    template: 'Deseja conceder permissão?'
+                  });
+              
+                  confirmPopup.then(function(res){
+                    if(res){
+
+                      if (window.cordova && window.cordova.plugins.settings) {                      
+                        window.cordova.plugins.settings.open("location", function() {}, function () {});
+                      }
+                    } else {                      
+                      var alertPopup = $ionicPopup.alert({
+                        title: 'Não será possível exibir os convênios próximos.',                       
+                      });                      
+                    }
+                  });
+                    
+                break;            
+            }
+          }, function(error){
+             
+          }, cordova.plugins.diagnostic.locationAuthorizationMode.ALWAYS);
+
+      }else if(currentPlatform == 'android'){
+
+        cordova.plugins.diagnostic.requestLocationAuthorization(function(status){
+            switch(status){
+                case cordova.plugins.diagnostic.permissionStatus.DENIED:
+                                  
+                  var confirmPopup = $ionicPopup.confirm({
+                    title: 'O AMPEB App precisa acessar a sua localização, para exibir convênios próximos.',
+                    template: 'Deseja conceder permissão?'
+                  });
+              
+                  confirmPopup.then(function(res) {
+                    if(res) {
+
+                      if (window.cordova && window.cordova.plugins.settings) {
+                      
+                        window.cordova.plugins.settings.open("location", function() {},function () {});
+                      } 
+
+                    } else {                      
+                      var alertPopup = $ionicPopup.alert({
+                        title: 'Não será possível exibir os convênios próximos.',
+                        template: 'It might taste good'
+                      });                       
+                    }
+                  });
+                  
+                  break;
+                           
+            }
+        }, function(error){
+           
+        });
+      }
+    //Fim solicitação de permissão para acessar a localização
 
     });
 

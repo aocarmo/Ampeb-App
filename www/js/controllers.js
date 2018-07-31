@@ -3,7 +3,7 @@
         template: '<ion-spinner icon="spiral" class="spinner-assertive"></ion-spinner>',
         duration: 30000
     })
-    .controller('aMPEBCtrl', ['$scope', '$stateParams', '$state', '$q', '$cordovaCamera', '$ionicPopup', 'LOCAL_STORAGE', '$timeout', 'noticiasFactory', 'eventosFactory', 'obterNoticiasService', 'obterEventosService', 'atualizarFotoAssociado', '$cordovaNetwork', '$ionicLoading', '$ionicHistory', 'fiquePorDentroFactory', 'obterFiquePorDentroService', 'getListaEnquete', 'enqueteFactory', 'getToken','getConfiguracaoAplicativo', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+    .controller('aMPEBCtrl', ['$scope', '$stateParams', '$state', '$q', '$cordovaCamera', '$ionicPopup', 'LOCAL_STORAGE', '$timeout', 'noticiasFactory', 'eventosFactory', 'obterNoticiasService', 'obterEventosService', 'atualizarFotoAssociado', '$cordovaNetwork', '$ionicLoading', '$ionicHistory', 'fiquePorDentroFactory', 'obterFiquePorDentroService', 'getListaEnquete', 'enqueteFactory', 'getToken', 'getConfiguracaoAplicativo', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
         // You can include any angular dependencies as parameters for this function
         // TIP: Access Route Parameters for your page via $stateParams.parameterName
         function ($scope, $stateParams, $state, $q, $cordovaCamera, $ionicPopup, LOCAL_STORAGE, $timeout, noticiasFactory, eventosFactory, obterNoticiasService, obterEventosService, atualizarFotoAssociado, $cordovaNetwork, $ionicLoading, $ionicHistory, fiquePorDentroFactory, obterFiquePorDentroService, getListaEnquete, enqueteFactory, getToken, getConfiguracaoAplicativo) {
@@ -23,17 +23,17 @@
                 getConfiguracaoAplicativo.obter(paramEnviaConfirmacao).then(function (retornoEnviaConfirmacao) {
 
                     $scope.obterNotificacoes();
-                    var str = retornoEnviaConfirmacao.data.data[0].valor;                    
+                    var str = retornoEnviaConfirmacao.data.data[0].valor;
                     var n = str.indexOf($stateParams.user.username);
 
                     //Caso a lista esteja vazia exibir para todos ou caso o cpf esteja na lista
-                    if(n != -1 || str == ""){
+                    if (n != -1 || str == "") {
                         $scope.exibirBtnLista = true;
                     }
-                  
+
 
                 });
-                
+
             });
 
             //Funcao para obter as notificacoes de noticias
@@ -331,7 +331,7 @@
 
 
         }])
-    .controller('aMPEBAPPCtrl', ['$scope', '$stateParams', '$state', '$http', '$ionicPopup', '$ionicLoading', 'LoginService', 'LOCAL_STORAGE', '$cordovaNetwork', 'getToken','getConfiguracaoAplicativo',// The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+    .controller('aMPEBAPPCtrl', ['$scope', '$stateParams', '$state', '$http', '$ionicPopup', '$ionicLoading', 'LoginService', 'LOCAL_STORAGE', '$cordovaNetwork', 'getToken', 'getConfiguracaoAplicativo',// The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
         // You can include any angular dependencies as parameters for this function
         // TIP: Access Route Parameters for your page via $stateParams.parameterName
         function ($scope, $stateParams, $state, $http, $ionicPopup, $ionicLoading, LoginService, LOCAL_STORAGE, $cordovaNetwork, getToken, getConfiguracaoAplicativo) {
@@ -369,7 +369,7 @@
                     }).finally(function () {
                         //Em qualquer caso remove o spinner de loading
                         $ionicLoading.hide();
-                        $state.go('aMPEB',   {user:dadosUsuarioObterToken});
+                        $state.go('menu.home', { user: dadosUsuarioObterToken });
                     });
 
                 });
@@ -423,9 +423,9 @@
                                             window.localStorage.setItem(LOCAL_STORAGE.manter_logado, "false");
 
                                         }
-                                 
+
                                         //Direciona para a tela inicial              
-                                        $state.go('aMPEB',  {user:dadosUsuarioObterToken});
+                                        $state.go('menu.home', { user: dadosUsuarioObterToken });
                                     }).finally(function () {
                                         //em qualquer caso remove o spinner de loading
                                         $ionicLoading.hide();
@@ -473,6 +473,10 @@
             $scope.pagina = 1;
             $scope.listaNoticias = [];
             $scope.moreDataCanBeLoaded = true;
+
+            //Variavel para verificar se as noticias são publicas ou privadas para exibir o menu
+            $scope.tipoRetornoPost = window.localStorage.getItem(LOCAL_STORAGE.tipo_retorno_post);
+
             //Verifica se estivar online pega dados via serviço 
             if ($cordovaNetwork.isOnline()) {
 
@@ -576,7 +580,8 @@
             $scope.pagina = 1;
             $scope.listaEventos = [];
             $scope.moreDataCanBeLoaded = true;
-
+            //Variavel para verificar se as noticias são publicas ou privadas para exibir o menu
+            $scope.tipoRetornoPost = window.localStorage.getItem(LOCAL_STORAGE.tipo_retorno_post);
             //Verifica se estivar online pega dados via serviço 
             if ($cordovaNetwork.isOnline()) {
 
@@ -823,25 +828,171 @@
 
         }])
 
-    .controller('detalheDoConvNioCtrl', ['$scope', '$stateParams', '$ionicLoading', 'conveniosFactory', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+    .controller('detalheDoConvNioCtrl', ['$scope', '$stateParams', '$ionicLoading', 'conveniosFactory', 'LOCAL_STORAGE', '$cordovaGeolocation','$ionicPopup','$cordovaNetwork', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
         // You can include any angular dependencies as parameters for this function
         // TIP: Access Route Parameters for your page via $stateParams.parameterName
-        function ($scope, $stateParams, $ionicLoading, conveniosFactory) {
+        function ($scope, $stateParams, $ionicLoading, conveniosFactory, LOCAL_STORAGE, $cordovaGeolocation,$ionicPopup,$cordovaNetwork) {
 
-            $scope.convenios = {};
+            var currentPlatform = ionic.Platform.platform();  
+                 
+            $scope.$on('$ionicView.beforeEnter', function () {    
+                $scope.verificarPermissoesAcessoLocalizacao();            
+            });    
 
-            //Pega dados do banco
-            $ionicLoading.show().then(function () {
-                conveniosFactory.selectConvenio(null, null, null, $stateParams.id).then(function (dados) {
 
-                    $scope.convenios = dados;
+            $scope.verificarPermissoesAcessoLocalizacao = function () {
+                if(currentPlatform == 'ios'){
 
-                }).finally(function () {
-                    //em qualquer caso remove o spinner de loading
-                    $ionicLoading.hide();
+                    cordova.plugins.diagnostic.getLocationAuthorizationStatus(function(status){
+                      switch(status){              
+                            case cordova.plugins.diagnostic.permissionStatus.GRANTED:
+                                $scope.exibirConvenio();
+                                break;
+                            case cordova.plugins.diagnostic.permissionStatus.DENIED:
+                            
+                                var confirmPopup = $ionicPopup.confirm({
+                                title: 'O AMPEB App precisa acessar a sua localização, para exibir convênios próximos.',
+                                template: 'Deseja conceder permissão?'
+                                });
+                            
+                                confirmPopup.then(function(res){
+                                if(res){
+            
+                                    if (window.cordova && window.cordova.plugins.settings) {                      
+                                        window.cordova.plugins.settings.open("location", function(data) {
+                                          
+                                        }, function (err) {
+                                            
+                                        });
+                                    
+                                    }
+                                } else {                      
+                                    var alertPopup = $ionicPopup.alert({
+                                        title: 'Não será possível exibir os convênios próximos.',                       
+                                    });                      
+                                }
+                                });
+                                
+                                break;            
+                      }
+                    }, function(error){
+                       
+                    }, cordova.plugins.diagnostic.locationAuthorizationMode.ALWAYS);
+          
+                }else if(currentPlatform == 'android'){
+          
+                  cordova.plugins.diagnostic.getLocationAuthorizationStatus(function(status){
+                      switch(status){
+                            case cordova.plugins.diagnostic.permissionStatus.GRANTED:
+                                $scope.exibirConvenio();
+                                break;
+                            case cordova.plugins.diagnostic.permissionStatus.DENIED:
+                                                
+                                var confirmPopup = $ionicPopup.confirm({
+                                title: 'O AMPEB App precisa acessar a sua localização, para exibir convênios próximos.',
+                                template: 'Deseja conceder permissão?'
+                                });
+                            
+                                confirmPopup.then(function(res) {
+                                if(res) {
+            
+                                    if (window.cordova && window.cordova.plugins.settings) {                                        
+                                        window.cordova.plugins.settings.open("location", function() {},function () {});
+                                    } 
+                                 
+                                } else {                      
+                                    var alertPopup = $ionicPopup.alert({
+                                    title: 'Não será possível exibir os convênios próximos.',
+                                    template: 'It might taste good'
+                                    });                       
+                                }
+                                });
+                                
+                                break;
+                                     
+                      }
+                  }, function(error){
+                     
+                  });
+                }
+            };
+            $scope.exibirConvenio = function () {
+
+                if ($cordovaNetwork.isOffline()) {
+                    var alertPopup = $ionicPopup.alert({
+                        title: 'Não será possivel exibir o mapa.',
+                        template: 'Por favor, conecte seu dispositivo a uma rede WIFI ou dados móveis.',
+                        okText: 'Ok',
+                        okType: 'button-assertive',
+                    });    
+                }
+
+                $scope.convenios = {};
+
+                //Variavel para verificar se os convenios são publicas ou privadas para exibir o menu
+                $scope.tipoRetornoPost = window.localStorage.getItem(LOCAL_STORAGE.tipo_retorno_post);
+
+                //Pega dados do banco
+                $ionicLoading.show().then(function () {
+                    conveniosFactory.selectConvenio(null, null, null, $stateParams.id).then(function (dados) {
+
+                        $scope.convenios = dados;                         
+                        var posOptions = { timeout: 10000, enableHighAccuracy: false };
+
+                        $cordovaGeolocation.getCurrentPosition(posOptions).then(function (position) {
+                           
+                            var lat = $scope.convenios[0].latitude
+                            var lon = $scope.convenios[0].longitude
+                          
+                            let informacoesEstabelecimentoBalaoMapa = '<a style="color: blue;" href="https://www.google.com/maps/dir/?api=1&origin='+position.coords.latitude+','+position.coords.longitude+'&destination='+lat+','+lon+'" target="_blank">Ver Rota</a>';
+                            let latLng = new google.maps.LatLng(lat, lon);
+
+                            let mapOptions = {
+                                center: latLng,
+                                zoom: 11,
+                                scrollwheel: false,
+                                mapTypeId: google.maps.MapTypeId.ROADMAP,
+                                mapTypeControl: false,
+                                zoomControl: false,
+                                streetViewControl: false
+                            }
+                            var infowindow = new google.maps.InfoWindow({});
+                            let mapa = new google.maps.Map(document.getElementById("map"), mapOptions);
+                     
+                            var marker = new google.maps.Marker({
+                                map: mapa,
+                                animation: google.maps.Animation.DROP,
+                                position: new google.maps.LatLng(lat, lon),
+                               
+                                });
+                        
+                            google.maps.event.addListener(marker, 'click', function () {
+                                infowindow.close(); // Close previously opened infowindow
+                                infowindow.setContent(informacoesEstabelecimentoBalaoMapa);
+                                infowindow.open(mapa, this);
+                            });
+
+
+                            // refresh map
+                            setTimeout(() => {
+                                google.maps.event.trigger(mapa, 'resize');
+                            }, 300);
+
+                        }, function (err) {
+                            // error
+                        });
+
+                    }).finally(function () {
+                        //em qualquer caso remove o spinner de loading
+                        $ionicLoading.hide();
+                    });
+
                 });
 
-            });
+            };
+          
+
+
 
             //Abrir o pdf com o google.
             $scope.openBrowserPdfConvenios = function (url) {
@@ -855,10 +1006,6 @@
 
                 cordova.InAppBrowser.open(url, "_system", "location=no,toolbar=no,hardwareback=yes");
             };
-
-
-
-
 
         }])
 
@@ -1215,6 +1362,9 @@
         function ($scope, $stateParams, $ionicLoading, conveniosFactory, $ionicHistory, $ionicPopup, getDadosConvenioCONAMP, LOCAL_STORAGE, $cordovaNetwork, $cordovaInAppBrowser) {
             $scope.dadosUsuario = JSON.parse(window.localStorage.getItem(LOCAL_STORAGE.local_dados_key));
 
+            //Variavel para verificar se as noticias são publicas ou privadas para exibir o menu
+            $scope.tipoRetornoPost = window.localStorage.getItem(LOCAL_STORAGE.tipo_retorno_post);
+
             $scope.listaConvenios = {};
             var idTipoConvenio = null;
             var nmConvenio = null;
@@ -1373,10 +1523,10 @@
 
         }])
 
-    .controller('enqueteCtrl', ['$scope', '$stateParams', '$cordovaNetwork', '$ionicLoading', '$ionicPopup', '$ionicHistory', 'LOCAL_STORAGE', 'getEnquete', 'votarEnquete','enqueteFactory','$state',// The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+    .controller('enqueteCtrl', ['$scope', '$stateParams', '$cordovaNetwork', '$ionicLoading', '$ionicPopup', '$ionicHistory', 'LOCAL_STORAGE', 'getEnquete', 'votarEnquete', 'enqueteFactory', '$state',// The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
         // You can include any angular dependencies as parameters for this function
         // TIP: Access Route Parameters for your page via $stateParams.parameterName
-        function ($scope, $stateParams, $cordovaNetwork, $ionicLoading, $ionicPopup, $ionicHistory, LOCAL_STORAGE, getEnquete, votarEnquete, enqueteFactory,$state) {
+        function ($scope, $stateParams, $cordovaNetwork, $ionicLoading, $ionicPopup, $ionicHistory, LOCAL_STORAGE, getEnquete, votarEnquete, enqueteFactory, $state) {
 
 
             if ($cordovaNetwork.isOnline()) {
@@ -1421,7 +1571,7 @@
                 });
 
                 alertPopup.then(function (res) {
-                    
+
                     $backView = $ionicHistory.backView();
                     $backView.go();
 
@@ -1452,15 +1602,15 @@
 
                                     alertPopup.then(function (res) {
                                         //Marcando enquetes
-                                       
+
                                         enqueteFactory.marcarEnquetesVotadas(id).then(function (marcados) {
-                                           //$state.go('aMPEB');
-                                             $backView = $ionicHistory.backView();
-                                            $backView.go();                          
+                                            //$state.go('aMPEB');
+                                            $backView = $ionicHistory.backView();
+                                            $backView.go();
                                         });
-                                       
-                                    });                                   
-                                   
+
+                                    });
+
                                 } else {
 
                                     var alertPopup = $ionicPopup.alert({
@@ -1517,41 +1667,41 @@
 
                     $scope.enquetes = {};
                     $scope.qtdEnquete = "";
-                    
-    
+
+
                     $ionicLoading.show().then(function () {
-    
-                        getListaEnquete.obter().then(function (retorno) {                    
-                         
-                            if(retorno != ""){
+
+                        getListaEnquete.obter().then(function (retorno) {
+
+                            if (retorno != "") {
                                 //console.log(JSON.stringify(retorno));
                                 $scope.qtdEnquete = retorno.length + " Enquete(s)"; //Total de enquetes
-                                $scope.enquetes = retorno;                     
+                                $scope.enquetes = retorno;
                                 //Marcando enquetes
                                 enqueteFactory.marcarEnquetesLidas().then(function (marcados) {
-        
+
                                 });
-                            }else{
-    
+                            } else {
+
                                 var alertPopup = $ionicPopup.alert({
-                                    title: 'Não existem enquetes disponíveis.',                         
+                                    title: 'Não existem enquetes disponíveis.',
                                     okText: 'Ok', // String (default: 'OK'). The text of the OK button.
                                     okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
                                 });
-                
-                                alertPopup.then(function (res) {            
+
+                                alertPopup.then(function (res) {
                                     $backView = $ionicHistory.backView();
-                                    $backView.go();            
+                                    $backView.go();
                                 });
-                            }             
-    
+                            }
+
                         }).finally(function () {
                             //em qualquer caso remove o spinner de loading
                             $ionicLoading.hide();
-    
+
                         });
                     });
-    
+
                 } else {
                     var alertPopup = $ionicPopup.alert({
                         title: 'Não foi possível obter a lista de enquetes.',
@@ -1559,18 +1709,18 @@
                         okText: 'Ok', // String (default: 'OK'). The text of the OK button.
                         okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
                     });
-    
+
                     alertPopup.then(function (res) {
-    
+
                         $backView = $ionicHistory.backView();
                         $backView.go();
-    
+
                     });
                 }
 
             });
 
-          
+
 
         }])
     .controller('resultadoDaEnqueteCtrl', ['$scope', '$stateParams', '$cordovaNetwork', '$ionicLoading', '$ionicPopup', '$ionicHistory', 'LOCAL_STORAGE', 'getEnquete', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
@@ -1582,7 +1732,7 @@
             if ($cordovaNetwork.isOnline()) {
 
                 $scope.flVotada = $stateParams.flVotada;
-                console.log($scope.flVotada);
+              
                 $scope.enquete = {};
 
                 $ionicLoading.show().then(function () {
@@ -1766,7 +1916,7 @@
 
         }])
 
-    .controller('transmissOAoVivoCtrl', ['$scope', '$stateParams', 'getConfiguracaoPresencaAssembleia', '$cordovaNetwork', '$ionicPopup', '$ionicHistory', 'obterTransmissaoAoVivo', '$q', 'getConfiguracaoAplicativo', '$ionicLoading', 'verificarConfirmacaoPresencaAssembleia', 'LOCAL_STORAGE',  '$interval','getQtdPresencaConfirmadaEvento','verificarPresencaConfirmadaEvento', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+    .controller('transmissOAoVivoCtrl', ['$scope', '$stateParams', 'getConfiguracaoPresencaAssembleia', '$cordovaNetwork', '$ionicPopup', '$ionicHistory', 'obterTransmissaoAoVivo', '$q', 'getConfiguracaoAplicativo', '$ionicLoading', 'verificarConfirmacaoPresencaAssembleia', 'LOCAL_STORAGE', '$interval', 'getQtdPresencaConfirmadaEvento', 'verificarPresencaConfirmadaEvento', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
         // You can include any angular dependencies as parameters for this function
         // TIP: Access Route Parameters for your page via $stateParams.parameterName
         function ($scope, $stateParams, getConfiguracaoPresencaAssembleia, $cordovaNetwork, $ionicPopup, $ionicHistory, obterTransmissaoAoVivo, $q, getConfiguracaoAplicativo, $ionicLoading, verificarConfirmacaoPresencaAssembleia, LOCAL_STORAGE, $interval, getQtdPresencaConfirmadaEvento, verificarPresencaConfirmadaEvento) {
@@ -1778,29 +1928,29 @@
             $scope.exibirBotao = {};
             $scope.lblBtnPresenca = "Presença(s) Confirmada(s)";
             $scope.dadosUsuario = JSON.parse(window.localStorage.getItem(LOCAL_STORAGE.local_dados_key));
-            var dataUser = { 
-                cpf: $scope.dadosUsuario.cpf ,
+            var dataUser = {
+                cpf: $scope.dadosUsuario.cpf,
                 origem_acesso: "a"
-            };           
+            };
 
 
             var textoBotao = "";
             var qtdPresenca = 0;
 
             $scope.$on('$ionicView.beforeEnter', function () {
-                 //Chamando a função para registrar a assembléia
-                $scope.registarAssembleia();                         
+                //Chamando a função para registrar a assembléia
+                $scope.registarAssembleia();
             });
 
             //Função que chama o serviço para verificar a quantidade de presenças
-            function verificaQuantidadePresencas () {
+            function verificaQuantidadePresencas() {
                 var dataEvento = {
                     'id_evento': $scope.idEvento
                 }
-                getQtdPresencaConfirmadaEvento.obter(dataEvento).then(function (retornoQtdPresenca) {                    
-                    textoBotao = textoBotao.replace("{QTD_PRESENCA}", "");                        
-                    $scope.lblBtnPresenca = retornoQtdPresenca.data.data[0].qtd_presenca_confirmada + textoBotao;       
-                });                   
+                getQtdPresencaConfirmadaEvento.obter(dataEvento).then(function (retornoQtdPresenca) {
+                    textoBotao = textoBotao.replace("{QTD_PRESENCA}", "");
+                    $scope.lblBtnPresenca = retornoQtdPresenca.data.data[0].qtd_presenca_confirmada + textoBotao;
+                });
             }
 
             $scope.registarAssembleia = function () {
@@ -1868,7 +2018,7 @@
                     $ionicLoading.show().then(function () {
 
                         //Pega o retorno de forma sincrona do ajax.
-                        $q.all([getTitulo, getUrl, getTextoRodape, getAlerta, getTipoAlerta, getTextoAlerta, getEnviaConfirmacao,getIdEventoTransmissao, getLabelBotaoPresencaConfirmada, getExibirBotaoPresencaConfirmada, getTempoAtualizaLabelQtdPresencaBotao]).then(function (result) {
+                        $q.all([getTitulo, getUrl, getTextoRodape, getAlerta, getTipoAlerta, getTextoAlerta, getEnviaConfirmacao, getIdEventoTransmissao, getLabelBotaoPresencaConfirmada, getExibirBotaoPresencaConfirmada, getTempoAtualizaLabelQtdPresencaBotao]).then(function (result) {
 
                             for (var i = 0; i < result.length; i++) {
                                 retornoTransmissao.push(result[i]);
@@ -1881,68 +2031,68 @@
                             textoBotao = retornoTransmissao[8].data.data[0].valor;
                             $scope.exibirBotao = retornoTransmissao[9].data.data[0].valor;
                             var tempoAtualizaQtdPresencaLabelBotao = parseInt(retornoTransmissao[10].data.data[0].valor);
-                            var dataVerificarConfimacao = { 
-                                cpf: $scope.dadosUsuario.cpf ,
+                            var dataVerificarConfimacao = {
+                                cpf: $scope.dadosUsuario.cpf,
                                 id_evento: $scope.idEvento
-                            };   
-                            
-                            verificarPresencaConfirmadaEvento.obter(dataVerificarConfimacao).then(function (retornoVerificarPresencaConfirmadaEvento) {    
-                 
-                                if(retornoVerificarPresencaConfirmadaEvento.data.data[0].presenca_confirmada == 0){
+                            };
+
+                            verificarPresencaConfirmadaEvento.obter(dataVerificarConfimacao).then(function (retornoVerificarPresencaConfirmadaEvento) {
+
+                                if (retornoVerificarPresencaConfirmadaEvento.data.data[0].presenca_confirmada == 0) {
 
                                     if (retornoTransmissao[3].data.data[0].valor == "S" && retornoTransmissao[6].data.data[0].valor == "S" && retornoTransmissao[4].data.data[0].valor == "1") {
-                               
+
                                         var confirmPopup = $ionicPopup.confirm({
                                             title: retornoTransmissao[5].data.data[0].valor,
                                             okText: 'Sim', // String (default: 'OK'). The text of the OK button.
                                             okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
                                             cancelText: 'Não'
-        
+
                                         });
-        
+
                                         confirmPopup.then(function (res) {
-        
+
                                             if (res) {
                                                 //Enviando e-mail de confirmação
                                                 $scope.enviaEmailConfirmacao(dataUser);
-        
+
                                             } else {
-        
+
                                                 // console.log('Email não enviado!');
                                             }
                                         });
-        
-        
+
+
                                     } else if (retornoTransmissao[3].data.data[0].valor == "S" && retornoTransmissao[6].data.data[0].valor == "S" && retornoTransmissao[4].data.data[0].valor == "2") {
-        
+
                                         var alertPopup = $ionicPopup.alert({
                                             title: retornoTransmissao[5].data.data[0].valor,
                                             okText: 'OK', // String (default: 'OK'). The text of the OK button.
                                             okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
                                         });
-        
+
                                         alertPopup.then(function (res) {
-        
+
                                             //Enviando e-mail de confirmação
                                             $scope.enviaEmailConfirmacao(dataUser);
-        
+
                                         });
                                     } else if (retornoTransmissao[3].data.data[0].valor == "N" && retornoTransmissao[6].data.data[0].valor == "S") {
-        
+
                                         //Enviando e-mail de confirmação
                                         $scope.enviaEmailConfirmacao(dataUser);
                                     }
 
                                 }
-                               
+
                             });
-                         
+
                             //Chamando a função recursiva para exibir a quantidade de registros no botao, so chamará caso seja para exibir o obotãona tela e seja para exibir a quantidade de presencas
-                            if($scope.exibirBotao == 'S'){
+                            if ($scope.exibirBotao == 'S') {
                                 var n = textoBotao.indexOf("{QTD_PRESENCA}");
-                                if(n != -1){
-                                    $interval(verificaQuantidadePresencas, tempoAtualizaQtdPresencaLabelBotao);  
-                                }   
+                                if (n != -1) {
+                                    $interval(verificaQuantidadePresencas, tempoAtualizaQtdPresencaLabelBotao);
+                                }
                             }
 
                         }).finally(function () {
@@ -1975,7 +2125,7 @@
                     // console.log(JSON.stringify(retornoEnvioConfirmacao));
                 });
             }
-           
+
         }])
 
     .controller('contatoCtrl', ['$scope', '$stateParams', 'getTipoContatoTelefonicoService', 'getOperadorasTelefoneService', '$q', 'LOCAL_STORAGE', '$ionicLoading', '$ionicHistory', '$ionicPopup', 'salvarDadosContatoAssociado', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
@@ -2142,7 +2292,12 @@
 
             $scope.municipiosConvenio = {};
             $scope.tiposConvenio = {};
+            $scope.raio = 25;
             var dadosUsuario = JSON.parse(window.localStorage.getItem(LOCAL_STORAGE.local_dados_key));
+
+
+            //Variavel para verificar se os convenios são publicas ou privadas para exibir o menu
+            $scope.tipoRetornoPost = window.localStorage.getItem(LOCAL_STORAGE.tipo_retorno_post);
 
             if ($cordovaNetwork.isOnline()) {
 
@@ -2589,7 +2744,7 @@
             };
 
         }])
-        .controller('listaEventosCtrl', ['$scope', '$stateParams', 'getEventos','$cordovaNetwork','$ionicLoading','$ionicPopup', // You can include any angular dependencies as parameters for this function
+    .controller('listaEventosCtrl', ['$scope', '$stateParams', 'getEventos', '$cordovaNetwork', '$ionicLoading', '$ionicPopup', // You can include any angular dependencies as parameters for this function
         // TIP: Access Route Parameters for your page via $stateParams.parameterName
         function ($scope, $stateParams, getEventos, $cordovaNetwork, $ionicLoading, $ionicPopup) {
 
@@ -2600,7 +2755,7 @@
 
                 if ($cordovaNetwork.isOnline()) {
                     $scope.obterListaEventos();
-                }else{
+                } else {
                     var alertPopup = $ionicPopup.alert({
                         title: 'Sem conexão com a internet',
                         template: 'Por favor, conecte seu dispositivo a uma rede WIFI ou dados móveis.',
@@ -2615,19 +2770,19 @@
                 }
             });
 
-            $scope.obterListaEventos= function () {
+            $scope.obterListaEventos = function () {
                 //Pega dados do banco
                 $ionicLoading.show().then(function () {
                     getEventos.obter().then(function (retornoEventos) {
-                       
-                        $scope.listaEventos = retornoEventos.data.data;  
+
+                        $scope.listaEventos = retornoEventos.data.data;
                         var i;
-                        for (i = 0; i < $scope.listaEventos.length; i++) { 
-                            if(i % 2 == 0){
+                        for (i = 0; i < $scope.listaEventos.length; i++) {
+                            if (i % 2 == 0) {
                                 $scope.listaEventos[i].color = 'true';
-                            }                           
+                            }
                         }
-                        $scope.qtdEventos = retornoEventos.data.data.length + " Evento(s)"; 
+                        $scope.qtdEventos = retornoEventos.data.data.length + " Evento(s)";
 
 
 
@@ -2639,24 +2794,147 @@
             };
 
 
-        }]).controller('listaPresencaConfirmadaCtrl', ['$scope', '$stateParams', 'getListaConfirmacaoPresencaEvento','$cordovaNetwork','$ionicLoading','$ionicPopup','getDetalheEvento','enviarEmailListaPresencaConfirmadaEvento','LOCAL_STORAGE', // You can include any angular dependencies as parameters for this function
-        // TIP: Access Route Parameters for your page via $stateParams.parameterName
-        function ($scope, $stateParams, getListaConfirmacaoPresencaEvento, $cordovaNetwork, $ionicLoading, $ionicPopup,getDetalheEvento, enviarEmailListaPresencaConfirmadaEvento,LOCAL_STORAGE) {
-            
-            $scope.listaPresencas = [];
-            $scope.lblQtdPresencas= "";
-            $scope.qtdPresencas = 0;
-            $scope.cor = 'true';
-            $scope.data_evento = "";
-            $scope.nome_evento = "";
+        }]).controller('listaPresencaConfirmadaCtrl', ['$scope', '$stateParams', 'getListaConfirmacaoPresencaEvento', '$cordovaNetwork', '$ionicLoading', '$ionicPopup', 'getDetalheEvento', 'enviarEmailListaPresencaConfirmadaEvento', 'LOCAL_STORAGE', // You can include any angular dependencies as parameters for this function
+            // TIP: Access Route Parameters for your page via $stateParams.parameterName
+            function ($scope, $stateParams, getListaConfirmacaoPresencaEvento, $cordovaNetwork, $ionicLoading, $ionicPopup, getDetalheEvento, enviarEmailListaPresencaConfirmadaEvento, LOCAL_STORAGE) {
 
-            $scope.dadosUsuario = JSON.parse(window.localStorage.getItem(LOCAL_STORAGE.local_dados_key));             
-           
-            $scope.$on('$ionicView.beforeEnter', function () {
+                $scope.listaPresencas = [];
+                $scope.lblQtdPresencas = "";
+                $scope.qtdPresencas = 0;
+                $scope.cor = 'true';
+                $scope.data_evento = "";
+                $scope.nome_evento = "";
 
+                $scope.dadosUsuario = JSON.parse(window.localStorage.getItem(LOCAL_STORAGE.local_dados_key));
+
+                $scope.$on('$ionicView.beforeEnter', function () {
+
+                    if ($cordovaNetwork.isOnline()) {
+                        $scope.obterListaPresencas($stateParams.id_evento);
+                    } else {
+                        var alertPopup = $ionicPopup.alert({
+                            title: 'Sem conexão com a internet',
+                            template: 'Por favor, conecte seu dispositivo a uma rede WIFI ou dados móveis.',
+                            okText: 'Ok',
+                            okType: 'button-assertive',
+                        });
+
+                        alertPopup.then(function (res) {
+                            $backView = $ionicHistory.backView();
+                            $backView.go();
+                        });
+                    }
+                });
+
+                $scope.obterListaPresencas = function (id_evento) {
+                    var data = {
+                        'id_evento': id_evento
+                    }
+
+                    $ionicLoading.show().then(function () {
+
+                        getDetalheEvento.obter(data).then(function (retornoDetalheEvento) {
+
+                            $scope.data_evento = retornoDetalheEvento.data.data[0].data_inicio_evento;
+                            $scope.nome_evento = retornoDetalheEvento.data.data[0].nome_evento;
+
+                            getListaConfirmacaoPresencaEvento.obter(data).then(function (retornoPresencas) {
+
+                                $scope.listaPresencas = retornoPresencas.data.data;
+                                var i;
+                                for (i = 0; i < $scope.listaPresencas.length; i++) {
+                                    if (i % 2 == 0) {
+                                        $scope.listaPresencas[i].color = 'true';
+                                    }
+                                    $scope.listaPresencas[i].nuOrden = i + 1;
+                                }
+
+                                $scope.lblQtdPresencas = retornoPresencas.data.data.length + " registro(s) de presença confirmada.";
+                                $scope.qtdPresencas = retornoPresencas.data.data.length;
+
+                            });
+
+                        }).finally(function () {
+                            //em qualquer caso remove o spinner de loading
+                            $ionicLoading.hide();
+                        });
+                    });
+                };
+
+                $scope.enviarPdf = function () {
+                    var data = {
+                        cpf: $scope.dadosUsuario.cpf,
+                        id_evento: $stateParams.id_evento,
+                        tipo: 'pdf',
+                        origem_acesso: 'a'
+                    };
+
+                    $ionicLoading.show().then(function () {
+
+                        enviarEmailListaPresencaConfirmadaEvento.obter(data).then(function (retorno) {
+                            var alertPopup = $ionicPopup.alert({
+                                title: retorno.data.data,
+                                okText: 'Ok', // String (default: 'OK'). The text of the OK button.
+                                okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+                            });
+                        }).finally(function () {
+                            //em qualquer caso remove o spinner de loading
+                            $ionicLoading.hide();
+                        });
+                    });
+
+                };
+
+                $scope.enviarExcel = function () {
+                    var data = {
+                        cpf: $scope.dadosUsuario.cpf,
+                        id_evento: $stateParams.id_evento,
+                        tipo: 'planilha',
+                        origem_acesso: 'a'
+                    };
+
+                    $ionicLoading.show().then(function () {
+
+                        enviarEmailListaPresencaConfirmadaEvento.obter(data).then(function (retorno) {
+                            var alertPopup = $ionicPopup.alert({
+                                title: retorno.data.data,
+                                okText: 'Ok', // String (default: 'OK'). The text of the OK button.
+                                okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+                            });
+
+                        }).finally(function () {
+                            //em qualquer caso remove o spinner de loading
+                            $ionicLoading.hide();
+                        });
+                    });
+                };
+
+        }]).controller('buscaDeAssociadoCtrl', ['$scope', '$stateParams','$cordovaNetwork','$ionicLoading','getEstadoEnderecoAssociados','getMunicipiosEnderecoAssociados','getListaAnoPosseAssociados','$ionicPopup', '$ionicHistory', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+                // You can include any angular dependencies as parameters for this function
+                // TIP: Access Route Parameters for your page via $stateParams.parameterName
+        function ($scope, $stateParams,$cordovaNetwork,$ionicLoading,getEstadoEnderecoAssociados,getMunicipiosEnderecoAssociados,getListaAnoPosseAssociados,$ionicPopup, $ionicHistory) {
+          
+                $scope.municipiosAssociados = {};
+                $scope.estadosAssociados = {};
+                $scope.listaAnoPosseAssociados = {};               
+                $scope.filtro = {};
                 if ($cordovaNetwork.isOnline()) {
-                    $scope.obterListaPresencas($stateParams.id_evento);
-                }else{
+
+                    $ionicLoading.show().then(function () {
+                        getEstadoEnderecoAssociados.obter().then(function (dadosEstados) {    
+                            $scope.estadosAssociados = dadosEstados.data.data;                            
+                        }).finally(function () {
+
+                            getListaAnoPosseAssociados.obter().then(function (dadosListaAno) {
+                                $scope.listaAnoPosseAssociados = dadosListaAno.data.data;                                
+                            }).finally(function () {
+                                $ionicLoading.hide();
+                            });   
+                        });
+    
+                    });
+                    
+                }else {
                     var alertPopup = $ionicPopup.alert({
                         title: 'Sem conexão com a internet',
                         template: 'Por favor, conecte seu dispositivo a uma rede WIFI ou dados móveis.',
@@ -2669,92 +2947,513 @@
                         $backView.go();
                     });
                 }
-            });
-
-            $scope.obterListaPresencas = function (id_evento) {
-                var data = {
-                    'id_evento': id_evento
-                }
-             
-                $ionicLoading.show().then(function () {
-
-                    getDetalheEvento.obter(data).then(function (retornoDetalheEvento) {
-                        
-                        $scope.data_evento = retornoDetalheEvento.data.data[0].data_inicio_evento;
-                        $scope.nome_evento = retornoDetalheEvento.data.data[0].nome_evento;
-
-                        getListaConfirmacaoPresencaEvento.obter(data).then(function (retornoPresencas) {
-                      
-                            $scope.listaPresencas = retornoPresencas.data.data;  
-                            var i;
-                            for (i = 0; i < $scope.listaPresencas.length; i++) { 
-                                if(i % 2 == 0){
-                                    $scope.listaPresencas[i].color = 'true';                           
-                                }     
-                                $scope.listaPresencas[i].nuOrden = i + 1;                      
-                            }
-                                   
-                            $scope.lblQtdPresencas = retornoPresencas.data.data.length + " registro(s) de presença confirmada."; 
-                            $scope.qtdPresencas = retornoPresencas.data.data.length;
-    
+                
+                $scope.obterComboCidade = function () {
+                    
+                    $ionicLoading.show().then(function () {
+                    var data = { id_estado: $scope.filtro.estado }; //Passando o estado como parametro.
+                    getMunicipiosEnderecoAssociados.obter(data).then(function (dadosMunicipio) {        
+                        $scope.municipiosAssociados = dadosMunicipio.data.data;                           
+                        }).finally(function () {
+                            $ionicLoading.hide();
                         });
-
-                    }).finally(function () {
-                        //em qualquer caso remove o spinner de loading
-                        $ionicLoading.hide();
                     });
-                });
-            };
-            
-            $scope.enviarPdf= function () {
-                var data = { 
-                    cpf: $scope.dadosUsuario.cpf ,
-                    id_evento: $stateParams.id_evento,
-                    tipo: 'pdf',
-                    origem_acesso:'a'
-                };   
+                };
+
+      
+
+        }]).controller('menuCtrl', ['$scope', '$stateParams', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+        // You can include any angular dependencies as parameters for this function
+        // TIP: Access Route Parameters for your page via $stateParams.parameterName
+        function ($scope, $stateParams) {
+
+
+        }]).controller('catalogoDeAssociadoCtrl', ['$scope', '$stateParams','getCatalogoAssociados','$cordovaNetwork','$ionicLoading', '$ionicPopup','$ionicHistory','LOCAL_STORAGE', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+        // You can include any angular dependencies as parameters for this function
+        // TIP: Access Route Parameters for your page via $stateParams.parameterName
+        function ($scope, $stateParams, getCatalogoAssociados,$cordovaNetwork,$ionicLoading, $ionicPopup, $ionicHistory,LOCAL_STORAGE) {
+
+            $scope.dadosAssociados = {};
+            $scope.url_sistema_foto = LOCAL_STORAGE.url_foto;
+            $scope.lblQtdAssociados = "";
+            var data = {
+                nome_associado: $stateParams.nome,
+                id_estado: $stateParams.id_estado,
+                id_municipio: $stateParams.id_cidade,
+                mes_aniversario: $stateParams.mes_anivesario,
+                ano_posse: $stateParams.ano_posse
+            }
+
+           
+            if ($cordovaNetwork.isOnline()) {
 
                 $ionicLoading.show().then(function () {
-
-                    enviarEmailListaPresencaConfirmadaEvento.obter(data).then(function (retorno) {                        
-                        var alertPopup = $ionicPopup.alert({
-                            title: retorno.data.data,
-                            okText: 'Ok', // String (default: 'OK'). The text of the OK button.
-                            okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
-                        });
+                    getCatalogoAssociados.obter(data).then(function (dadosAssociados) {    
+                        $scope.dadosAssociados = dadosAssociados.data.data;     
+                        $scope.lblQtdAssociados = dadosAssociados.data.data.length + " Associado(s) Encontrado(s).";                       
                     }).finally(function () {
-                        //em qualquer caso remove o spinner de loading
                         $ionicLoading.hide();
                     });
+
                 });
                 
-            };
+            }else {
+                var alertPopup = $ionicPopup.alert({
+                    title: 'Sem conexão com a internet',
+                    template: 'Por favor, conecte seu dispositivo a uma rede WIFI ou dados móveis.',
+                    okText: 'Ok',
+                    okType: 'button-assertive',
+                });
 
-            $scope.enviarExcel= function () {
-                var data = { 
-                    cpf: $scope.dadosUsuario.cpf ,
-                    id_evento: $stateParams.id_evento,
-                    tipo: 'planilha',
-                    origem_acesso:'a'
-                };  
+                alertPopup.then(function (res) {
+                    $backView = $ionicHistory.backView();
+                    $backView.go();
+                });
+            }
 
-                $ionicLoading.show().then(function () {
 
-                    enviarEmailListaPresencaConfirmadaEvento.obter(data).then(function (retorno) {
+
+
+        }]).controller('carteiraVirtualCtrl', ['$scope', '$stateParams','$cordovaNetwork','$ionicLoading', '$ionicPopup','$ionicHistory','LOCAL_STORAGE','getInformacoesAssociado', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+            // You can include any angular dependencies as parameters for this function
+            // TIP: Access Route Parameters for your page via $stateParams.parameterName
+            function ($scope, $stateParams, $cordovaNetwork,$ionicLoading, $ionicPopup,$ionicHistory,LOCAL_STORAGE,getInformacoesAssociado) {
+                
+                $scope.dadosAssociado = {};
+                $scope.url_sistema_foto = LOCAL_STORAGE.url_foto;
+                $scope.qrCode = "";
+                $scope.qtdDependentes = {};
+                $scope.$on('$ionicView.beforeEnter', function () {
+                    $scope.dadosUsuario = JSON.parse(window.localStorage.getItem(LOCAL_STORAGE.local_dados_key));
+                    var data = {
+                        cpf: $scope.dadosUsuario.cpf,
+                        exibir_dependentes: true
+                    }        
+
+                    $scope.gerarQrCode($scope.dadosUsuario.cpf);
+
+                    if ($cordovaNetwork.isOnline()) {
+    
+                        $ionicLoading.show().then(function () {
+                            getInformacoesAssociado.obter(data).then(function (dadosAssociado) {    
+                                $scope.dadosAssociado = dadosAssociado.data.data[0]; 
+                                $scope.qtdDependentes = dadosAssociado.data.data[0].dependentes.length;                                                                   
+                            }).finally(function () {
+                                $ionicLoading.hide();
+                            });
+        
+                        });
+                        
+                    }else {
                         var alertPopup = $ionicPopup.alert({
-                            title: retorno.data.data,
-                            okText: 'Ok', // String (default: 'OK'). The text of the OK button.
-                            okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+                            title: 'Sem conexão com a internet',
+                            template: 'Por favor, conecte seu dispositivo a uma rede WIFI ou dados móveis.',
+                            okText: 'Ok',
+                            okType: 'button-assertive',
+                        });
+        
+                        alertPopup.then(function (res) {
+                            $backView = $ionicHistory.backView();
+                            $backView.go();
+                        });
+                    }
+                    
+                });
+               
+   
+                $scope.gerarQrCode = function (cpf) {
+                    let options = {
+                        width: 256,
+                        height: 256,
+                        colorDark: "#000000",
+                        colorLight: "#ffffff",
+                    };
+    
+                    cordova.plugins.qrcodejs.encode('TEXT_TYPE', cpf, (base64EncodedQRImage) => {
+                        $scope.qrCode = base64EncodedQRImage;
+                    }, (err) => {
+                        console.error('QRCodeJS error is ' + JSON.stringify(err));
+                    }, options);
+                };
+
+               
+               
+
+            }])
+        .directive('flipContainer', function () {
+            return {
+                restrict: 'C',
+                link: function ($scope, $elem, $attrs) {
+                    $scope.flip = function () {
+                        $elem.toggleClass('flip');
+                    }
+                }
+            };
+        }).controller('declaraODeAssociadoAMPEBCtrl', ['$scope', '$stateParams', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+            // You can include any angular dependencies as parameters for this function
+            // TIP: Access Route Parameters for your page via $stateParams.parameterName
+            function ($scope, $stateParams) {
+
+
+        }]).controller('informePlanoDeSaDeSulAmericaCtrl', ['$scope', '$stateParams', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+                // You can include any angular dependencies as parameters for this function
+                // TIP: Access Route Parameters for your page via $stateParams.parameterName
+                function ($scope, $stateParams) {
+
+
+        }]).controller('emissODeDocumentosCtrl', ['$scope', '$stateParams', '$cordovaNetwork','LOCAL_STORAGE','$ionicLoading','$ionicPopup','$ionicHistory','getListaDocumentosAssociado','getDocumentoAssociado', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+                    // You can include any angular dependencies as parameters for this function
+                    // TIP: Access Route Parameters for your page via $stateParams.parameterName
+            function ($scope, $stateParams, $cordovaNetwork, LOCAL_STORAGE,$ionicLoading, $ionicPopup, $ionicHistory, getListaDocumentosAssociado, getDocumentoAssociado) {
+
+                $scope.listaDocumentos = {};
+                $scope.$on('$ionicView.beforeEnter', function () {
+
+                    $scope.dadosUsuario = JSON.parse(window.localStorage.getItem(LOCAL_STORAGE.local_dados_key));
+                    var data = {
+                        cpf: $scope.dadosUsuario.cpf                    
+                    }   
+
+                    if ($cordovaNetwork.isOnline()) {
+    
+                        $ionicLoading.show().then(function () {
+                            getListaDocumentosAssociado.obter(data).then(function (listaDocumentos) {    
+                                $scope.listaDocumentos = listaDocumentos.data.data;                                          
+                            }).finally(function () {
+                                $ionicLoading.hide();
+                            });    
+                        });
+                        
+                    }else {
+                        var alertPopup = $ionicPopup.alert({
+                            title: 'Sem conexão com a internet',
+                            template: 'Por favor, conecte seu dispositivo a uma rede WIFI ou dados móveis.',
+                            okText: 'Ok',
+                            okType: 'button-assertive',
+                        });
+        
+                        alertPopup.then(function (res) {
+                            $backView = $ionicHistory.backView();
+                            $backView.go();
+                        });
+                    }
+                });     
+
+
+                
+                $scope.exibirDocumento = function (tipoDocumento, idDocumento,url) {
+
+                    if(tipoDocumento == 'geracao'){
+                        var data = {
+                            cpf: $scope.dadosUsuario.cpf,
+                            id: idDocumento                 
+                        } 
+
+                        $ionicLoading.show().then(function () {
+                            getDocumentoAssociado.obter(data).then(function (retorno) {                                                                 
+                            
+                              var link = "http://docs.google.com/viewer?url=" + encodeURIComponent(retorno.data.data[0].url) + "&embedded=true";
+                              cordova.InAppBrowser.open(link, "_system", "location=no,toolbar=no,hardwareback=yes");
+                            }).finally(function () {
+                                $ionicLoading.hide();
+                            });    
                         });
 
-                    }).finally(function () {
-                        //em qualquer caso remove o spinner de loading
-                        $ionicLoading.hide();
+                    }else if(tipoDocumento == 'anexo'){                 
+
+                        var link = "http://docs.google.com/viewer?url=" + encodeURIComponent(url) + "&embedded=true";
+                        cordova.InAppBrowser.open(link, "_system", "location=no,toolbar=no,hardwareback=yes");
+                    
+                    }
+                     
+                };
+               
+            
+
+        }]).controller('homeCtrl', ['$scope', '$stateParams', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+                        // You can include any angular dependencies as parameters for this function
+                        // TIP: Access Route Parameters for your page via $stateParams.parameterName
+            function ($scope, $stateParams) {
+
+
+        }]).controller('informacoesAssociadoCtrl', ['$scope', '$stateParams','$cordovaNetwork','LOCAL_STORAGE','$ionicLoading','$ionicPopup','$ionicHistory','getInformacoesAssociado', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+                            // You can include any angular dependencies as parameters for this function
+                            // TIP: Access Route Parameters for your page via $stateParams.parameterName
+            function ($scope, $stateParams,$cordovaNetwork, LOCAL_STORAGE,$ionicLoading,$ionicPopup,$ionicHistory,getInformacoesAssociado) {
+
+                $scope.dadosAssociado = {};
+                $scope.url_sistema_foto = LOCAL_STORAGE.url_foto;
+             
+                var data = {
+                    id: $stateParams.id,                   
+                }
+    
+               
+                if ($cordovaNetwork.isOnline()) {
+    
+                    $ionicLoading.show().then(function () {
+                        getInformacoesAssociado.obter(data).then(function (dadosAssociado) {    
+                            $scope.dadosAssociado = dadosAssociado.data.data[0];                                     
+                        }).finally(function () {
+                            $ionicLoading.hide();
+                        });
+    
                     });
+                    
+                }else {
+                    var alertPopup = $ionicPopup.alert({
+                        title: 'Sem conexão com a internet',
+                        template: 'Por favor, conecte seu dispositivo a uma rede WIFI ou dados móveis.',
+                        okText: 'Ok',
+                        okType: 'button-assertive',
+                    });
+    
+                    alertPopup.then(function (res) {
+                        $backView = $ionicHistory.backView();
+                        $backView.go();
+                    });
+                }
+
+        }]).controller('conveniosProximosCtrl', ['$scope', '$stateParams', '$cordovaGeolocation', '$cordovaNetwork','WEB_METODOS','$ionicLoading','$ionicPopup','$ionicHistory','getConveniosProximos', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+            // You can include any angular dependencies as parameters for this function
+            // TIP: Access Route Parameters for your page via $stateParams.parameterName
+            function ($scope, $stateParams, $cordovaGeolocation, $cordovaNetwork, WEB_METODOS, $ionicLoading, $ionicPopup, $ionicHistory,getConveniosProximos) {
+                
+                var currentPlatform = ionic.Platform.platform();  
+                 
+                $scope.$on('$ionicView.beforeEnter', function () {    
+                    $scope.verificarPermissoesAcessoLocalizacao();            
+                });    
+
+
+                $scope.verificarPermissoesAcessoLocalizacao = function () {
+                    if(currentPlatform == 'ios'){
+
+                        cordova.plugins.diagnostic.getLocationAuthorizationStatus(function(status){
+                          switch(status){              
+                                case cordova.plugins.diagnostic.permissionStatus.GRANTED:
+                                    $scope.exibirConveniosProximos();
+                                    break;
+                                case cordova.plugins.diagnostic.permissionStatus.DENIED:
+                                
+                                    var confirmPopup = $ionicPopup.confirm({
+                                    title: 'O AMPEB App precisa acessar a sua localização, para exibir convênios próximos.',
+                                    template: 'Deseja conceder permissão?'
+                                    });
+                                
+                                    confirmPopup.then(function(res){
+                                    if(res){
+                
+                                        if (window.cordova && window.cordova.plugins.settings) {                      
+                                            window.cordova.plugins.settings.open("location", function(data) {
+                                              
+                                            }, function (err) {
+                                                
+                                            });
+                                        
+                                        }
+                                    } else {                      
+                                        var alertPopup = $ionicPopup.alert({
+                                            title: 'Não será possível exibir os convênios próximos.',                       
+                                        });                      
+                                    }
+                                    });
+                                    
+                                    break;            
+                          }
+                        }, function(error){
+                           
+                        }, cordova.plugins.diagnostic.locationAuthorizationMode.ALWAYS);
+              
+                    }else if(currentPlatform == 'android'){
+              
+                      cordova.plugins.diagnostic.getLocationAuthorizationStatus(function(status){
+                          switch(status){
+                                case cordova.plugins.diagnostic.permissionStatus.GRANTED:
+                                    $scope.exibirConveniosProximos();
+                                    break;
+                                case cordova.plugins.diagnostic.permissionStatus.DENIED:
+                                                    
+                                    var confirmPopup = $ionicPopup.confirm({
+                                    title: 'O AMPEB App precisa acessar a sua localização, para exibir convênios próximos.',
+                                    template: 'Deseja conceder permissão?'
+                                    });
+                                
+                                    confirmPopup.then(function(res) {
+                                    if(res) {
+                
+                                        if (window.cordova && window.cordova.plugins.settings) {                                        
+                                            window.cordova.plugins.settings.open("location", function() {},function () {});
+                                        } 
+                                     
+                                    } else {                      
+                                        var alertPopup = $ionicPopup.alert({
+                                        title: 'Não será possível exibir os convênios próximos.',
+                                        template: 'It might taste good'
+                                        });                       
+                                    }
+                                    });
+                                    
+                                    break;
+                                         
+                          }
+                      }, function(error){
+                         
+                      });
+                    }
+                };
+                $scope.exibirConveniosProximos = function () {
+
+                    if ($cordovaNetwork.isOnline()) {
+    
+                        var posOptions = { timeout: 10000, enableHighAccuracy: false };
+                        $cordovaGeolocation
+                            .getCurrentPosition(posOptions)
+                            .then(function (position) {
+        
+                                var lat = position.coords.latitude
+                                var lon = position.coords.longitude
+        
+                                var data = {
+                                    raio: $stateParams.raio,
+                                    latitude: lat,
+                                    longitude:lon      
+                                }                          
+        
+                                $ionicLoading.show().then(function () {
+    
+                                    getConveniosProximos.obter(data).then(function (listaEstabelecimentosProximos) {    
+                                        console.log("sucess:"+JSON.stringify(data));
+                                        
+                                        let latLng = new google.maps.LatLng(lat, lon);
+        
+                                        let mapOptions = {
+                                            center: latLng,
+                                            zoom: 11,
+                                            scrollwheel: false,
+                                            mapTypeId: google.maps.MapTypeId.ROADMAP,
+                                            mapTypeControl: false,
+                                            zoomControl: false,
+                                            streetViewControl: false
+                                        }
+    
+                                        let mapa = new google.maps.Map(document.getElementById("map"), mapOptions);
+                    
+                                        new google.maps.Marker({
+                                            map: mapa,
+                                            animation: google.maps.Animation.DROP,
+                                            position: new google.maps.LatLng(lat, lon)
+                                        });
+                                       
+                                        if( listaEstabelecimentosProximos.data.result){
+                                            var infowindow = new google.maps.InfoWindow({});
+                                            var contentString = [];
+                                              // add markers to map by hotel
+                                            for (let i = 0; i < listaEstabelecimentosProximos.data.data.length; i++) {
+    
+                                                let informacoesEstabelecimentoBalaoMapa = '<div style="width: 250px; height:180px;"><table style="padding-top: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px;"><tr style="padding-top: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px;"><td><img align="center" style="vertical-align: middle;width: 70px;height: 70px;border-radius: 100%;" src="' + WEB_METODOS.urlImagemConvenio + listaEstabelecimentosProximos.data.data[i].imagem_convenio + '"></td><td>&nbsp;</td>' 
+                                                + '<td><span><h4>' + listaEstabelecimentosProximos.data.data[i].nome_convenio + '</h4></span>';
+                                                if (listaEstabelecimentosProximos.data.data[i].descricao_desconto != "" && listaEstabelecimentosProximos.data.data[i].descricao_desconto != null) {
+                                                    // informacoesEstabelecimentoBalaoMapa += '<h3>Email<h3><br>'; 
+                                                    informacoesEstabelecimentoBalaoMapa += '<span><b>' + listaEstabelecimentosProximos.data.data[i].descricao_desconto + '</b></span><br>';
+                                                   }
+                                                   informacoesEstabelecimentoBalaoMapa +=  '<span>'  + listaEstabelecimentosProximos.data.data[i].endereco + '</span><br>' + '<span>' +listaEstabelecimentosProximos.data.data[i].nome_municipio + '/' + listaEstabelecimentosProximos.data.data[i].sigla_estado +'</span><br>';
+    
+                                         
+                                                if (listaEstabelecimentosProximos.data.data[i].telefones != "" && listaEstabelecimentosProximos.data.data[i].telefones != null) {
+                                                 informacoesEstabelecimentoBalaoMapa += '<span>' + listaEstabelecimentosProximos.data.data[i].telefones + '</span><br>';
+                                                }
+                                               
+                                                informacoesEstabelecimentoBalaoMapa += '<a style="color: blue;" href="https://www.google.com/maps/dir/?api=1&origin='+lat+','+lon+'&destination='+listaEstabelecimentosProximos.data.data[i].latitude+','+listaEstabelecimentosProximos.data.data[i].longitude+'" target="_blank">Visualize no Google Maps</a>';
+                                                informacoesEstabelecimentoBalaoMapa += "</td></tr></table>";    
+    
+                                                contentString.push(informacoesEstabelecimentoBalaoMapa);                                      
+                                                
+                                        
+                                                var marker = new google.maps.Marker({
+                                                map: mapa,
+                                                animation: google.maps.Animation.DROP,
+                                                position: new google.maps.LatLng(listaEstabelecimentosProximos.data.data[i].latitude, listaEstabelecimentosProximos.data.data[i].longitude),
+                                               
+                                                });
+                                        
+                                                google.maps.event.addListener(marker, 'click', function () {
+                                                    infowindow.close(); // Close previously opened infowindow
+                                                    infowindow.setContent(contentString[i]);
+                                                    infowindow.open(mapa, this);
+                                                });
+                                        
+                                            }                
+                                   
+                                        }else{
+    
+                                        }
+        
+                                      
+        
+                                    }).catch(function (err) {
+                                        console.log(JSON.stringify(err));
+                                    })
+                                    .finally(function () {
+                                        $ionicLoading.hide();
+                                    });    
+                                });
+                                // refresh map
+                                setTimeout(() => {
+                                    google.maps.event.trigger(mapa, 'resize');
+                                }, 300);
+        
+                            }, function (err) {
+                                // error
+                            });
+                        
+                    }else {
+                        var alertPopup = $ionicPopup.alert({
+                            title: 'Sem conexão com a internet',
+                            template: 'Por favor, conecte seu dispositivo a uma rede WIFI ou dados móveis.',
+                            okText: 'Ok',
+                            okType: 'button-assertive',
+                        });
+        
+                        alertPopup.then(function (res) {
+                            $backView = $ionicHistory.backView();
+                            $backView.go();
+                        });
+                    }
+
+                };
+              
+
+               
+        }]).controller('aniversariantesCtrl', ['$scope', '$stateParams', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+            // You can include any angular dependencies as parameters for this function
+            // TIP: Access Route Parameters for your page via $stateParams.parameterName
+            function ($scope, $stateParams) {
+
+        }]).controller('carteiraVirtualDependentesCtrl', ['$scope', '$stateParams', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+            // You can include any angular dependencies as parameters for this function
+            // TIP: Access Route Parameters for your page via $stateParams.parameterName
+            function ($scope, $stateParams) {
+                $scope.qrCode = {};
+                $scope.$on('$ionicView.beforeEnter', function () {                 
+                
+                    $scope.dependente = $stateParams.dependente;
+                    let options = {
+                        width: 256,
+                        height: 256,
+                        colorDark: "#000000",
+                        colorLight: "#ffffff",
+                    };
+
+                    cordova.plugins.qrcodejs.encode('TEXT_TYPE', $scope.dependente.cpf_dependente + "teste", (base64EncodedQRImage) => {
+                        $scope.qrCode = base64EncodedQRImage;
+                    }, (err) => {
+                        console.error('QRCodeJS error is ' + JSON.stringify(err));
+                    }, options);
+                            
                 });
-            };
+
+
+               
 
         }])
-
-
-

@@ -3,8 +3,9 @@ $stable: #F3F3F3;
 $royal: #EF473A;
 $ionicons-font-path: "../lib/ionic/fonts" !default;
 @import "../www/lib/ionic/scss";
+
 .containerTopo {
-	background-image: url('http: //www.ampeb.org.br/wp-content/themes/ampeb/imgs/bg-topo.png');
+	background-image: url('img/bg-topo.png');
 	background-repeat: repeat;
 }
 
@@ -72,5 +73,11 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 	box-shadow: 0 0 0 0;
 	border: 0 none;
 	outline: 0;
+}
+
+.imagem-perfil-informacoes-associado {
+	width: 250px;
+	height: 250px;
+	border-radius: 100%;	
 }
 

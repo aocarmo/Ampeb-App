@@ -1,0 +1,140 @@
+<ion-view title="AMPEB" hide-back-button="true" id="page4">
+  <ion-nav-buttons side="right" class="has-header">
+    <button ng-click="logout()" class="button button-icon icon ion-log-out"> Sair</button>
+  </ion-nav-buttons>
+  <ion-content padding="true" class="has-header">
+     <ion-refresher on-refresh="refresh()"></ion-refresher>
+    <div id="aMPEB-container10">
+      <div>
+        <div class="row containerTopo padding-topo">
+          <div class="col padding-topo">
+            <div class="row padding-topo">
+              <div class="col col-50 padding-topo">
+                <div class="topo-esquerda">
+                  <img style="width:100px; height:60px;" src="img/ampebLogo.png">
+                </div>
+              </div>
+              <div class="col col-50 padding-topo">
+               <div id="fotoPerfil" ion-img-cache-bg style="background-image: url('{{fotoUsuario}}');" ng-click="alterarFoto()" class="topo-direita imagem-perfil"></div>
+              </div>
+               
+            </div>
+            <div class="row padding-topo">
+              <div style="padding:1px" class="col">Bem vindo(a), {{dadosUsuario.nome_usuario}}</div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <hr>
+        </div>
+      </div>
+    </div>
+    <div id="aMPEB-container11">
+      <div>
+        <div align="center" class="row">
+
+          <div class="col col-50 botaoMenu">
+            <a ui-sref="menu.meuCadastroNaAMPEB" class="button button-icon">
+              <i class="icon ion-person"></i>
+              <br>
+              <span class="nome-icone">Meu Cadastro</span>
+            </a>
+          </div>
+          <div class="col col-50 botaoMenu">
+             <a ui-sref="menu.meuMural" class="button icon button-icon">
+              <i class="icon ion-radio-waves"></i>
+              <span id="fiquePorDentroBadge" style="position: absolute" class="badge badge-royal"></span>
+              <br>
+              <span class="nome-icone">Fique por dentro</span>
+            </a>  
+          </div>
+        </div>
+        <div align="center" class="row">
+          <div class="col col-50  botaoMenu">
+            <a ui-sref="menu.buscarConvNios" class="button icon button-icon">
+              <i class="icon ion-ios-pricetags"></i><br>
+              <span class="nome-icone">Convênios</span>
+            </a>
+          </div>
+          <div class="col col-50  botaoMenu">
+            <a ui-sref="menu.notCias({tipo: private})" class="button icon button-icon">
+              <i class="icon ion-social-rss"></i>
+              <span id="noticiasBadge" style="position: absolute" class="badge badge-royal"></span>
+              <br>
+              <span class="nome-icone">Notícias</span>
+            </a>
+          </div>
+        </div>
+        <div align="center" class="row">
+          <div class="col col-50 botaoMenu">
+            <a ui-sref="menu.prXimosEventos" class="button icon button-icon">
+              <i class="icon ion-calendar"></i>
+              <span id="eventosBadge" style="position: absolute" class="badge badge-royal"></span>
+              <br>
+              <span class="nome-icone">Eventos</span>
+            </a>
+          </div>
+          <div class="col col-50 botaoMenu">
+            <a ui-sref="menu.listaEnquetes" class="button icon button-icon">
+              <i class="icon ion-clipboard"></i>
+              <span id="enquetesBadge" style="position: absolute" class="badge badge-royal"></span>
+              <br>
+              <span class="nome-icone">Enquete</span>
+            </a>
+          </div>
+        </div>
+        <div align="center" class="row">
+          <div class="col col-50 botaoMenu">
+             <a ui-sref="menu.alterarASenha" class="button button-icon">
+              <i class="icon ion-locked"></i>
+              <br>
+              <span class="nome-icone">Alterar senha</span>
+            </a>
+          </div>
+
+          <div class="col col-50 botaoMenu">
+            <a ui-sref="menu.contatosAMPEB" class="button icon button-icon">
+              <i class="icon ion-android-call"></i>
+              <br>
+              <span class="nome-icone">Contatos AMPEB</span>
+            </a>
+          </div>
+        </div>   
+        <div align="center" class="row">
+          <div class="col col-99  botaoMenu">
+            <a ui-sref="menu.transmissOAoVivo" ng-click="registarAssembleia()" class="button icon button-icon">
+              <i class="icon ion-ios-play"></i>
+              <span style="position: absolute" class="badge badge-royal"></span>
+              <br>
+              <span class="nome-icone">Transmissão ao vivo</span>
+            </a>
+          </div>
+         <!-- <div class="col col-50  botaoMenu">
+            <a ui-sref="menu.novidadesConvenios" class="button icon button-icon">
+              <i class="icon ion-ios-pricetags"></i>
+              <span id="noticiasBadge" style="position: absolute" class="badge badge-royal">3</span>
+              <br>
+              <span class="nome-icone">Novidades de Convênios</span>
+            </a>
+          </div>-->
+        </div>
+        <div align="center" class="row" ng-if="exibirBtnLista">
+          <div class="col col-99 botaoMenu">
+            <a ui-sref="menu.listaEventos" class="button icon button-icon">
+              <i class="icon ion-ios-people"></i>
+              <span style="position: absolute" class="badge badge-royal"></span>
+              <br>
+              <span class="nome-icone">Lista de Confirmação de Presença em Eventos</span>
+            </a>
+          </div>
+        </div>
+        <div>
+          <hr>
+        </div>
+      </div>
+    </div>
+     <ion-list>
+        <ion-item ng-repeat="item in items">{{item}}</ion-item>
+      </ion-list>
+  </ion-content>
+</ion-view>

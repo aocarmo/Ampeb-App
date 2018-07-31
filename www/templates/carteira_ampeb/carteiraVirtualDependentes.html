@@ -1,0 +1,69 @@
+<ion-view title="Carteira Virtual de Associado" id="page5">
+        <ion-content padding="true" class="has-header common-bg">
+            <div ng-click="flip()" class="flip-container">
+                <div class="flipper clearfix">
+                  <div  class="front  item-text-wrapped">
+                    <ion-grid>
+                      <ion-row>
+                        <!--list of cartaos-->
+                        <ion-col>
+                          <div class="carteirinha">
+                            <ion-grid>
+                              <ion-row class="row">
+                                <ion-col class="col col-50">
+                                  <img src="{{dependente.foto_dependente != '' ? url_sistema_foto+dependente.foto_dependente : 'img/icone_foto.png'}}" style="display: block; width: 80px; height:80px; margin-left: 10%;border-radius: 50%; border: solid 1px #841119;">
+                                </ion-col>
+                                <ion-col class="col col-50">
+                                  <img src="img/R08BZblgTDuVWPqcCh2J_logo-ampeb.png" style="display: block; width: 100%; height: 70%; margin-right: 100%;">
+                                </ion-col>
+                              </ion-row>
+                            </ion-grid>
+                            <div class="background">
+                              <div class="background-filter">
+                                <div class="">
+                                  <span class="text-black">&nbsp;
+                                    <strong> Nome: </strong>
+                                  </span>
+                                  <span class="text-black" ion-text color="light">{{dependente.nome_dependente}}</span>
+                                  <div class="clear"></div>
+                                </div>
+                                <div class="">
+                                  <span class="text-black">&nbsp;
+                                    <strong> CPF: </strong>
+                                  </span>
+                                  <span class="text-black" ion-text color="light">{{dependente.cpf_dependente}}</span>
+                                  <div class="clear"></div>
+                                  <div class="">
+                                    <span class="text-black">&nbsp;
+                                      <strong> Data de Nascimento: </strong>
+                                    </span>
+                                    <span class="text-black" ion-text color="light">{{dependente.data_nascimento}}</span>
+                                    <div class="clear"></div>
+                                  </div>                 
+                                  <div class="">
+                                    <span class="text-black">&nbsp;
+                                      <strong> Idade: </strong>
+                                    </span>
+                                    <span class="text-black"  ion-text color="light">{{dependente.idade}} ano(s)</span>
+                                    <div class="clear"></div>
+                                  </div>                               
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </ion-col>
+                      </ion-row>
+                    </ion-grid>
+                  </div>
+                  <div class="back  item-text-wrapped success">
+                    <div class="carteirinha" style=" padding-top: 30px;">
+                      <div align="center">
+                        <img style="width: 40%; height: 40%;" data-ng-src="{{qrCode}}">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+        
+        </ion-content>
+      </ion-view>

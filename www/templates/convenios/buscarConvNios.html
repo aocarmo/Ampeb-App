@@ -1,0 +1,58 @@
+<ion-view title="Buscar Convênios" id="page24">
+  <ion-content padding="true" class="has-header">
+    <h2 id="buscarConvNios-heading24" style="color:#821723;font-weight:300;">Buscar Convênios</h2>
+    <hr class="hr-topoPagina">
+    <form id="buscarConvNios-form11" class="list">
+      <label class="item item-input" id="buscarConvNios-input13" name="txtNomeConvenio">
+        <span class="input-label">Nome</span>
+        <input type="text" placeholder="" ng-model="filtro.nmConvenio">
+      </label>
+
+       <label class="item item-select" id="buscarConvNios-select12" name="sctCidade">
+        <span class="input-label">Cidade</span>
+        <select ng-model="filtro.municipio">
+          <option value="">Todas</option>
+          <option ng-repeat="municipio in municipiosConvenio" value="{{municipio.nmMunicipioConvenio}}">{{municipio.nmMunicipioConvenio}}</option>
+        </select>
+      </label>
+
+      <label class="item item-select" id="buscarConvNios-select10" name="sctTipoConvenio">
+        <span class="input-label">Tipo</span>
+        <select ng-model="filtro.tipoConvenio">
+          <option value="">Todos</option>
+         <option ng-repeat="tipoConvenio in tiposConvenio" value="{{tipoConvenio.id}}">{{tipoConvenio.nmTipoConvenio}}</option>
+        </select>
+      </label>
+
+     <div align="center">
+        <a  ui-sref="{{tipoRetornoPost == 'publish' ? 'listaDeConvNios({idTipoConvenio: filtro.tipoConvenio, nmConvenio: filtro.nmConvenio, nmMunicipio: filtro.municipio})' : 'menu.listaDeConvNios({idTipoConvenio: filtro.tipoConvenio, nmConvenio: filtro.nmConvenio, nmMunicipio: filtro.municipio})' }}" id="buscarConvNios-button11" class="button button-assertive  button-block">Buscar</a>
+        
+        <div class="list">
+            <div class="item item-divider">
+                <span align="left"style="color:#821723;font-weight:300;font-size: 18px;">Distância<span class="badge badge-primary ">{{raio}} Km</span></span>
+              </div>
+            <div class="item range range-positive">              
+              <i style="color:#821723;font-size: 18px;" class="icon ion-android-locate"></i>
+              <input type="range" name="volume" min="1" max="50" value="25" ng-model="raio">
+              <i style="color:#821723;font-size: 28px;" class="icon ion-android-locate"></i>
+            </div>
+          </div>
+        <a  class="button button-outline icon-left ion-location button-assertive" ui-sref="{{tipoRetornoPost == 'publish' ? 'conveniosProximos({raio: raio})' : 'menu.conveniosProximos({raio: raio})' }}">Ver convênios próximos a mim</a>
+     </div>
+     
+      <div class="list">
+
+        <div ng-repeat="tipoConvenio in tiposConvenio" style="display: {{tipoConvenio.display}}" align="center" class="card">
+          <div class="item item-image img-tipo-convenio">
+            <img ion-img-cache ui-sref="{{tipoRetornoPost == 'publish' ? 'listaDeConvNios({idTipoConvenio: tipoConvenio.id})' : 'menu.listaDeConvNios({idTipoConvenio: tipoConvenio.id})' }}" ng-src="{{tipoConvenio.dsUrlImagem}}">
+          </div>
+
+          <div class="item">
+            {{tipoConvenio.nmTipoConvenio}}
+          </div>
+        </div>        
+
+      </div>
+    </form>
+  </ion-content>
+</ion-view>

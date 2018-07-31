@@ -1,0 +1,76 @@
+<ion-side-menus enable-menu-with-back-views="false">
+  <ion-side-menu-content>
+    <ion-nav-bar class="bar-stable">
+      <ion-nav-back-button></ion-nav-back-button>
+      <ion-nav-buttons side="left">
+        <button class="button button-icon button-clear ion-navicon" menu-toggle="left"></button>
+      </ion-nav-buttons>
+    </ion-nav-bar>
+    <ion-nav-view name="side-menu21"></ion-nav-view>
+  </ion-side-menu-content>
+  <ion-side-menu side="left" id="side-menu21" style="background-color:#FFFFFF;">
+    <ion-header-bar class="bar-stable">
+      <div class="title">Menu</div>
+    </ion-header-bar>
+    <ion-content padding="false" class="side-menu-left has-header ">
+      <ion-list id="menu-list1">
+        <ion-item class="item-icon-left item-icon-right" id="menu-list-item4" ui-sref="menu.home()" menu-close="">
+          <i class="icon ion-home"></i>Inicio
+          <i class="icon ion-ios-arrow-right"></i>
+        </ion-item>
+        <ion-item class="item-icon-left item-icon-right" id="menu-list-item4" ui-sref="menu.alterarASenha()" menu-close="">
+          <i class="icon ion-locked"></i>Alterar Senha
+          <i class="icon ion-ios-arrow-right"></i>
+        </ion-item>
+      <!--  <ion-item class="item-icon-left item-icon-right" id="menu-list-item7" ui-sref="menu.aniversariantes()" menu-close="">
+          <i class="icon ion-person-stalker"></i>Aniversariantes
+          <i class="icon ion-ios-arrow-right"></i>
+        </ion-item>-->
+        <ion-item class="item-icon-left item-icon-right" id="menu-list-item5" ui-sref="menu.buscaDeAssociado()" menu-close="">
+          <i class="icon ion-ios-people"></i>Busca de Associado
+          <i class="icon ion-ios-arrow-right"></i>
+        </ion-item>
+        <ion-item class="item-icon-left item-icon-right" id="menu-list-item6" ui-sref="menu.carteiraVirtual()" menu-close="">
+          <i class="icon ion-card"></i>Carteira virtual
+          <i class="icon ion-ios-arrow-right"></i>
+        </ion-item>
+        <ion-item class="item-icon-left item-icon-right" id="menu-list-item6" ui-sref="menu.contatosAMPEB()" menu-close="">
+          <i class="icon ion-android-call"></i>Contatos AMPEB
+          <i class="icon ion-ios-arrow-right"></i>
+        </ion-item>
+        <ion-item class="item-icon-left item-icon-right" id="menu-list-item6" ui-sref="menu.buscarConvNios()" menu-close="">
+          <i class="icon ion-ios-pricetags"></i>Convênios
+          <i class="icon ion-ios-arrow-right"></i>
+        </ion-item>
+        <ion-item class="item-icon-left item-icon-right" id="menu-list-item7" ui-sref="menu.emissODeDocumentos()" menu-close="">
+          <i class="icon ion-document-text"></i>Documentos
+          <i class="icon ion-ios-arrow-right"></i>
+        </ion-item>
+        <ion-item class="item-icon-left item-icon-right" id="menu-list-item7" ui-sref="menu.listaEnquetes()" menu-close="">
+          <i class="icon ion-clipboard"></i>Enquetes
+          <i class="icon ion-ios-arrow-right"></i>
+        </ion-item>
+        <ion-item class="item-icon-left item-icon-right" id="menu-list-item7" ui-sref="menu.prXimosEventos()" menu-close="">
+          <i class="icon ion-calendar"></i>Eventos
+          <i class="icon ion-ios-arrow-right"></i>
+        </ion-item>
+        <ion-item class="item-icon-left item-icon-right" id="menu-list-item7" ui-sref="menu.meuMural()" menu-close="">
+          <i class="icon ion-radio-waves"></i>Fique por dentro
+          <i class="icon ion-ios-arrow-right"></i>
+        </ion-item>
+        <ion-item class="item-icon-left item-icon-right" id="menu-list-item7" ui-sref="menu.meuCadastroNaAMPEB()" menu-close="">
+          <i class="icon ion-person"></i>Meu Cadastro
+          <i class="icon ion-ios-arrow-right"></i>
+        </ion-item>
+        <ion-item class="item-icon-left item-icon-right" id="menu-list-item7" ui-sref="menu.notCias({tipo: private})" menu-close="">
+          <i class="icon ion-social-rss"></i>Notícias
+          <i class="icon ion-ios-arrow-right"></i>
+        </ion-item>
+        <ion-item class="item-icon-left item-icon-right" id="menu-list-item7" ui-sref="menu.transmissOAoVivo" ng-click="registarAssembleia()" menu-close="">
+          <i class="icon ion-ios-play"></i>Transmissão ao vivo
+          <i class="icon ion-ios-arrow-right"></i>
+        </ion-item>
+      </ion-list>
+    </ion-content>
+  </ion-side-menu>
+</ion-side-menus>
