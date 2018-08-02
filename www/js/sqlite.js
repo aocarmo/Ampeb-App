@@ -828,7 +828,26 @@ sqlite.factory('enqueteFactory', function ($q, $cordovaSQLite) {
                   
               },
               function (err) {
-                  deferred.reject(err);
+
+                if(err.code == 6){
+                    query = "UPDATE enquete SET dsEnquete = ?, totalVotos = ?, totalVotantes = ?, dtCadastro = ?, dtExpiracao = ?, flAtivo = ?, flLido = ?, flVotada = ? WHERE  id =  ?";
+                    values = [dsEnquete, totalVotos, totalVotantes, dtCadastro, dtExpiracao, flAtivo, flLido, flVotada, id];
+                    outputs = [];
+                    //Usada para fazer o retorno do banco aguardar esta completa
+                   
+
+                    $cordovaSQLite.execute(db, query,values).then(function (data) {
+                        outputs.push({ "atualizado": data});
+                        deferred.resolve(outputs);
+                
+                    }, function (error) {
+
+                        outputs.push({ "retorno": error });
+                        deferred.reject(error);
+                    });
+            
+                }
+                    deferred.reject(err);
                 }
 
             );

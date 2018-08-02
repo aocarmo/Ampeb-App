@@ -201,6 +201,7 @@
             if ($scope.dadosUsuario.foto_associado != "") {
                 //Colocado para burlar o cache da imagem
                 $scope.fotoUsuario = LOCAL_STORAGE.url_foto + $scope.dadosUsuario.foto_associado + '?decache=' + Math.random();
+                
 
             } else {
                 $scope.fotoUsuario = "img/icone_foto.png";
@@ -276,6 +277,7 @@
                             if (dados.data.result == true) {
                                 //Colocado para burlar o cache da imagem
                                 $scope.fotoUsuario = LOCAL_STORAGE.url_foto + $scope.dadosUsuario.foto_associado + '?decache=' + Math.random();
+                              
                             }
 
                         }).finally(function () {
@@ -314,6 +316,7 @@
                             if (dados.data.result == true) {
                                 //Colocado para burlar o cache da imagem
                                 $scope.fotoUsuario = LOCAL_STORAGE.url_foto + $scope.dadosUsuario.foto_associado + '?decache=' + Math.random();
+                              
                             }
 
                         }).finally(function () {
