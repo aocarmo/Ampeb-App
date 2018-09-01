@@ -33,45 +33,29 @@
       <div>
         <div align="center" class="row">
 
-          <div class="col col-50 botaoMenu">
-            <a ui-sref="menu.meuCadastroNaAMPEB" class="button button-icon">
-              <i class="icon ion-person"></i>
-              <br>
-              <span class="nome-icone">Meu Cadastro</span>
-            </a>
-          </div>
+        
           <div class="col col-50 botaoMenu">
              <a ui-sref="menu.meuMural" class="button icon button-icon">
               <i class="icon ion-radio-waves"></i>
               <span id="fiquePorDentroBadge" style="position: absolute" class="badge badge-royal"></span>
               <br>
-              <span class="nome-icone">Fique por dentro</span>
+              <span style="font-size: 15px;" class="nome-icone">Fique por dentro</span>
             </a>  
-          </div>
-        </div>
-        <div align="center" class="row">
-          <div class="col col-50  botaoMenu">
-            <a ui-sref="menu.buscarConvNios" class="button icon button-icon">
-              <i class="icon ion-ios-pricetags"></i><br>
-              <span class="nome-icone">Convênios</span>
-            </a>
           </div>
           <div class="col col-50  botaoMenu">
             <a ui-sref="menu.notCias({tipo: private})" class="button icon button-icon">
               <i class="icon ion-social-rss"></i>
               <span id="noticiasBadge" style="position: absolute" class="badge badge-royal"></span>
               <br>
-              <span class="nome-icone">Notícias</span>
+              <span style="font-size: 15px;" class="nome-icone">Notícias</span>
             </a>
           </div>
         </div>
         <div align="center" class="row">
-          <div class="col col-50 botaoMenu">
-            <a ui-sref="menu.prXimosEventos" class="button icon button-icon">
-              <i class="icon ion-calendar"></i>
-              <span id="eventosBadge" style="position: absolute" class="badge badge-royal"></span>
-              <br>
-              <span class="nome-icone">Eventos</span>
+          <div class="col col-50  botaoMenu">
+            <a ui-sref="menu.buscarConvNios" class="button icon button-icon">
+              <i class="icon ion-ios-pricetags"></i><br>
+              <span style="font-size: 15px;" class="nome-icone">Convênios</span>
             </a>
           </div>
           <div class="col col-50 botaoMenu">
@@ -79,52 +63,76 @@
               <i class="icon ion-clipboard"></i>
               <span id="enquetesBadge" style="position: absolute" class="badge badge-royal"></span>
               <br>
-              <span class="nome-icone">Enquete</span>
+              <span style="font-size: 15px;" class="nome-icone">Enquetes</span>
             </a>
-          </div>
+          </div>        
         </div>
         <div align="center" class="row">
-          <div class="col col-50 botaoMenu">
-             <a ui-sref="menu.alterarASenha" class="button button-icon">
-              <i class="icon ion-locked"></i>
+            <div class="col col-50  botaoMenu">
+            <a ui-sref="menu.carteiraVirtual" class="button icon button-icon">
+              <i class="icon ion-card"></i>
               <br>
-              <span class="nome-icone">Alterar senha</span>
+              <span style="font-size: 15px;" class="nome-icone">Carteira Virtual</span>
             </a>
           </div>
-
           <div class="col col-50 botaoMenu">
-            <a ui-sref="menu.contatosAMPEB" class="button icon button-icon">
-              <i class="icon ion-android-call"></i>
+            <a ui-sref="menu.prXimosEventos" class="button icon button-icon">
+              <i class="icon ion-calendar"></i>
+              <span id="eventosBadge" style="position: absolute" class="badge badge-royal"></span>
               <br>
-              <span class="nome-icone">Contatos AMPEB</span>
+              <span style="font-size: 15px;" class="nome-icone">Eventos</span>
             </a>
           </div>
-        </div>   
+      
+        </div>    
         <div align="center" class="row">
-          <div class="col col-99  botaoMenu">
+          <div class="col col-50  botaoMenu">
             <a ui-sref="menu.transmissOAoVivo" ng-click="registarAssembleia()" class="button icon button-icon">
               <i class="icon ion-ios-play"></i>
               <span style="position: absolute" class="badge badge-royal"></span>
               <br>
-              <span class="nome-icone">Transmissão ao vivo</span>
+              <span style="font-size: 15px;" class="nome-icone">Transmissão ao vivo</span>
             </a>
           </div>
+          <div class="col col-50 botaoMenu">
+              <a ui-sref="menu.contatos" class="button icon button-icon">
+                <i class="icon ion-android-call"></i>
+                <br>
+                <span style="font-size: 15px;" class="nome-icone">Contatos</span>
+              </a>
+            </div>
          <!-- <div class="col col-50  botaoMenu">
             <a ui-sref="menu.novidadesConvenios" class="button icon button-icon">
               <i class="icon ion-ios-pricetags"></i>
               <span id="noticiasBadge" style="position: absolute" class="badge badge-royal">3</span>
               <br>
-              <span class="nome-icone">Novidades de Convênios</span>
+              <span style="font-size: 15px;" class="nome-icone">Novidades de Convênios</span>
             </a>
           </div>-->
         </div>
+        <div align="center" class="row">
+            <div class="col col-50 botaoMenu">
+                <a ui-sref="menu.meuCadastroNaAMPEB" class="button button-icon">
+                  <i class="icon ion-person"></i>
+                  <br>
+                  <span style="font-size: 15px;" class="nome-icone">Meu Cadastro</span>
+                </a>
+              </div>
+          <div class="col col-50 botaoMenu">
+             <a ui-sref="menu.alterarASenha" class="button button-icon">
+              <i class="icon ion-locked"></i>
+              <br>
+              <span style="font-size: 15px;" class="nome-icone">Alterar senha</span>
+            </a>
+          </div>       
+        </div> 
         <div align="center" class="row" ng-if="exibirBtnLista">
           <div class="col col-99 botaoMenu">
             <a ui-sref="menu.listaEventos" class="button icon button-icon">
               <i class="icon ion-ios-people"></i>
               <span style="position: absolute" class="badge badge-royal"></span>
               <br>
-              <span class="nome-icone">Lista de Confirmação de Presença em Eventos</span>
+              <span style="font-size: 15px;" class="nome-icone">Lista de Confirmação de Presença em Eventos</span>
             </a>
           </div>
         </div>

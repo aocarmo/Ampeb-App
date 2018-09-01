@@ -160,9 +160,10 @@ angular.module('app', ['ionic', 'app.controllers', 'app.routes', 'app.directives
       var notificationOpenedCallback = function (jsonData) {
         console.log('notificationOpenedCallback: ' + JSON.stringify(jsonData));
       };
-
-      window.plugins.OneSignal
-        .startInit("b47e67f6-405e-4041-9597-571b12e2f80d")
+   // .startInit("b47e67f6-405e-4041-9597-571b12e2f80d")
+   //.startInit("774c0150-e398-4ed0-a600-e9d32ac8a6b5")
+      window.plugins.OneSignal    
+       .startInit("b47e67f6-405e-4041-9597-571b12e2f80d")
         .handleNotificationOpened(notificationOpenedCallback)
         .endInit();
 

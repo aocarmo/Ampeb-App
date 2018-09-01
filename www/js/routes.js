@@ -34,7 +34,7 @@ angular.module('app.routes', [])
       })
       .state('notCias', {
         url: '/noticias',
-        templateUrl: 'templates/notCias.html',
+        templateUrl: 'templates/noticias/notCias.html',
         controller: 'notCiasCtrl'
       })
 
@@ -454,11 +454,21 @@ angular.module('app.routes', [])
       })
       .state('menu.carteiraVirtualDependentes', {
         url: '/carteiraVirtualDependentes',
-        params: { dependente: null },
+        params: { dependente: null, nome_associado: null, urlQrCode: null },
         views: {
           'side-menu21': {
             templateUrl: 'templates/carteira_ampeb/carteiraVirtualDependentes.html',
             controller: 'carteiraVirtualDependentesCtrl'
+          }
+        }
+      })
+      .state('menu.contatos', {
+        url: '/contatos',
+        params: { },
+        views: {
+          'side-menu21': {
+            templateUrl: 'templates/contatos/contatos.html',
+            controller: 'contatosCtrl'
           }
         }
       })

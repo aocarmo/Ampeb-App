@@ -1,5 +1,5 @@
 <ion-side-menus enable-menu-with-back-views="false">
-  <ion-side-menu-content>
+  <ion-side-menu-content drag-content="false">
     <ion-nav-bar class="bar-stable">
       <ion-nav-back-button></ion-nav-back-button>
       <ion-nav-buttons side="left">
@@ -8,7 +8,7 @@
     </ion-nav-bar>
     <ion-nav-view name="side-menu21"></ion-nav-view>
   </ion-side-menu-content>
-  <ion-side-menu side="left" id="side-menu21" style="background-color:#FFFFFF;">
+  <ion-side-menu side="left" id="side-menu21"  style="background-color:#FFFFFF;">
     <ion-header-bar class="bar-stable">
       <div class="title">Menu</div>
     </ion-header-bar>
@@ -18,11 +18,11 @@
           <i class="icon ion-home"></i>Inicio
           <i class="icon ion-ios-arrow-right"></i>
         </ion-item>
-        <ion-item class="item-icon-left item-icon-right" id="menu-list-item4" ui-sref="menu.alterarASenha()" menu-close="">
+      <ion-item class="item-icon-left item-icon-right" id="menu-list-item4" ui-sref="menu.alterarASenha()" menu-close="">
           <i class="icon ion-locked"></i>Alterar Senha
           <i class="icon ion-ios-arrow-right"></i>
         </ion-item>
-      <!--  <ion-item class="item-icon-left item-icon-right" id="menu-list-item7" ui-sref="menu.aniversariantes()" menu-close="">
+       <!--   <ion-item class="item-icon-left item-icon-right" id="menu-list-item7" ui-sref="menu.aniversariantes()" menu-close="">
           <i class="icon ion-person-stalker"></i>Aniversariantes
           <i class="icon ion-ios-arrow-right"></i>
         </ion-item>-->
@@ -30,12 +30,13 @@
           <i class="icon ion-ios-people"></i>Busca de Associado
           <i class="icon ion-ios-arrow-right"></i>
         </ion-item>
+        
         <ion-item class="item-icon-left item-icon-right" id="menu-list-item6" ui-sref="menu.carteiraVirtual()" menu-close="">
           <i class="icon ion-card"></i>Carteira virtual
           <i class="icon ion-ios-arrow-right"></i>
         </ion-item>
-        <ion-item class="item-icon-left item-icon-right" id="menu-list-item6" ui-sref="menu.contatosAMPEB()" menu-close="">
-          <i class="icon ion-android-call"></i>Contatos AMPEB
+        <ion-item class="item-icon-left item-icon-right" id="menu-list-item6" ui-sref="menu.contatos()" menu-close="">
+          <i class="icon ion-android-call"></i>Contatos
           <i class="icon ion-ios-arrow-right"></i>
         </ion-item>
         <ion-item class="item-icon-left item-icon-right" id="menu-list-item6" ui-sref="menu.buscarConvNios()" menu-close="">

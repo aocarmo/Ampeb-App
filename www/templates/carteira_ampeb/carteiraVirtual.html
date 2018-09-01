@@ -47,13 +47,23 @@
                           <span class="text-black"  ion-text color="light">{{dadosAssociado.matricula}}</span>
                           <div class="clear"></div>
                         </div>
-                        <div class="">
+                       <!-- <div class="">
                           <span class="text-black">&nbsp;
                             <strong> Associado desde: </strong>
                           </span>
                           <span class="text-black" ion-text color="light">{{dadosAssociado.data_inscricao}}</span>
                           <div class="clear"></div>
-                        </div>
+                        </div> -->
+                        <div align ="center" class="">
+                          <span  style="font-size: 8px;" class="text-black">&nbsp;
+                            <strong>{{dataGeracao}}</strong>
+                          </span> 
+                          <br>   
+                          <span  style="font-size: 8px;" class="text-black">&nbsp;
+                              <strong>{{texto}}</strong>
+                            </span>             
+                          <div class="clear"></div>
+                        </div> 
                       </div>
                     </div>
                   </div>
@@ -74,8 +84,8 @@
     <div ng-if="qtdDependentes > 0" align="center" style="padding-top: 70%;" >
         <h3 align="center" style="color:#821723;font-weight:300;">Meus Dependentes</h3>
         <ion-list id="catalogoDeAssociado-list2">
-            <ion-item wrap  ng-repeat="dependente in dadosAssociado.dependentes" class="item-avatar item-icon-right item-text-wrap" id="catalogoDeAssociado-list-item11" ui-sref="menu.carteiraVirtualDependentes({dependente: dependente})">
-                <img src="{{dependente.foto_dependente != '' ? url_sistema_foto+dependente.foto_dependente : 'img/icone_foto.png'}}">
+            <ion-item wrap  ng-repeat="dependente in dadosAssociado.dependentes" class="item-avatar item-icon-right item-text-wrap" id="catalogoDeAssociado-list-item11" ui-sref="menu.carteiraVirtualDependentes({dependente: dependente, nome_associado:dadosAssociado.nome_associado, urlQrCode: urlValidacaoAssociado})">
+                <img src="{{dependente.foto_dependente != '' ? dependente.foto_dependente : 'img/icone_foto.png'}}">
                 <h2>{{dependente.nome_dependente}}</h2>  
                 <i class="icon ion-ios-arrow-right"></i>             
             </ion-item>

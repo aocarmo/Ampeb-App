@@ -3,7 +3,6 @@
   "version": "1.1.1",
   "description": "AmpebApp: An Ionic project",
   "dependencies": {
-    "cordova-android": "~6.2.3",
     "cordova-custom-config": "^5.0.2",
     "cordova-ios": "~4.5.4",
     "cordova-open-native-settings": "^1.5.1",
@@ -14,6 +13,8 @@
     "cordova-plugin-file": "~4.3.2",
     "cordova-plugin-file-transfer": "~1.6.2",
     "cordova-plugin-geolocation": "^2.4.3",
+    "cordova-plugin-googlemaps": "^2.3.11",
+    "cordova-plugin-googlemaps-sdk": "git+https://github.com/mapsplugin/cordova-plugin-googlemaps-sdk.git#2.7.0",
     "cordova-plugin-inappbrowser": "~1.7.1",
     "cordova-plugin-ios-camera-permissions": "git+https://github.com/Cordobo/cordova-plugin-ios-camera-permissions.git",
     "cordova-plugin-network-information": "~1.3.2",
@@ -30,7 +31,10 @@
     "gulp-sass": "^2.0.4",
     "ionic-img-cache": "^1.1.3",
     "ionic-plugin-keyboard": "~2.2.1",
-    "onesignal-cordova-plugin": "~2.1.2"
+    "minimist": "^1.2.0",
+    "onesignal-cordova-plugin": "~2.1.2",
+    "xml2js": "^0.4.19",
+    "cordova-android": "~6.3.0"
   },
   "devDependencies": {
     "@ionic/cli-plugin-cordova": "1.6.2",
@@ -84,7 +88,13 @@
       },
       "cordova.plugins.diagnostic": {},
       "cordova-open-native-settings": {},
-      "cordova-custom-config": {}
+      "cordova-custom-config": {},
+      "cordova-plugin-googlemaps": {
+        "API_KEY_FOR_ANDROID": "AIzaSyAG1PV-6fyvhTs-_l2Ddv2DX8p35dn-WZA",
+        "API_KEY_FOR_IOS": "AIzaSyAG1PV-6fyvhTs-_l2Ddv2DX8p35dn-WZA",
+        "LOCATION_WHEN_IN_USE_DESCRIPTION": "This app wants to get your location while this app runs only.",
+        "LOCATION_ALWAYS_USAGE_DESCRIPTION": "This app wants to get your location always, even this app runs in background."
+      }
     },
     "platforms": [
       "ios",

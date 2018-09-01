@@ -7,7 +7,7 @@
         <span class="input-label">Nome</span>
         <input type="text" placeholder="" ng-model="filtro.nome">
       </label> 
-      <label class="item item-select" name="sctEstado">
+     <!-- <label class="item item-select" name="sctEstado">
         <span class="input-label">Estado</span>
         <select ng-model="filtro.estado" ng-change="obterComboCidade()">
           <option selected value="">Todos</option>
@@ -21,7 +21,7 @@
           <option ng-repeat="cidade in municipiosAssociados" value="{{cidade.id_municipio}}">{{cidade.nome_municipio}}</option>     
           
         </select>
-      </label>
+      </label> -->
       <label class="item item-select" id="buscaDeAssociado-select2" name="sctMesAniversario">
         <span class="input-label">Aniversário</span>
         <select ng-model="filtro.mesAniversario">
@@ -47,7 +47,7 @@
          <option ng-repeat="anoPosse in listaAnoPosseAssociados" value="{{anoPosse.ano_posse}}">{{anoPosse.ano_posse}}</option>
         </select>
       </label>
-      <a ui-sref="menu.catalogoDeAssociado({nome: filtro.nome, id_estado: filtro.estado, id_cidade: filtro.cidade, mes_anivesario: filtro.mesAniversario, ano_posse: filtro.anoPosse})" id="buscaDeAssociado-button1" class="button button-assertive button-block">Buscar</a>
+      <a ui-sref="menu.catalogoDeAssociado({nome: filtro.nome, mes_anivesario: filtro.mesAniversario, ano_posse: filtro.anoPosse})" id="buscaDeAssociado-button1" class="button button-assertive button-block">Buscar</a>
     </form>
   </ion-content>
 </ion-view>

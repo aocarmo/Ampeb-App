@@ -2,13 +2,14 @@
   <ion-content padding="true" class="has-header">
     <h2 id="dependentesAtivos-heading31" style="color:#821723;font-weight:300;">Dependentes Ativos</h2>
     <hr class="hr-topoPagina">
-    <div class="item item-body" id="dependentesAtivos-list-item-container9">
+    <div align="center"  class="item item-body" id="dependentesAtivos-list-item-container9">
       <ion-list id="dependentesAtivos-list13">
-        <ion-item ng-repeat="dependente in dependentes" class="dark  item-text-wrap" id="dependentesAtivos-list-item31">
-            {{dependente.nome_dependente}}
-            <p style="white-space:normal;">Idade: {{dependente.idade}} ano(s)</p> 
-        </ion-item>        
-      </ion-list>
+        <ion-item wrap  ng-repeat="dependente in dependentes"  class="item-avatar item-icon-right item-text-wrap" id="dependentesAtivos-list-item31">
+            <img src="{{dependente.foto_dependente != '' ? dependente.foto_dependente : 'img/icone_foto.png'}}">
+            <h2>{{dependente.nome_dependente}}</h2>  
+            <p style="white-space:normal;">Idade: {{dependente.idade}} ano(s)</p>                   
+        </ion-item>
+      </ion-list>   
     </div>
     <hr class="hr-topoPagina">
     <div id="notCia-markdown5" style="text-align:justify;" class="show-list-numbers-and-dots">

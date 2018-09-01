@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.randernet.ampeb" version="1.1.7" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="com.randernet.ampeb" version="1.1.8" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>AMPEB</name>
     <description>
         Desenvolvido por RanderNet.
@@ -7,12 +7,15 @@
     <author email="aplicativos@ampeb.org.br" href="http://www.ampeb.org.br//">
      AMPEB
     </author>
-    <content original-src="index.html" src="http://192.168.0.14:8100" />
+    <content src="index.html" />
     <access origin="*" />
-    <allow-navigation href="*" />
     <access origin="cdvfile://*" />
     <access launch-external="yes" origin="tel:*" />
     <access launch-external="yes" origin="mailto:*" />
+    <allow-navigation href="*" />
+    <allow-navigation href="http://192.168.0.14:8100" />
+    <allow-navigation href="http://192.168.56.1:8100" />
+    <allow-navigation href="http://169.254.222.163:8100" />
     <allow-intent href="cdvfile://*" />
     <allow-intent href="tel:*" />
     <allow-intent href="mailto:*" />
@@ -22,10 +25,11 @@
     <preference name="DisallowOverscroll" value="true" />
     <preference name="SplashScreenDelay" value="2000" />
     <preference name="FadeSplashScreenDuration" value="2000" />
-    <preference name="android-minSdkVersion" value="16" />
+    <preference name="android-minSdkVersion" value="19" />
     <preference name="BackupWebStorage" value="none" />
     <preference name="SplashScreen" value="screen" />
     <preference name="iosPersistentFileLocation" value="Library" />
+    <preference name="SplashShowOnlyFirstTime" value="false" />
     <feature name="StatusBar">
         <param name="ios-package" onload="true" value="CDVStatusBar" />
     </feature>
@@ -48,6 +52,7 @@
         <icon height="29" src="resources/ios/icon/icon-small.png" width="29" />
         <icon height="58" src="resources/ios/icon/icon-small@2x.png" width="58" />
         <icon height="87" src="resources/ios/icon/icon-small@3x.png" width="87" />
+        <icon height="1024" src="resources/ios/icon/icon-1024.png" width="1024" />
         <splash height="1136" src="resources/ios/splash/Default-568h@2x~iphone.png" width="640" />
         <splash height="1334" src="resources/ios/splash/Default-667h.png" width="750" />
         <splash height="2208" src="resources/ios/splash/Default-736h.png" width="1242" />
@@ -58,16 +63,9 @@
         <splash height="1024" src="resources/ios/splash/Default-Portrait~ipad.png" width="768" />
         <splash height="960" src="resources/ios/splash/Default@2x~iphone.png" width="640" />
         <splash height="480" src="resources/ios/splash/Default~iphone.png" width="320" />
-        <icon height="1024" src="resources/ios/icon/icon-1024.png" width="1024" />
         <splash height="2048" src="resources/ios/splash/Default-Landscape@~ipadpro.png" width="2732" />
         <splash height="2732" src="resources/ios/splash/Default-Portrait@~ipadpro.png" width="2048" />
         <splash height="2732" src="resources/ios/splash/Default@2x~universal~anyany.png" width="2732" />
-        <custom-config-file parent="NSLocationAlwaysUsageDescription" platform="ios" target="*-Info.plist">
-            <string>O AMPEB App precisa de permissão para acessar a sua localização para exibir a localização dos convênios.</string>
-        </custom-config-file>
-        <custom-config-file parent="NSLocationWhenInUseUsageDescription" platform="ios" target="*-Info.plist">
-            <string>O AMPEB App precisa de permissão para acessar a sua localização para exibir a localização dos convênios.</string>
-        </custom-config-file>
     </platform>
     <platform name="android">
         <icon density="ldpi" src="resources/android/icon/drawable-ldpi-icon.png" />
@@ -92,13 +90,12 @@
     <edit-config file="*-Info.plist" mode="merge" target="NSLocationWhenInUseUsageDescription">
         <string>O AMPEB App precisa de permissão para acessar a sua localização para exibir a localização dos convênios.</string>
     </edit-config>
+    <edit-config file="*-Info.plist" mode="merge" target="NSLocationAlwaysAndWhenInUseUsageDescription">
+        <string>O AMPEB App precisa de permissão para acessar a sua localização para exibir a localização dos convênios.</string>
+    </edit-config>
     <icon src="resources/android/icon/drawable-xhdpi-icon.png" />
-    <allow-navigation href="http://192.168.0.14:8100" />
-    <preference name="SplashShowOnlyFirstTime" value="false" />
-    <allow-navigation href="http://192.168.56.1:8100" />
-    <allow-navigation href="http://169.254.222.163:8100" />
     <engine name="ios" spec="~4.5.4" />
-    <engine name="android" spec="~6.2.3" />
+    <engine name="android" spec="~6.3.0" />
     <plugin name="cordova-plugin-actionsheet" spec="~2.3.3" />
     <plugin name="cordova-plugin-camera" spec="~2.4.0" />
     <plugin name="cordova-plugin-device" spec="~1.1.5" />
@@ -125,4 +122,10 @@
     <plugin name="cordova.plugins.diagnostic" spec="^4.0.8" />
     <plugin name="cordova-open-native-settings" spec="^1.5.1" />
     <plugin name="cordova-custom-config" spec="^5.0.2" />
+    <plugin name="cordova-plugin-googlemaps" spec="^2.3.11">
+        <variable name="API_KEY_FOR_ANDROID" value="AIzaSyAG1PV-6fyvhTs-_l2Ddv2DX8p35dn-WZA" />
+        <variable name="API_KEY_FOR_IOS" value="AIzaSyAG1PV-6fyvhTs-_l2Ddv2DX8p35dn-WZA" />
+        <variable name="LOCATION_WHEN_IN_USE_DESCRIPTION" value="This app wants to get your location while this app runs only." />
+        <variable name="LOCATION_ALWAYS_USAGE_DESCRIPTION" value="This app wants to get your location always, even this app runs in background." />
+    </plugin>
 </widget>
