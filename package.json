@@ -3,14 +3,17 @@
   "version": "1.1.1",
   "description": "AmpebApp: An Ionic project",
   "dependencies": {
+    "cordova-android": "~6.3.0",
     "cordova-custom-config": "^5.0.2",
     "cordova-ios": "~4.5.4",
     "cordova-open-native-settings": "^1.5.1",
     "cordova-plugin-actionsheet": "~2.3.3",
+    "cordova-plugin-android-permissions": "^1.0.0",
     "cordova-plugin-camera": "~2.4.0",
     "cordova-plugin-compat": "~1.1.0",
     "cordova-plugin-device": "~1.1.5",
     "cordova-plugin-file": "~4.3.2",
+    "cordova-plugin-file-opener2": "git+https://github.com/pwlin/cordova-plugin-file-opener2.git",
     "cordova-plugin-file-transfer": "~1.6.2",
     "cordova-plugin-geolocation": "^2.4.3",
     "cordova-plugin-googlemaps": "^2.3.11",
@@ -33,8 +36,7 @@
     "ionic-plugin-keyboard": "~2.2.1",
     "minimist": "^1.2.0",
     "onesignal-cordova-plugin": "~2.1.2",
-    "xml2js": "^0.4.19",
-    "cordova-android": "~6.3.0"
+    "xml2js": "^0.4.19"
   },
   "devDependencies": {
     "@ionic/cli-plugin-cordova": "1.6.2",
@@ -94,7 +96,9 @@
         "API_KEY_FOR_IOS": "AIzaSyAG1PV-6fyvhTs-_l2Ddv2DX8p35dn-WZA",
         "LOCATION_WHEN_IN_USE_DESCRIPTION": "This app wants to get your location while this app runs only.",
         "LOCATION_ALWAYS_USAGE_DESCRIPTION": "This app wants to get your location always, even this app runs in background."
-      }
+      },
+      "cordova-plugin-file-opener2": {},
+      "cordova-plugin-android-permissions": {}
     },
     "platforms": [
       "ios",

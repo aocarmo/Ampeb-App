@@ -3154,12 +3154,12 @@
                 function ($scope, $stateParams) {
 
 
-        }]).controller('emissODeDocumentosCtrl', ['$scope', '$stateParams', '$cordovaNetwork','LOCAL_STORAGE','$ionicLoading','$ionicPopup','$ionicHistory','getListaDocumentosAssociado','getDocumentoAssociado', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+        }]).controller('emissODeDocumentosCtrl', ['$scope', '$stateParams', '$cordovaNetwork','LOCAL_STORAGE','$ionicLoading','$ionicPopup','$ionicHistory','getListaDocumentosAssociado','getDocumentoAssociado','$cordovaFileOpener2','$cordovaFileTransfer', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
                     // You can include any angular dependencies as parameters for this function
                     // TIP: Access Route Parameters for your page via $stateParams.parameterName
-            function ($scope, $stateParams, $cordovaNetwork, LOCAL_STORAGE,$ionicLoading, $ionicPopup, $ionicHistory, getListaDocumentosAssociado, getDocumentoAssociado) {
+            function ($scope, $stateParams, $cordovaNetwork, LOCAL_STORAGE,$ionicLoading, $ionicPopup, $ionicHistory, getListaDocumentosAssociado, getDocumentoAssociado,$cordovaFileOpener2,$cordovaFileTransfer) {
 
-                $scope.listaDocumentos = {};
+                 /*$scope.listaDocumentos = {};
                 $scope.$on('$ionicView.beforeEnter', function () {
 
                     $scope.dadosUsuario = JSON.parse(window.localStorage.getItem(LOCAL_STORAGE.local_dados_key));
@@ -3219,10 +3219,128 @@
                     
                     }
                      
+                };*/
+                $scope.listaDocumentos = {};
+                var currentPlatform = ionic.Platform.platform();  
+                $scope.downloadProgress ="";
+                $scope.$on('$ionicView.beforeEnter', function () {
+                 
+                    $scope.dadosUsuario = JSON.parse(window.localStorage.getItem(LOCAL_STORAGE.local_dados_key));
+                    var data = {
+                        cpf: $scope.dadosUsuario.cpf                    
+                    }   
+
+                    if ($cordovaNetwork.isOnline()) {
+    
+                        $ionicLoading.show().then(function () {
+                            getListaDocumentosAssociado.obter(data).then(function (listaDocumentos) {    
+                                $scope.listaDocumentos = listaDocumentos.data.data;                                          
+                            }).finally(function () {
+                                $ionicLoading.hide();
+                            });    
+                        });
+                        
+                    }else {
+                        var alertPopup = $ionicPopup.alert({
+                            title: 'Sem conexão com a internet',
+                            template: 'Por favor, conecte seu dispositivo a uma rede WIFI ou dados móveis.',
+                            okText: 'Ok',
+                            okType: 'button-assertive',
+                        });
+        
+                        alertPopup.then(function (res) {
+                            $backView = $ionicHistory.backView();
+                            $backView.go();
+                        });
+                    }
+                });     
+
+                
+                $scope.exibirDocumento = function (tipoDocumento, idDocumento,url) {
+                  //Se documento for gerado
+                    if(tipoDocumento == 'geracao'){
+                       
+                        var data = {
+                            cpf: $scope.dadosUsuario.cpf,
+                            id: idDocumento                 
+                        } 
+                        
+                        $ionicLoading.show({ template: '<ion-spinner icon="spiral" class="spinner-assertive"></ion-spinner> <br/> Download 0%' }).then(function () {
+                            
+                            getDocumentoAssociado.obter(data).then(function (retorno) {                                                                 
+                             
+                                $scope.abrirPDF(retorno.data.data[0].url).finally(function () {
+                                    $ionicLoading.hide();
+                                }); 
+
+                            }).finally(function () {
+                                  
+                            });    
+                        });
+
+                    }else if(tipoDocumento == 'anexo'){     
+                        
+                        
+                        $scope.abrirPDF(url);
+                    
+                    }
+                     
+                };
+
+                $scope.abrirPDF = function (url) {
+                  
+                    var filename = url.split("/").pop();    
+                    let filePath = "";
+                    //Caso seja IOS uso fileOpner
+                    if(currentPlatform == 'ios'){
+
+                        filePath = cordova.file.cacheDirectory + 'pdf/' + filename;       
+                        $cordovaFileTransfer.download(url, filePath, {}, true).then(function (result) {
+                        
+                            $cordovaFileOpener2.open(filePath).then(function(data) {                                
+                                console.log(JSON.stringify(data));
+                                $ionicLoading.hide();
+                            }, function() {
+                                console.log(JSON.stringify(err));       
+                                $ionicLoading.hide();                         
+                            });  
+                        
+                            }, function (error) {                                  
+                        
+                            }, function (progress) {
+                                $scope.downloadProgress = (progress.loaded / progress.total) * 100;       
+                                $ionicLoading.show({template: '<ion-spinner icon="spiral" class="spinner-assertive"></ion-spinner> <br/> Download '+ Math.round($scope.downloadProgress)+'%'});                                                                
+                            });  
+                    }else{
+                        //Caso seja Android
+                        filePath = cordova.file.externalDataDirectory + 'pdf/' + filename;        
+                        $cordovaFileTransfer.download(url, filePath, {}, true).then(function (result) {
+
+                            $ionicLoading.hide();                           
+                            window.resolveLocalFileSystemURL(filePath, function (entry) {
+                                cordova.plugins.fileOpener2.open(entry.toURL(),'application/pdf', {
+                                    error: function (e) {
+                                        console.log('Error status: ' + e.status + ' - Error message: ' + e.message);
+                                    },
+                                    success: function () {
+                                        console.log('file opened successfully');
+                                    }
+                                });
+                            }, function (e) {
+                                console.log('File Not Found');
+                            });
+                            // cordova.InAppBrowser.open(window.resolveLocalFileSystemURL(filePath), "_system", "location=no,toolbar=no,hardwareback=yes");   
+                        
+                            }, function (error) {                                  
+                                $ionicLoading.hide();
+                        }, function (progress) {
+                            $scope.downloadProgress = (progress.loaded / progress.total) * 100;     
+                            $ionicLoading.show({template: '<ion-spinner icon="spiral" class="spinner-assertive"></ion-spinner> <br/> Download '+ Math.round($scope.downloadProgress)+'%'});                                 
+                        });        
+                    }  
                 };
                
             
-
         }]).controller('homeCtrl', ['$scope', '$stateParams', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
                         // You can include any angular dependencies as parameters for this function
                         // TIP: Access Route Parameters for your page via $stateParams.parameterName
