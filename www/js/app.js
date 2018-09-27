@@ -209,7 +209,7 @@ angular.module('app', ['ionic', 'app.controllers', 'app.routes', 'app.directives
 
 
       //Iniciando a solicitação de permissão para acessar a localização
-      var currentPlatform = ionic.Platform.platform();  
+    /*  var currentPlatform = ionic.Platform.platform();  
       if(currentPlatform == 'ios'){
 
           cordova.plugins.diagnostic.requestLocationAuthorization(function(status){
@@ -266,6 +266,8 @@ angular.module('app', ['ionic', 'app.controllers', 'app.routes', 'app.directives
                       });                       
                     }
                   });
+
+
                   
                   break;
                            
@@ -273,7 +275,7 @@ angular.module('app', ['ionic', 'app.controllers', 'app.routes', 'app.directives
         }, function(error){
            
         });
-      }
+      }*/
     //Fim solicitação de permissão para acessar a localização
 
     });

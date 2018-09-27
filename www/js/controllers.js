@@ -845,76 +845,89 @@
 
 
             $scope.verificarPermissoesAcessoLocalizacao = function () {
+                 
                 if(currentPlatform == 'ios'){
 
                     cordova.plugins.diagnostic.getLocationAuthorizationStatus(function(status){
-                      switch(status){              
-                            case cordova.plugins.diagnostic.permissionStatus.GRANTED:
-                               $scope.exibirConvenio();                            
-                                break;
-                            case cordova.plugins.diagnostic.permissionStatus.DENIED:
-                            
-                                var confirmPopup = $ionicPopup.confirm({
-                                title: 'O AMPEB App precisa acessar a sua localização, para exibir convênios próximos.',
-                                template: 'Deseja conceder permissão?'
-                                });
-                            
-                                confirmPopup.then(function(res){
-                                if(res){
-            
-                                    if (window.cordova && window.cordova.plugins.settings) {                      
-                                        window.cordova.plugins.settings.open("location", function(data) {
-                                          
-                                        }, function (err) {
-                                            
-                                        });
+
+                        if(status == cordova.plugins.diagnostic.permissionStatus.GRANTED || status == cordova.plugins.diagnostic.permissionStatus.GRANTED_WHEN_IN_USE){
+                            $scope.exibirConvenio();
+                        }else{
+
+                            cordova.plugins.diagnostic.requestLocationAuthorization(function(status){
+                                switch(status){              
+                                    case cordova.plugins.diagnostic.permissionStatus.DENIED:
                                     
-                                    }
-                                } else {                      
-                                    var alertPopup = $ionicPopup.alert({
-                                        title: 'Não será possível exibir os convênios próximos.',                       
-                                    });                      
+                                      var confirmPopup = $ionicPopup.confirm({
+                                        title: 'O AMPEB App precisa acessar a sua localização, para exibir convênios próximos.',
+                                        template: 'Deseja conceder permissão?'
+                                      });
+                                  
+                                      confirmPopup.then(function(res){
+                                        if(res){
+                    
+                                          if (window.cordova && window.cordova.plugins.settings) {                      
+                                            window.cordova.plugins.settings.open("location", function() {}, function () {});
+                                          }
+                                        } else {                      
+                                          var alertPopup = $ionicPopup.alert({
+                                            title: 'Não será possível exibir os convênios próximos.',                       
+                                          });                      
+                                        }
+                                      });
+                                        
+                                    break;            
                                 }
-                                });
-                                
-                                break;            
-                      }
+                              }, function(error){
+                                 
+                              }, cordova.plugins.diagnostic.locationAuthorizationMode.ALWAYS);                      
+                           
+                        }
+                     
                     }, function(error){
                        
                     }, cordova.plugins.diagnostic.locationAuthorizationMode.ALWAYS);
           
                 }else if(currentPlatform == 'android'){
-          
-                  cordova.plugins.diagnostic.getLocationAuthorizationStatus(function(status){
-                      switch(status){
-                            case cordova.plugins.diagnostic.permissionStatus.GRANTED:
-                                $scope.exibirConvenio();
-                                break;
-                            case cordova.plugins.diagnostic.permissionStatus.DENIED:
-                                                
-                                var confirmPopup = $ionicPopup.confirm({
-                                title: 'O AMPEB App precisa acessar a sua localização, para exibir convênios próximos.',
-                                template: 'Deseja conceder permissão?'
-                                });
-                            
-                                confirmPopup.then(function(res) {
-                                if(res) {
-            
-                                    if (window.cordova && window.cordova.plugins.settings) {                                        
-                                        window.cordova.plugins.settings.open("location", function() {},function () {});
-                                    } 
+
                                  
-                                } else {                      
-                                    var alertPopup = $ionicPopup.alert({
-                                    title: 'Não será possível exibir os convênios próximos.',
-                                    template: 'It might taste good'
-                                    });                       
-                                }
-                                });
+                  cordova.plugins.diagnostic.getLocationAuthorizationStatus(function(status){
+                    
+                    if(status == cordova.plugins.diagnostic.permissionStatus.GRANTED){
+                    
+                            $scope.exibirConvenio();                    
+                       
+                    }else{
+
+                        cordova.plugins.diagnostic.requestLocationAuthorization(function(status){
+                            switch(status){              
+                                case cordova.plugins.diagnostic.permissionStatus.DENIED:
                                 
-                                break;
-                                     
-                      }
+                                  var confirmPopup = $ionicPopup.confirm({
+                                    title: 'O AMPEB App precisa acessar a sua localização, para exibir convênios próximos.',
+                                    template: 'Deseja conceder permissão?'
+                                  });
+                              
+                                  confirmPopup.then(function(res){
+                                    if(res){
+                
+                                      if (window.cordova && window.cordova.plugins.settings) {                      
+                                        window.cordova.plugins.settings.open("location", function() {}, function () {});
+                                      }
+                                    } else {                      
+                                      var alertPopup = $ionicPopup.alert({
+                                        title: 'Não será possível exibir os convênios próximos.',                       
+                                      });                      
+                                    }
+                                  });
+                                    
+                                break;            
+                            }
+                          }, function(error){
+                             
+                          });     
+                    }
+                   
                   }, function(error){
                      
                   });
@@ -941,7 +954,7 @@
                     conveniosFactory.selectConvenio(null, null, null, $stateParams.id).then(function (dados) {
 
                         $scope.convenios = dados;                         
-                        var posOptions = { timeout: 10000, enableHighAccuracy: false };
+                        var posOptions = { timeout: 10000, enableHighAccuracy: true };
 
                         $cordovaGeolocation.getCurrentPosition(posOptions).then(function (position) {
                            
@@ -3385,10 +3398,10 @@
                     });
                 }
 
-        }]).controller('conveniosProximosCtrl', ['$scope', '$stateParams', '$cordovaGeolocation', '$cordovaNetwork','WEB_METODOS','$ionicLoading','$ionicPopup','$ionicHistory','getConveniosProximos','$rootScope', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+        }]).controller('conveniosProximosCtrl', ['$scope', '$stateParams', '$cordovaGeolocation', '$cordovaNetwork','WEB_METODOS','$ionicLoading','$ionicPopup','$ionicHistory','getConveniosProximos','$rootScope','$ionicPlatform', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
             // You can include any angular dependencies as parameters for this function
             // TIP: Access Route Parameters for your page via $stateParams.parameterName
-            function ($scope, $stateParams, $cordovaGeolocation, $cordovaNetwork, WEB_METODOS, $ionicLoading, $ionicPopup, $ionicHistory,getConveniosProximos ,$rootScope) {
+            function ($scope, $stateParams, $cordovaGeolocation, $cordovaNetwork, WEB_METODOS, $ionicLoading, $ionicPopup, $ionicHistory,getConveniosProximos ,$rootScope,  $ionicPlatform) {
                 
                 $rootScope.side_menu.style.visibility = "hidden";
                 var currentPlatform = ionic.Platform.platform();  
@@ -3400,76 +3413,90 @@
 
 
                 $scope.verificarPermissoesAcessoLocalizacao = function () {
+                 
                     if(currentPlatform == 'ios'){
 
                         cordova.plugins.diagnostic.getLocationAuthorizationStatus(function(status){
-                          switch(status){              
-                                case cordova.plugins.diagnostic.permissionStatus.GRANTED:
-                                    $scope.exibirConveniosProximos();
-                                    break;
-                                case cordova.plugins.diagnostic.permissionStatus.DENIED:
-                                
-                                    var confirmPopup = $ionicPopup.confirm({
-                                    title: 'O AMPEB App precisa acessar a sua localização, para exibir convênios próximos.',
-                                    template: 'Deseja conceder permissão?'
-                                    });
-                                
-                                    confirmPopup.then(function(res){
-                                    if(res){
-                
-                                        if (window.cordova && window.cordova.plugins.settings) {                      
-                                            window.cordova.plugins.settings.open("location", function(data) {
-                                              
-                                            }, function (err) {
-                                                
-                                            });
+
+                            if(status == cordova.plugins.diagnostic.permissionStatus.GRANTED || status == cordova.plugins.diagnostic.permissionStatus.GRANTED_WHEN_IN_USE){
+                                $scope.exibirConveniosProximos();
+                            }else{
+
+                                cordova.plugins.diagnostic.requestLocationAuthorization(function(status){
+                                    switch(status){              
+                                        case cordova.plugins.diagnostic.permissionStatus.DENIED:
                                         
-                                        }
-                                    } else {                      
-                                        var alertPopup = $ionicPopup.alert({
-                                            title: 'Não será possível exibir os convênios próximos.',                       
-                                        });                      
+                                          var confirmPopup = $ionicPopup.confirm({
+                                            title: 'O AMPEB App precisa acessar a sua localização, para exibir convênios próximos.',
+                                            template: 'Deseja conceder permissão?'
+                                          });
+                                      
+                                          confirmPopup.then(function(res){
+                                            if(res){
+                        
+                                              if (window.cordova && window.cordova.plugins.settings) {                      
+                                                window.cordova.plugins.settings.open("location", function() {}, function () {});
+                                              }
+                                            } else {                      
+                                              var alertPopup = $ionicPopup.alert({
+                                                title: 'Não será possível exibir os convênios próximos.',                       
+                                              });                      
+                                            }
+                                          });
+                                            
+                                        break;            
                                     }
-                                    });
-                                    
-                                    break;            
-                          }
+                                  }, function(error){
+                                     
+                                  }, cordova.plugins.diagnostic.locationAuthorizationMode.ALWAYS);                      
+                               
+                            }
+                         
                         }, function(error){
                            
                         }, cordova.plugins.diagnostic.locationAuthorizationMode.ALWAYS);
               
                     }else if(currentPlatform == 'android'){
-              
-                      cordova.plugins.diagnostic.getLocationAuthorizationStatus(function(status){
-                          switch(status){
-                                case cordova.plugins.diagnostic.permissionStatus.GRANTED:
-                                    $scope.exibirConveniosProximos();
-                                    break;
-                                case cordova.plugins.diagnostic.permissionStatus.DENIED:
-                                                    
-                                    var confirmPopup = $ionicPopup.confirm({
-                                    title: 'O AMPEB App precisa acessar a sua localização, para exibir convênios próximos.',
-                                    template: 'Deseja conceder permissão?'
-                                    });
-                                
-                                    confirmPopup.then(function(res) {
-                                    if(res) {
-                
-                                        if (window.cordova && window.cordova.plugins.settings) {                                        
-                                            window.cordova.plugins.settings.open("location", function() {},function () {});
-                                        } 
+
                                      
-                                    } else {                      
-                                        var alertPopup = $ionicPopup.alert({
-                                        title: 'Não será possível exibir os convênios próximos.',
-                                        template: 'It might taste good'
-                                        });                       
-                                    }
-                                    });
+                      cordova.plugins.diagnostic.getLocationAuthorizationStatus(function(status){
+                        
+                        if(status == cordova.plugins.diagnostic.permissionStatus.GRANTED){
+                            $ionicPlatform.ready(function() {
+                                $scope.exibirConveniosProximos();
+                            });
+                           
+                        }else{
+
+                            cordova.plugins.diagnostic.requestLocationAuthorization(function(status){
+                                switch(status){              
+                                    case cordova.plugins.diagnostic.permissionStatus.DENIED:
                                     
-                                    break;
-                                         
-                          }
+                                      var confirmPopup = $ionicPopup.confirm({
+                                        title: 'O AMPEB App precisa acessar a sua localização, para exibir convênios próximos.',
+                                        template: 'Deseja conceder permissão?'
+                                      });
+                                  
+                                      confirmPopup.then(function(res){
+                                        if(res){
+                    
+                                          if (window.cordova && window.cordova.plugins.settings) {                      
+                                            window.cordova.plugins.settings.open("location", function() {}, function () {});
+                                          }
+                                        } else {                      
+                                          var alertPopup = $ionicPopup.alert({
+                                            title: 'Não será possível exibir os convênios próximos.',                       
+                                          });                      
+                                        }
+                                      });
+                                        
+                                    break;            
+                                }
+                              }, function(error){
+                                 
+                              });     
+                        }
+                       
                       }, function(error){
                          
                       });
@@ -3478,136 +3505,66 @@
                 $scope.exibirConveniosProximos = function () {
 
                     if ($cordovaNetwork.isOnline()) {
-    
-                        var posOptions = { timeout: 10000, enableHighAccuracy: false };
-                        $cordovaGeolocation
-                            .getCurrentPosition(posOptions)
-                            .then(function (position) {
-        
-                                var lat = position.coords.latitude
-                                var lon = position.coords.longitude
-        
-                                var data = {
-                                    raio: $stateParams.raio,
-                                    latitude: lat,
-                                    longitude:lon      
-                                }                          
-        
-                                $ionicLoading.show().then(function () {
-    
-                                    getConveniosProximos.obter(data).then(function (listaEstabelecimentosProximos) {   
-                                        
-                                        var estabelecimentosFormatados = [];                                       
-                                    
-                                        for (var i = 0; i < listaEstabelecimentosProximos.data.data.length; i++) {
-                                            
-                                            let informacoesEstabelecimentoBalaoMapa = '<div style="width: 250px; max-height:300px;"><table style="padding-top: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px;"><tr style="padding-top: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px;"><td><img align="center" style="vertical-align: middle;width: 70px;height: 70px;border-radius: 100%;" src="' + WEB_METODOS.urlImagemConvenio + listaEstabelecimentosProximos.data.data[i].imagem_convenio + '"></td><td>&nbsp;</td>' 
-                                            + '<td><span><h5>' + listaEstabelecimentosProximos.data.data[i].nome_convenio + '</h5></span>';
-                                            if (listaEstabelecimentosProximos.data.data[i].descricao_desconto != "" && listaEstabelecimentosProximos.data.data[i].descricao_desconto != null) {
-                                                // informacoesEstabelecimentoBalaoMapa += '<h3>Email<h3><br>'; 
-                                                informacoesEstabelecimentoBalaoMapa += '<span><b>' + listaEstabelecimentosProximos.data.data[i].descricao_desconto + '</b></span><br>';
-                                                }
-                                                informacoesEstabelecimentoBalaoMapa +=  '<span>'  + listaEstabelecimentosProximos.data.data[i].endereco + '</span><br>' + '<span>' +listaEstabelecimentosProximos.data.data[i].nome_municipio + '/' + listaEstabelecimentosProximos.data.data[i].sigla_estado +'</span><br>';
 
-                                        
-                                            if (listaEstabelecimentosProximos.data.data[i].telefones != "" && listaEstabelecimentosProximos.data.data[i].telefones != null) {
-                                                informacoesEstabelecimentoBalaoMapa += '<span>' + listaEstabelecimentosProximos.data.data[i].telefones + '</span><br>';
-                                            }
-
-                                            informacoesEstabelecimentoBalaoMapa += '<a onclick="window.open(this.href, \'_system\'); return false;" style="color: blue;" href="https://www.google.com/maps/dir/?api=1&origin='+lat+','+lon+'&destination='+listaEstabelecimentosProximos.data.data[i].latitude+','+listaEstabelecimentosProximos.data.data[i].longitude+'">Visualize no Google Maps</a>';
-                                            //informacoesEstabelecimentoBalaoMapa += '<a style="color: blue;" ng-click="maps(\'https://www.google.com\')">Visualize no Google Maps</a>';
-                                            informacoesEstabelecimentoBalaoMapa += "</td></tr></table>";    
-
-                                          var  estabelecimento =  {'position': {'lat': listaEstabelecimentosProximos.data.data[i].latitude, 'lng':listaEstabelecimentosProximos.data.data[i].longitude}, 
-                                                                    'informacoesEstabelecimentoBalaoMapa': informacoesEstabelecimentoBalaoMapa
-                                                                    };                                     
-                                          estabelecimentosFormatados.push(estabelecimento);
-                                        }
-                                   
-                                        $scope.gerarMapa(lat,lon, estabelecimentosFormatados);
-                                        
-                                      /*  let latLng = new google.maps.LatLng(lat, lon);
-        
-                                        let mapOptions = {
-                                            center: latLng,
-                                            zoom: 11,
-                                            scrollwheel: false,
-                                            mapTypeId: google.maps.MapTypeId.ROADMAP,
-                                            mapTypeControl: false,
-                                            zoomControl: false,
-                                            streetViewControl: false
-                                        }
-    
-                                        let mapa = new google.maps.Map(document.getElementById("map"), mapOptions);
+                        $ionicLoading.show().then(function () {
                     
-                                        new google.maps.Marker({
-                                            map: mapa,
-                                            animation: google.maps.Animation.DROP,
-                                            position: new google.maps.LatLng(lat, lon)
-                                        });
-                                       
-                                        if( listaEstabelecimentosProximos.data.result){
-                                            var infowindow = new google.maps.InfoWindow({});
-                                            var contentString = [];
-                                              // add markers to map by hotel
-                                            for (let i = 0; i < listaEstabelecimentosProximos.data.data.length; i++) {
-    
-                                                let informacoesEstabelecimentoBalaoMapa = '<div style="width: 250px; height:180px;"><table style="padding-top: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px;"><tr style="padding-top: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px;"><td><img align="center" style="vertical-align: middle;width: 70px;height: 70px;border-radius: 100%;" src="' + WEB_METODOS.urlImagemConvenio + listaEstabelecimentosProximos.data.data[i].imagem_convenio + '"></td><td>&nbsp;</td>' 
-                                                + '<td><span><h4>' + listaEstabelecimentosProximos.data.data[i].nome_convenio + '</h4></span>';
+                            var posOptions = { timeout: 10000, enableHighAccuracy: true };
+                            $cordovaGeolocation
+                                .getCurrentPosition(posOptions)
+                                .then(function (position) {
+                                
+                                    var lat = position.coords.latitude
+                                    var lon = position.coords.longitude
+            
+                                    var data = {
+                                        raio: $stateParams.raio,
+                                        latitude: lat,
+                                        longitude:lon      
+                                    }                          
+        
+                                        getConveniosProximos.obter(data).then(function (listaEstabelecimentosProximos) {   
+                                            
+                                            var estabelecimentosFormatados = [];                                       
+                                        
+                                            for (var i = 0; i < listaEstabelecimentosProximos.data.data.length; i++) {
+                                                
+                                                let informacoesEstabelecimentoBalaoMapa = '<div style="width: 250px; max-height:300px;"><table style="padding-top: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px;"><tr style="padding-top: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px;"><td><img align="center" style="vertical-align: middle;width: 70px;height: 70px;border-radius: 100%;" src="' + WEB_METODOS.urlImagemConvenio + listaEstabelecimentosProximos.data.data[i].imagem_convenio + '"></td><td>&nbsp;</td>' 
+                                                + '<td><span><h5>' + listaEstabelecimentosProximos.data.data[i].nome_convenio + '</h5></span>';
                                                 if (listaEstabelecimentosProximos.data.data[i].descricao_desconto != "" && listaEstabelecimentosProximos.data.data[i].descricao_desconto != null) {
                                                     // informacoesEstabelecimentoBalaoMapa += '<h3>Email<h3><br>'; 
                                                     informacoesEstabelecimentoBalaoMapa += '<span><b>' + listaEstabelecimentosProximos.data.data[i].descricao_desconto + '</b></span><br>';
-                                                   }
-                                                   informacoesEstabelecimentoBalaoMapa +=  '<span>'  + listaEstabelecimentosProximos.data.data[i].endereco + '</span><br>' + '<span>' +listaEstabelecimentosProximos.data.data[i].nome_municipio + '/' + listaEstabelecimentosProximos.data.data[i].sigla_estado +'</span><br>';
-    
-                                         
+                                                    }
+                                                    informacoesEstabelecimentoBalaoMapa +=  '<span>'  + listaEstabelecimentosProximos.data.data[i].endereco + '</span><br>' + '<span>' +listaEstabelecimentosProximos.data.data[i].nome_municipio + '/' + listaEstabelecimentosProximos.data.data[i].sigla_estado +'</span><br>';
+
+                                            
                                                 if (listaEstabelecimentosProximos.data.data[i].telefones != "" && listaEstabelecimentosProximos.data.data[i].telefones != null) {
-                                                 informacoesEstabelecimentoBalaoMapa += '<span>' + listaEstabelecimentosProximos.data.data[i].telefones + '</span><br>';
+                                                    informacoesEstabelecimentoBalaoMapa += '<span>' + listaEstabelecimentosProximos.data.data[i].telefones + '</span><br>';
                                                 }
-                                               
-                                                informacoesEstabelecimentoBalaoMapa += '<a style="color: blue;" href="https://www.google.com/maps/dir/?api=1&origin='+lat+','+lon+'&destination='+listaEstabelecimentosProximos.data.data[i].latitude+','+listaEstabelecimentosProximos.data.data[i].longitude+'" target="_system">Visualize no Google Maps</a>';
+
+                                                informacoesEstabelecimentoBalaoMapa += '<a onclick="window.open(this.href, \'_system\'); return false;" style="color: blue;" href="https://www.google.com/maps/dir/?api=1&origin='+lat+','+lon+'&destination='+listaEstabelecimentosProximos.data.data[i].latitude+','+listaEstabelecimentosProximos.data.data[i].longitude+'">Visualize no Google Maps</a>';
                                                 //informacoesEstabelecimentoBalaoMapa += '<a style="color: blue;" ng-click="maps(\'https://www.google.com\')">Visualize no Google Maps</a>';
                                                 informacoesEstabelecimentoBalaoMapa += "</td></tr></table>";    
-    
-                                                contentString.push(informacoesEstabelecimentoBalaoMapa);                                      
-                                                
-                                        
-                                                var marker = new google.maps.Marker({
-                                                map: mapa,
-                                                animation: google.maps.Animation.DROP,
-                                                position: new google.maps.LatLng(listaEstabelecimentosProximos.data.data[i].latitude, listaEstabelecimentosProximos.data.data[i].longitude),
-                                               
-                                                });
-                                        
-                                                google.maps.event.addListener(marker, 'click', function () {
-                                                    infowindow.close(); // Close previously opened infowindow
-                                                    infowindow.setContent(contentString[i]);
-                                                    infowindow.open(mapa, this);
-                                                });
-                                        
-                                            }                                              
-                                     
-                                   
-                                        }else{
-    
-                                        } */                                     
-        
-                                    }).catch(function (err) {
-                                        console.log(JSON.stringify(err));
-                                    })
-                                    .finally(function () {
-                                        $ionicLoading.hide();
-                                    });    
-                                });
-                                // refresh map
-                              /*  setTimeout(() => {
-                                    google.maps.event.trigger(mapa, 'resize');
-                                }, 300);*/
-        
-                            }, function (err) {
-                                // error
-                            });
 
+                                            var  estabelecimento =  {'position': {'lat': listaEstabelecimentosProximos.data.data[i].latitude, 'lng':listaEstabelecimentosProximos.data.data[i].longitude}, 
+                                                                        'informacoesEstabelecimentoBalaoMapa': informacoesEstabelecimentoBalaoMapa
+                                                                        };                                     
+                                            estabelecimentosFormatados.push(estabelecimento);
+                                            }
+                                    
+                                            $scope.gerarMapa(lat,lon, estabelecimentosFormatados);
+                                            
+                                        }).catch(function (err) {
+                                            console.log(JSON.stringify(err));
+                                        })
+                                        .finally(function () {
+                                            $ionicLoading.hide();
+                                        });                          
+            
+                                }, function (err) {
+                                    // error
+                                    alert(err);
+                                });
+                        }); 
                                //Abrir o pdf com o google.
                                 $scope.maps = function (url) {
                               
