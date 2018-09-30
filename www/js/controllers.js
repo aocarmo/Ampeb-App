@@ -837,6 +837,7 @@
         function ($scope, $stateParams, $ionicLoading, conveniosFactory, LOCAL_STORAGE, $cordovaGeolocation,$ionicPopup,$cordovaNetwork,$rootScope) {
 
             $rootScope.side_menu.style.visibility = "hidden";
+            $scope.exibirMapa = false;
             var currentPlatform = ionic.Platform.platform();  
                  
             $scope.$on('$ionicView.beforeEnter', function () {    
@@ -850,39 +851,61 @@
 
                     cordova.plugins.diagnostic.getLocationAuthorizationStatus(function(status){
 
-                        if(status == cordova.plugins.diagnostic.permissionStatus.GRANTED || status == cordova.plugins.diagnostic.permissionStatus.GRANTED_WHEN_IN_USE){
-                            $scope.exibirConvenio();
-                        }else{
-
+                        if(status == cordova.plugins.diagnostic.permissionStatus.GRANTED || status == cordova.plugins.diagnostic.permissionStatus.GRANTED_WHEN_IN_USE){                          
+                              //Verifica se a localizaçao está ativada
+                            cordova.plugins.diagnostic.isLocationEnabled(function(enabled){
+                        
+                                if(enabled){
+                                    $scope.exibirConvenio(true);                                  
+                                }else{                                  
+                                    $scope.exibirConvenio(false);
+                                }
+                            }, function(error){
+                                console.error("The following error occurred: "+error);
+                            });
+                        }
+                        else if(status == cordova.plugins.diagnostic.permissionStatus.NOT_REQUESTED){    
+                            
                             cordova.plugins.diagnostic.requestLocationAuthorization(function(status){
                                 switch(status){              
+                                    case cordova.plugins.diagnostic.permissionStatus.NOT_REQUESTED:
+                                        $scope.exibirConvenio(false);
+                                        break;
                                     case cordova.plugins.diagnostic.permissionStatus.DENIED:
-                                    
-                                      var confirmPopup = $ionicPopup.confirm({
-                                        title: 'O AMPEB App precisa acessar a sua localização, para exibir convênios próximos.',
-                                        template: 'Deseja conceder permissão?'
-                                      });
-                                  
-                                      confirmPopup.then(function(res){
-                                        if(res){
-                    
-                                          if (window.cordova && window.cordova.plugins.settings) {                      
-                                            window.cordova.plugins.settings.open("location", function() {}, function () {});
-                                          }
-                                        } else {                      
-                                          var alertPopup = $ionicPopup.alert({
-                                            title: 'Não será possível exibir os convênios próximos.',                       
-                                          });                      
-                                        }
-                                      });
-                                        
-                                    break;            
+                                        $scope.exibirConvenio(false);
+                                        break;
+                                    case cordova.plugins.diagnostic.permissionStatus.GRANTED:
+                                        //Verifica se a localizaçao está ativada
+                                        cordova.plugins.diagnostic.isLocationEnabled(function(enabled){                                
+                                            if(enabled){
+                                                $scope.exibirConvenio(true);
+                                            }else{
+                                                $scope.exibirConvenio(false);
+                                            }
+                                        }, function(error){
+                                            console.error("The following error occurred: "+error);
+                                        });   
+                                        break;
+                                    case cordova.plugins.diagnostic.permissionStatus.GRANTED_WHEN_IN_USE:
+                                        //Verifica se a localizaçao está ativada
+                                        cordova.plugins.diagnostic.isLocationEnabled(function(enabled){                                
+                                            if(enabled){
+                                                $scope.exibirConvenio(true);
+                                            }else{
+                                                $scope.exibirConvenio(false);
+                                            }
+                                        }, function(error){
+                                            console.error("The following error occurred: "+error);
+                                        });   
+                                        break;       
                                 }
                               }, function(error){
                                  
-                              }, cordova.plugins.diagnostic.locationAuthorizationMode.ALWAYS);                      
-                           
+                              }, cordova.plugins.diagnostic.locationAuthorizationMode.ALWAYS);    
                         }
+                        else if(status == cordova.plugins.diagnostic.permissionStatus.DENIED){    
+                            $scope.exibirConvenio(false);
+                        }                       
                      
                     }, function(error){
                        
@@ -895,37 +918,40 @@
                     
                     if(status == cordova.plugins.diagnostic.permissionStatus.GRANTED){
                     
-                            $scope.exibirConvenio();                    
+                        //Verifica se a localizaçao está ativada
+                        cordova.plugins.diagnostic.isLocationEnabled(function(enabled){
+                    
+                            if(enabled){
+                                $scope.exibirConvenio(true);
+                            }else{
+                                $scope.exibirConvenio(false);
+                            }
+                        }, function(error){
+                            console.error("The following error occurred: "+error);
+                        });                                          
                        
                     }else{
 
                         cordova.plugins.diagnostic.requestLocationAuthorization(function(status){
-                            switch(status){              
-                                case cordova.plugins.diagnostic.permissionStatus.DENIED:
-                                
-                                  var confirmPopup = $ionicPopup.confirm({
-                                    title: 'O AMPEB App precisa acessar a sua localização, para exibir convênios próximos.',
-                                    template: 'Deseja conceder permissão?'
-                                  });
-                              
-                                  confirmPopup.then(function(res){
-                                    if(res){
-                
-                                      if (window.cordova && window.cordova.plugins.settings) {                      
-                                        window.cordova.plugins.settings.open("location", function() {}, function () {});
-                                      }
-                                    } else {                      
-                                      var alertPopup = $ionicPopup.alert({
-                                        title: 'Não será possível exibir os convênios próximos.',                       
-                                      });                      
+
+                            if(status == cordova.plugins.diagnostic.permissionStatus.GRANTED){
+                                //Verifica se a localizaçao está ativada
+                                cordova.plugins.diagnostic.isLocationEnabled(function(enabled){                                
+                                    if(enabled){
+                                        $scope.exibirConvenio(true);
+                                    }else{
+                                        $scope.exibirConvenio(false);
                                     }
-                                  });
-                                    
-                                break;            
+                                }, function(error){
+                                    console.error("The following error occurred: "+error);
+                                });   
+                            }else{
+                                $scope.exibirConvenio(false);
                             }
-                          }, function(error){
+                    
+                        }, function(error){
                              
-                          });     
+                        });     
                     }
                    
                   }, function(error){
@@ -933,7 +959,9 @@
                   });
                 }
             };
-            $scope.exibirConvenio = function () {
+            $scope.exibirConvenio = function (exibirMapa) {
+               
+                $scope.exibirMapa = exibirMapa;
 
                 if ($cordovaNetwork.isOffline()) {
                     var alertPopup = $ionicPopup.alert({
@@ -953,18 +981,22 @@
                 $ionicLoading.show().then(function () {
                     conveniosFactory.selectConvenio(null, null, null, $stateParams.id).then(function (dados) {
 
-                        $scope.convenios = dados;                         
-                        var posOptions = { timeout: 10000, enableHighAccuracy: true };
+                        $scope.convenios = dados;   
+                        //So exibe o mapa caso a localização esteja ativa e com permissões 
+                        if(exibirMapa){
+                            var posOptions = { timeout: 10000, enableHighAccuracy: true };
 
-                        $cordovaGeolocation.getCurrentPosition(posOptions).then(function (position) {
-                           
-                            var lat = $scope.convenios[0].latitude
-                            var lon = $scope.convenios[0].longitude
-                            $scope.gerarMapa(lat,lon,position.coords.latitude,position.coords.longitude);                         
-
-                        }, function (err) {
-                            // error
-                        });
+                            $cordovaGeolocation.getCurrentPosition(posOptions).then(function (position) {
+                               
+                                var lat = $scope.convenios[0].latitude
+                                var lon = $scope.convenios[0].longitude
+                                $scope.gerarMapa(lat,lon,position.coords.latitude,position.coords.longitude);                         
+    
+                            }, function (err) {
+                                // error
+                            });
+                        }                      
+                 
 
                     }).finally(function () {
                         //em qualquer caso remove o spinner de loading
@@ -3419,9 +3451,43 @@
                         cordova.plugins.diagnostic.getLocationAuthorizationStatus(function(status){
 
                             if(status == cordova.plugins.diagnostic.permissionStatus.GRANTED || status == cordova.plugins.diagnostic.permissionStatus.GRANTED_WHEN_IN_USE){
-                                $scope.exibirConveniosProximos();
-                            }else{
-
+                                         //Verifica se a localizaçao está ativada
+                                cordova.plugins.diagnostic.isLocationEnabled(function(enabled){
+                                    
+                                    if(enabled){
+                                        $scope.exibirConveniosProximos();
+                                    }else{
+                                        var alertPopup = $ionicPopup.alert({
+                                            title: 'Serviço de localização desativado.',
+                                            template: 'Por favor, ative o GPS do seu dispositivo para ver os convênios próximos a você!',
+                                            okText: 'Ok',
+                                            okType: 'button-assertive',
+                                        });
+                        
+                                        alertPopup.then(function (res) {
+                                            $backView = $ionicHistory.backView();
+                                            $backView.go();
+                                        });
+                                    }
+                                }, function(error){
+                                    console.error("The following error occurred: "+error);
+                                });
+                            }
+                            else if(status == cordova.plugins.diagnostic.permissionStatus.DENIED){
+                                var alertPopup = $ionicPopup.alert({
+                                    title: 'Serviço de localização desativado.',
+                                    template: 'Por favor, ative o GPS do seu dispositivo para ver os convênios próximos a você!',
+                                    okText: 'Ok',
+                                    okType: 'button-assertive',
+                                });
+                
+                                alertPopup.then(function (res) {
+                                    $backView = $ionicHistory.backView();
+                                    $backView.go();
+                                });
+                            }
+                            else if(status == cordova.plugins.diagnostic.permissionStatus.NOT_REQUESTED){
+                          
                                 cordova.plugins.diagnostic.requestLocationAuthorization(function(status){
                                     switch(status){              
                                         case cordova.plugins.diagnostic.permissionStatus.DENIED:
@@ -3444,7 +3510,53 @@
                                             }
                                           });
                                             
-                                        break;            
+                                        break;      
+                                        case cordova.plugins.diagnostic.permissionStatus.GRANTED:
+                                        //Verifica se a localizaçao está ativada
+                                            cordova.plugins.diagnostic.isLocationEnabled(function(enabled){
+                                                
+                                                if(enabled){
+                                                    $scope.exibirConveniosProximos();
+                                                }else{
+                                                    var alertPopup = $ionicPopup.alert({
+                                                        title: 'Serviço de localização desativado.',
+                                                        template: 'Por favor, ative o GPS do seu dispositivo para ver os convênios próximos a você!',
+                                                        okText: 'Ok',
+                                                        okType: 'button-assertive',
+                                                    });
+                                    
+                                                    alertPopup.then(function (res) {
+                                                        $backView = $ionicHistory.backView();
+                                                        $backView.go();
+                                                    });
+                                                }
+                                            }, function(error){
+                                                console.error("The following error occurred: "+error);
+                                            });
+                                        break;     
+                                        case cordova.plugins.diagnostic.permissionStatus.GRANTED_WHEN_IN_USE:
+                                        //Verifica se a localizaçao está ativada
+                                            cordova.plugins.diagnostic.isLocationEnabled(function(enabled){
+                                                
+                                                if(enabled){
+                                                    $scope.exibirConveniosProximos();
+                                                }else{
+                                                    var alertPopup = $ionicPopup.alert({
+                                                        title: 'Serviço de localização desativado.',
+                                                        template: 'Por favor, ative o GPS do seu dispositivo para ver os convênios próximos a você!',
+                                                        okText: 'Ok',
+                                                        okType: 'button-assertive',
+                                                    });
+                                    
+                                                    alertPopup.then(function (res) {
+                                                        $backView = $ionicHistory.backView();
+                                                        $backView.go();
+                                                    });
+                                                }
+                                            }, function(error){
+                                                console.error("The following error occurred: "+error);
+                                            });
+                                        break;               
                                     }
                                   }, function(error){
                                      
@@ -3458,13 +3570,32 @@
               
                     }else if(currentPlatform == 'android'){
 
-                                     
+                       //Verifica se existe permissão para acessar a localização              
                       cordova.plugins.diagnostic.getLocationAuthorizationStatus(function(status){
                         
                         if(status == cordova.plugins.diagnostic.permissionStatus.GRANTED){
-                            $ionicPlatform.ready(function() {
-                                $scope.exibirConveniosProximos();
+                            //Verifica se a localizaçao está ativada
+                            cordova.plugins.diagnostic.isLocationEnabled(function(enabled){
+                                
+                                if(enabled){
+                                    $scope.exibirConveniosProximos();
+                                }else{
+                                    var alertPopup = $ionicPopup.alert({
+                                        title: 'Serviço de localização desativado.',
+                                        template: 'Por favor, ative o GPS do seu dispositivo para ver os convênios próximos a você!',
+                                        okText: 'Ok',
+                                        okType: 'button-assertive',
+                                    });
+                    
+                                    alertPopup.then(function (res) {
+                                        $backView = $ionicHistory.backView();
+                                        $backView.go();
+                                    });
+                                }
+                           }, function(error){
+                                console.error("The following error occurred: "+error);
                             });
+                       
                            
                         }else{
 
@@ -3490,7 +3621,30 @@
                                         }
                                       });
                                         
-                                    break;            
+                                    break;    
+                                    case cordova.plugins.diagnostic.permissionStatus.GRANTED:
+                                               //Verifica se a localizaçao está ativada
+                                        cordova.plugins.diagnostic.isLocationEnabled(function(enabled){
+                                            
+                                            if(enabled){
+                                                $scope.exibirConveniosProximos();
+                                            }else{
+                                                var alertPopup = $ionicPopup.alert({
+                                                    title: 'Serviço de localização desativado.',
+                                                    template: 'Por favor, ative o GPS do seu dispositivo para ver os convênios próximos a você!',
+                                                    okText: 'Ok',
+                                                    okType: 'button-assertive',
+                                                });
+                                
+                                                alertPopup.then(function (res) {
+                                                    $backView = $ionicHistory.backView();
+                                                    $backView.go();
+                                                });
+                                            }
+                                        }, function(error){
+                                            console.error("The following error occurred: "+error);
+                                        });
+                                    break;        
                                 }
                               }, function(error){
                                  

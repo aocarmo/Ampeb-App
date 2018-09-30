@@ -20,7 +20,9 @@
         <a ng-if="convenio.dsEndereco != ''" class="item item-text-wrap">
           {{convenio.dsEndereco}}
         </a>
-        <div id="map" class="google-map item"></div>
+        <div id="map" class="google-map item">
+          <span class="item item-text-wrap" ng-if="!exibirMapa">Não foi possível carregar o mapa, por favor ative os serviços de localização.</span>
+        </div>
         <div ng-if="convenio.nmMunicipio != ''" class="item item-divider">
           Local
         </div>
