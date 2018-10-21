@@ -1,37 +1,19 @@
-<ion-view title="Novidades de Convênios" id="page7">
+<ion-view title="" id="page7">
     <ion-content padding="true" class="has-header">
-      <h3 id="novidadesConvenios-heading2" style="color:#821723;font-weight:300;">Novidades de Convênios</h3>
+      <h3 id="novidadesConvenios-heading2" style="color:#821723;font-weight:300;">Campanhas Promocionais</h3>
       <hr class="hr-topoPagina">
       <div class="item item-body" id="novidadesConvenios-list-item-container1">
         <ion-list id="novidadesConvenios-list6">
-         <!-- <ion-item ng-repeat="noticia in listaNoticias" class="item-thumbnail-left item-icon-right assertive" id="novidadesConvenios-list-item5"
-            ui-sref="menu.notCia({id: noticia.id})">
-            <img ion-img-cache ionic ng-src="{{noticia.dsUrlImagem != '' && noticia.dsUrlImagem || 'img/img_not_found.jpg'}}" style="height:40%" />
+          <ion-item ng-repeat="novidade in listaNovidades" class="item-thumbnail-left item-icon-right assertive" id="novidadesConvenios-list-item5" ui-sref="menu.novidadesConveniosDetalhe({id: novidade.id})">
+            <img ion-img-cache ionic ng-src="{{novidade.dsUrlImagem != '' && novidade.dsUrlImagem || 'img/img_not_found.jpg'}}" style="height:40%" />
             <h2assertive>
-              <span class="categoria_post">{{noticia.dsCategoria}}</span>
-              <p style="white-space:normal;">{{noticia.dtNoticia}}</p>
-              <p ng-bind-html="noticia.dsTitulo" class="titulo_post" style="white-space:normal;"></p>
+              <span class="categoria_post item-text-wrap">{{novidade.nmConvenio}}</span>              
+              <p ng-bind-html="novidade.dsTitulo" class="titulo_post" style="white-space:normal;"></p>
               <i class="icon ion-ios-arrow-right"></i>
             </h2assertive>
-          </ion-item>-->
-          <ion-item class="item-thumbnail-left item-icon-right assertive" id="novidadesConvenios-list-item5" ui-sref="menu.novidadesConveniosDetalhe">
-          <img ion-img-cache ionic ng-src="http://www.grupognap.com.br/media/images/189/189/595ffd308d0a7b224abdd002a801447dbed0d488fd97a.jpg" style="height:40%" />
-          <h2assertive>
-            <span class="categoria_post">Aldeia CrossFit</span>          
-            <p ng-bind-html="'A Aldeia Crossfit está oferecendo desconto de 30% de na mensalidade de dezembro.'" class="titulo_post" style="white-space:normal;"></p>
-            <i class="icon ion-ios-arrow-right"></i>
-          </h2assertive>
-        </ion-item>
-        <ion-item class="item-thumbnail-left item-icon-right assertive" id="novidadesConvenios-list-item5" ui-sref="">
-            <img ion-img-cache ionic ng-src="http://www.buritiford.com.br/imagens/logos/logomarca-ford-buriti-2018.jpg" style="height:40%" />
-            <h2assertive>
-              <span class="categoria_post">Buriti Ford</span>          
-              <p ng-bind-html="'A Buriti está oferecendo taxa 0% na compra do novo Ford Focus.'" class="titulo_post" style="white-space:normal;"></p>
-              <i class="icon ion-ios-arrow-right"></i>
-            </h2assertive>
-          </ion-item>
+          </ion-item>      
         </ion-list>
       </div>
-      <!--<ion-infinite-scroll ng-if="moreDataCanBeLoaded" on-infinite="obterMais()" distance="5%"></ion-infinite-scroll>-->
+      <ion-infinite-scroll ng-if="moreDataCanBeLoaded" on-infinite="obterMais()" distance="5%"></ion-infinite-scroll>
     </ion-content>
   </ion-view>

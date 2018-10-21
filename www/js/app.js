@@ -152,18 +152,40 @@ angular.module('app', ['ionic', 'app.controllers', 'app.routes', 'app.directives
     $httpProvider.interceptors.push('MyHttpInterceptor');
 
   })
-  .run(function ($ionicPlatform, $cordovaSQLite,$ionicPopup) {
+  .run(function ($ionicPlatform, $cordovaSQLite,$ionicPopup,$injector,LOCAL_STORAGE) {
     $ionicPlatform.ready(function () {
+        var $state = $injector.get('$state');
       // Enable to debug issues.
       // window.plugins.OneSignal.setLogLevel({logLevel: 4, visualLevel: 4});
+      
       //Push notifications config
       var notificationOpenedCallback = function (jsonData) {
-        console.log('notificationOpenedCallback: ' + JSON.stringify(jsonData));
+        //console.log('notificationOpenedCallback: ' + JSON.stringify(jsonData));
+    
+        //Verifica se está logado
+        var tipo_retorno_post =  window.localStorage.getItem(LOCAL_STORAGE.tipo_retorno_post);
+        //tratamento feito provisóriamente para saber quando é uma novidade
+        if(tipo_retorno_post != 'publish'){
+          if(jsonData.notification.payload.additionalData.cat ==""){                 
+            $state.go('menu.novidadesConveniosDetalhe', { id: jsonData.notification.payload.additionalData.id_post, isPush: true });
+          }
+        }else{
+
+            var alertPopup = $ionicPopup.alert({
+              title: 'Autenticação Necessária!',
+              template: 'É necessário estar logado para ver este conteúdo.',
+              okText: 'Ok', 
+              okType: 'button-assertive', 
+            });
+
+        }
+     
+
       };
    // .startInit("b47e67f6-405e-4041-9597-571b12e2f80d")
    //.startInit("774c0150-e398-4ed0-a600-e9d32ac8a6b5")
       window.plugins.OneSignal    
-       .startInit("b47e67f6-405e-4041-9597-571b12e2f80d")
+       .startInit("774c0150-e398-4ed0-a600-e9d32ac8a6b5")
         .handleNotificationOpened(notificationOpenedCallback)
         .endInit();
 
@@ -202,81 +224,13 @@ angular.module('app', ['ionic', 'app.controllers', 'app.routes', 'app.directives
       $cordovaSQLite.execute(db, "DROP TABLE IF EXISTS enquetes"); //Tratamento para atualizar novas colunas nas tabelas em dispositivos que ja tem o app instalado
       $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS enquete (id integer primary key, dsEnquete varchar(250), totalVotos integer, totalVotantes integer, dtCadastro text, dtExpiracao text, flAtivo int, flLido integer, flVotada integer)");
       
+      $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS novidadesConvenios (id integer primary key, id_convenio integer, dtCadastro text, nmConvenio varchar(100), dsTitulo varchar(150), dsNovidade text, dtPublicacao text, dtExpiracao text, dsUrlImagem text, dsUrlPdf text, flLido integer, dtAtualizacao text)");
+
       //Apagando dados sempre que inicializar o app   
       $cordovaSQLite.execute(db, "DELETE FROM municipio_convenio");
       $cordovaSQLite.execute(db, "DELETE FROM tipo_convenio");
       $cordovaSQLite.execute(db, "DELETE FROM convenio");
 
-
-      //Iniciando a solicitação de permissão para acessar a localização
-    /*  var currentPlatform = ionic.Platform.platform();  
-      if(currentPlatform == 'ios'){
-
-          cordova.plugins.diagnostic.requestLocationAuthorization(function(status){
-            switch(status){              
-                case cordova.plugins.diagnostic.permissionStatus.DENIED:
-                
-                  var confirmPopup = $ionicPopup.confirm({
-                    title: 'O AMPEB App precisa acessar a sua localização, para exibir convênios próximos.',
-                    template: 'Deseja conceder permissão?'
-                  });
-              
-                  confirmPopup.then(function(res){
-                    if(res){
-
-                      if (window.cordova && window.cordova.plugins.settings) {                      
-                        window.cordova.plugins.settings.open("location", function() {}, function () {});
-                      }
-                    } else {                      
-                      var alertPopup = $ionicPopup.alert({
-                        title: 'Não será possível exibir os convênios próximos.',                       
-                      });                      
-                    }
-                  });
-                    
-                break;            
-            }
-          }, function(error){
-             
-          }, cordova.plugins.diagnostic.locationAuthorizationMode.ALWAYS);
-
-      }else if(currentPlatform == 'android'){
-
-        cordova.plugins.diagnostic.requestLocationAuthorization(function(status){
-            switch(status){
-                case cordova.plugins.diagnostic.permissionStatus.DENIED:
-                                  
-                  var confirmPopup = $ionicPopup.confirm({
-                    title: 'O AMPEB App precisa acessar a sua localização, para exibir convênios próximos.',
-                    template: 'Deseja conceder permissão?'
-                  });
-              
-                  confirmPopup.then(function(res) {
-                    if(res) {
-
-                      if (window.cordova && window.cordova.plugins.settings) {
-                      
-                        window.cordova.plugins.settings.open("location", function() {},function () {});
-                      } 
-
-                    } else {                      
-                      var alertPopup = $ionicPopup.alert({
-                        title: 'Não será possível exibir os convênios próximos.',
-                        template: 'It might taste good'
-                      });                       
-                    }
-                  });
-
-
-                  
-                  break;
-                           
-            }
-        }, function(error){
-           
-        });
-      }*/
-    //Fim solicitação de permissão para acessar a localização
 
     });
 

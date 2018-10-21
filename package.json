@@ -82,7 +82,6 @@
       "cordova-plugin-whitelist": {},
       "cordova-sqlite-storage": {},
       "ionic-plugin-keyboard": {},
-      "onesignal-cordova-plugin": {},
       "cordova-plugin-compat": {},
       "cordova-plugin-qrcodejs": {},
       "cordova-plugin-geolocation": {
@@ -98,7 +97,8 @@
         "LOCATION_ALWAYS_USAGE_DESCRIPTION": "This app wants to get your location always, even this app runs in background."
       },
       "cordova-plugin-file-opener2": {},
-      "cordova-plugin-android-permissions": {}
+      "cordova-plugin-android-permissions": {},
+      "onesignal-cordova-plugin": {}
     },
     "platforms": [
       "ios",

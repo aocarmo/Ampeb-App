@@ -303,6 +303,7 @@ angular.module('app.routes', [])
       })
       .state('menu.novidadesConvenios', {
         url: '/novidadesConvenios',
+        params: { id: null},
         views: {
           'side-menu21': {
             templateUrl: 'templates/convenios/novidadesConvenios.html',
@@ -312,6 +313,7 @@ angular.module('app.routes', [])
       })
       .state('menu.novidadesConveniosDetalhe', {
         url: '/novidadesConveniosDetalhe',
+        params: { id: null, isPush: null},
         views: {
           'side-menu21': {
             templateUrl: 'templates/convenios/novidadesConveniosDetalhe.html',
@@ -427,7 +429,7 @@ angular.module('app.routes', [])
       })
       .state('menu.conveniosProximos', {
         url: '/conveniosProximos',
-        params: { raio: null },
+        params: { raio: null, nmConvenio: null, idTipoConvenio: null },
         views: {
           'side-menu21': {
             templateUrl: 'templates/convenios/conveniosProximos.html',
@@ -438,7 +440,7 @@ angular.module('app.routes', [])
 
       .state('conveniosProximos', {
         url: '/conveniosProximos',
-        params: { raio: null},        
+        params: { raio: null, nmConvenio: null, idTipoConvenio: null },        
         templateUrl: 'templates/convenios/conveniosProximos.html',
         controller: 'conveniosProximosCtrl',      
       })

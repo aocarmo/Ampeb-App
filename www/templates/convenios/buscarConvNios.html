@@ -37,7 +37,7 @@
               <i style="color:#821723;font-size: 28px;" class="icon ion-android-locate"></i>
             </div>
           </div>
-        <a  class="button button-outline icon-left ion-location button-assertive" ui-sref="{{tipoRetornoPost == 'publish' ? 'conveniosProximos({raio: raio})' : 'menu.conveniosProximos({raio: raio})' }}">Ver convênios próximos a mim</a>
+        <a  class="button button-outline icon-left ion-location button-assertive" ui-sref="{{tipoRetornoPost == 'publish' ? 'conveniosProximos({raio: raio, nmConvenio:filtro.nmConvenio, idTipoConvenio:filtro.tipoConvenio})' : 'menu.conveniosProximos({raio: raio, nmConvenio:filtro.nmConvenio, idTipoConvenio:filtro.tipoConvenio})' }}">Ver convênios próximos a mim</a>
      </div>
      
       <div class="list">

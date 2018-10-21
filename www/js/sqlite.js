@@ -983,3 +983,208 @@ sqlite.factory('enqueteFactory', function ($q, $cordovaSQLite) {
        
     }
 });
+
+sqlite.factory('novidadesConveniosFactory', function ($q, $cordovaSQLite) {
+    return {
+        insert: function (id, id_convenio, dtCadastro, nmConvenio, dsTitulo, dsNovidade, dtPublicacao, dtExpiracao, dsUrlImagem, dsUrlPdf, flLido, dtAtualizacao) {
+            var query = "INSERT INTO novidadesConvenios (id, id_convenio, dtCadastro, nmConvenio, dsTitulo, dsNovidade, dtPublicacao, dtExpiracao, dsUrlImagem, dsUrlPdf, flLido, dtAtualizacao) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            var values = [id, id_convenio, dtCadastro, nmConvenio, dsTitulo, dsNovidade, dtPublicacao, dtExpiracao, dsUrlImagem, dsUrlPdf, flLido, dtAtualizacao];
+            var outputs = [];
+            //Usada para fazer o retorno do banco aguardar esta completa
+            var deferred = $q.defer();
+
+            $cordovaSQLite.execute(db, query, values).then(
+              function (res) {
+          
+                  outputs.push({ "retorno": res.insertId });
+                  deferred.resolve(outputs);
+                  
+              },
+              function (err) {
+         
+                  deferred.reject(err);
+                
+              }
+
+            );
+            
+            return deferred.promise;
+        },
+        selectNovidade: function (id) {
+            var query = "SELECT  id, id_convenio, nmConvenio, dsTitulo, dsNovidade, strftime('%d/%m/%Y', datetime(dtPublicacao)) as dtPublicacao, strftime('%d/%m/%Y', datetime(dtExpiracao)) as dtExpiracao, dsUrlImagem, dsUrlPdf, flLido FROM novidadesConvenios WHERE id=?";
+            var values = [id];
+            var outputs = [];
+
+            //Usada para fazer o retorno do banco aguardar esta completa
+            var deferred = $q.defer();
+            $cordovaSQLite.execute(db, query,values).then(function (data) {
+                if (data.rows.length > 0) {
+
+                    for (var i = 0; i < data.rows.length; i++) {
+                        outputs.push({
+                            "id": data.rows.item(i).id,
+                            "id_convenio": data.rows.item(i).id_convenio,
+                            "nmConvenio": data.rows.item(i).nmConvenio,
+                            "dsTitulo": data.rows.item(i).dsTitulo,
+                            "dsNovidade": data.rows.item(i).dsNovidade,
+                            "dtPublicacao": data.rows.item(i).dtPublicacao,
+                            "dtExpiracao": data.rows.item(i).dtExpiracao,
+                            "dsUrlImagem": data.rows.item(i).dsUrlImagem,
+                            "dsUrlPdf": data.rows.item(i).dsUrlPdf,                            
+                            "flLido": data.rows.item(i).flLido,
+                        });
+                    }
+
+                    deferred.resolve(outputs);
+
+                } else {
+                    var retorno = null;
+                    outputs.push(retorno);
+                    deferred.resolve(outputs);
+                }
+            }, function (error) {
+
+                deferred.reject(error);
+            });
+
+            return deferred.promise;
+        },
+        selectListaNovidades: function (idConvenio) {
+          
+            var query = "";
+            if(idConvenio != null ){
+                 query = "SELECT  id, id_convenio, nmConvenio, dsTitulo, dsNovidade, strftime('%d/%m/%Y %H:%M:%S', datetime(dtPublicacao)) as dtPublicacao, strftime('%d/%m/%Y %H:%M:%S', datetime(dtExpiracao)) as dtExpiracao, dsUrlImagem, dsUrlPdf, flLido FROM novidadesConvenios WHERE strftime('%d/%m/%Y', datetime(dtExpiracao)) >= strftime('%d/%m/%Y', datetime('now')) AND id_convenio = "+idConvenio+" ORDER BY datetime(dtCadastro) DESC";
+            }else{
+                 query = "SELECT  id, id_convenio, nmConvenio, dsTitulo, dsNovidade, strftime('%d/%m/%Y %H:%M:%S', datetime(dtPublicacao)) as dtPublicacao, strftime('%d/%m/%Y %H:%M:%S', datetime(dtExpiracao)) as dtExpiracao, dsUrlImagem, dsUrlPdf, flLido FROM novidadesConvenios WHERE strftime('%d/%m/%Y', datetime(dtExpiracao)) >= strftime('%d/%m/%Y', datetime('now'))  ORDER BY datetime(dtCadastro) DESC";
+            }
+        
+            var outputs = [];
+
+            //Usada para fazer o retorno do banco aguardar esta completa
+            var deferred = $q.defer();
+            $cordovaSQLite.execute(db, query).then(function (data) {
+                if (data.rows.length > 0) {
+
+                   for (var i = 0; i < data.rows.length; i++) {
+                        outputs.push({
+                            "id": data.rows.item(i).id,
+                            "id_convenio": data.rows.item(i).id_convenio,
+                            "nmConvenio": data.rows.item(i).nmConvenio,
+                            "dsTitulo": data.rows.item(i).dsTitulo,   
+                            "dsUrlImagem": data.rows.item(i).dsUrlImagem               
+                        });
+                    }
+
+                   deferred.resolve(outputs);
+
+                } else {
+                    var retorno = null;
+                    outputs.push(retorno);
+                    deferred.resolve(outputs);
+                }
+            }, function (error) {
+                selectListaNovidades
+                deferred.reject(error);
+            });
+
+            return deferred.promise;  //This line was missing
+
+           
+        },
+        obterQtdNovidadeNaoLida: function () {
+            var query = "SELECT count(*) as qtd FROM novidadesConvenios WHERE flLido = 0";
+           
+            var outputs = [];
+
+            //Usada para fazer o retorno do banco aguardar esta completa
+            var deferred = $q.defer();
+            $cordovaSQLite.execute(db, query).then(function (data) {
+                if (data.rows.length > 0) {
+
+                    outputs.push({ "qtdNovidadesNaoLidas": data.rows.item(0).qtd});
+                    deferred.resolve(outputs);
+
+                } else {
+                    
+                    var retorno = null;
+                    outputs.push(retorno);
+                    deferred.resolve(outputs);
+                }
+            }, function (error) {
+
+                outputs.push({ "retorno": error });
+                deferred.reject(error);
+            });
+
+            return deferred.promise;
+        },
+        marcarNovidadesLidas: function (idConvenio, idNovidade) {
+
+            var query = "";
+            if(idConvenio != null){
+                query = "UPDATE novidadesConvenios SET flLido = 1 WHERE flLido = 0 and id_convenio = "+idConvenio;
+            }else if(idNovidade != null){
+                query = "UPDATE novidadesConvenios SET flLido = 1 WHERE flLido = 0 and id = "+idNovidade;
+            }else{
+                query = "UPDATE novidadesConvenios SET flLido = 1 WHERE flLido = 0";
+            }
+          
+            var outputs = [];
+
+            //Usada para fazer o retorno do banco aguardar esta completa
+            var deferred = $q.defer();
+            $cordovaSQLite.execute(db, query).then(function (data) {
+                    outputs.push({ "atualizado": data});
+                    deferred.resolve(outputs);
+               
+            }, function (error) {
+
+                outputs.push({ "retorno": error });
+                deferred.reject(error);
+            });
+
+            return deferred.promise;
+        },
+        deleteNovidades: function (id) {
+            var query = "DELETE FROM novidadesConvenios WHERE id NOT IN ("+id+")";
+            var outputs = [];
+
+            //Usada para fazer o retorno do banco aguardar esta completa
+            var deferred = $q.defer();
+            $cordovaSQLite.execute(db, query).then(function (data) {
+
+                    outputs.push({ "retorno": 1});
+                    deferred.resolve(outputs);
+               
+            }, function (error) {
+
+                deferred.reject(error);
+            });
+
+            return deferred.promise;  //This line was missing
+
+           
+        },
+        deleteNovidadesDesatualizadas: function (id,dtAtualizacao) {
+            var query = "DELETE FROM novidadesConvenios WHERE id = "+id+" AND dtAtualizacao <> '"+dtAtualizacao+"'";
+            var outputs = [];
+
+            //Usada para fazer o retorno do banco aguardar esta completa
+            var deferred = $q.defer();
+            $cordovaSQLite.execute(db, query).then(function (data) {
+                  
+                    outputs.push({ "retorno": 1});
+                    deferred.resolve(outputs);
+               
+            }, function (error) {
+
+                deferred.reject(error);
+            });
+
+            return deferred.promise;  //This line was missing
+
+           
+        }
+       
+    }
+});

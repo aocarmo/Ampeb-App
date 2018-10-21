@@ -1672,4 +1672,316 @@ angular.module('app.services', [])
         }
     };
 
+}])/***** Serviços para o modulo de noticias *****/
+.service('obterNovidadesConveniosService', ['$http', '$q', 'WEB_METODOS', 'novidadesConveniosFactory','LOCAL_STORAGE',  function ($http, $q, WEB_METODOS, novidadesConveniosFactory,LOCAL_STORAGE) {
+
+    return {
+        obterNovidadesConvenios: function (idConvenio, idNovidade = null) {
+            
+            //Tratamento para buscar somente novidades de um convenio caso seja passado o id_idConvenio ou buscar somente um registro pelo id
+            var url = WEB_METODOS.urlServicosPortalNovidadesConvenios;
+            if(idConvenio != null){
+                url = url +  "&id_convenio="+idConvenio;
+            }else if(idNovidade != null){
+                url = url + "&include="+idNovidade;
+            }
+
+           return   $http.get(url,{headers: {'Authorization': window.localStorage.getItem(LOCAL_STORAGE.local_token)}}).then(function (response) {
+                  
+                       
+                        //Lendo todas as noticias                      
+                        var idNovidadeConvenio = [];
+                        var deferred = $q.defer();
+                        
+                        if(idNovidade != null){
+                      
+                            for (var i = 0; i < response.data.length; i++) {
+                                novidadesConveniosFactory.deleteNovidadesDesatualizadas(response.data[i].id, response.data[i].modified);
+
+                                var nmConvenio = "";
+                                //Valida��o de categoria
+                                if (response.data[i].meta.desc_convenio[0] != null) {
+                                    nmConvenio = response.data[i].meta.desc_convenio[0];
+                                }
+                             
+                                var dsTitulo = "";
+                                //Valida��o de titulo
+                                if (response.data[i].title.rendered != null) {
+                                    dsTitulo = response.data[i].title.rendered;
+                                }
+                                var dsNovidade = "";
+                                //Valida��o da descri��o
+                                if (response.data[i].content.rendered != null) {
+                                    dsNovidade = response.data[i].content.rendered;
+                                }
+
+                              
+                                var dtPublicacao = "";
+                                //Valida��o de data de publicacao
+                                if (response.data[i].meta.dt_publicacao_novidade_convenio[0] != null) {
+                                    dtPublicacao = response.data[i].meta.dt_publicacao_novidade_convenio[0];
+                                }
+                                var dtExpiracao = "";
+                                if (response.data[i].meta.dt_expiracao_novidade_convenio[0] != null) {
+                                    dtExpiracao = response.data[i].meta.dt_expiracao_novidade_convenio[0];
+                                }
+                                var dtCadastro = "";
+                                if (response.data[i].date != null) {
+                                    dtCadastro = response.data[i].date;
+                                }
+                                var dtAtualizacao = "";
+                                if (response.data[i].modified != null) {
+                                    dtAtualizacao = response.data[i].modified;
+                                }
+
+                                var dsUrlImagem = "img/img_not_found.jpg";
+                                //Valida��o da url da imagem
+                                if (response.data[i].hasOwnProperty('_embedded')) {      
+                                    if (response.data[i]._embedded.hasOwnProperty('wp:featuredmedia')) {                        
+                                        if (response.data[i]._embedded['wp:featuredmedia'][0] != null) {
+                                            if (response.data[i]._embedded['wp:featuredmedia'][0].media_details != null) {
+                                                if (response.data[i]._embedded['wp:featuredmedia'][0].media_details.sizes != null) {
+                                                    if (response.data[i]._embedded['wp:featuredmedia'][0].media_details.sizes.medium != null) {
+                                                        if (response.data[i]._embedded['wp:featuredmedia'][0].media_details.sizes.medium.source_url != null) {
+                                                            dsUrlImagem = response.data[i]._embedded['wp:featuredmedia'][0].media_details.sizes.medium.source_url;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }    
+
+                                var dsUrlPDF = ""; 
+                                if (response.data[i].meta.pdf_convenio != null) {
+                                    dsUrlPDF = response.data[i].meta.pdf_convenio;
+                                }                                         
+                              
+                                novidadesConveniosFactory.insert(response.data[i].id, response.data[i].meta.id_convenio[0], dtCadastro, nmConvenio, dsTitulo, dsNovidade, dtPublicacao, dtExpiracao, dsUrlImagem,dsUrlPDF,0,dtAtualizacao);                                    
+                              
+                            }
+
+
+
+                            novidadesConveniosFactory.selectNovidade(idNovidade).then(function (dadosNovidade) {                    
+                                deferred.resolve(dadosNovidade);    
+                            });
+
+                        }else{
+
+                            //Loop para verificar e exluir todos os post que sofreram modificações
+                        for (var i = 0; i < response.data.length; i++) {
+                        
+                            novidadesConveniosFactory.deleteNovidadesDesatualizadas(response.data[i].id, response.data[i].modified);    
+                            //Pegando os id das noticias que não serão excluidas
+                            idNovidadeConvenio.push(response.data[i].id);     
+                        }
+
+                      
+                        //Excluindo do banco noticias que não estão mais disponiveis no servico
+                        var novidadesExcluir =  novidadesConveniosFactory.deleteNovidades(idNovidadeConvenio.join()).then(function (novidadesExcluirRetorno) {    
+                            return novidadesExcluirRetorno;
+                        });                                          
+
+                        var retornoNovidadesExibir = [];
+
+                        //Executando a exclusão das noticias
+                        $q.all([novidadesExcluir]).then(function(result){
+                           
+                            for (var i = 0; i < result.length; i++){
+                                retornoNovidadesExibir.push(result[i]);
+                            }
+                         
+                            //Se o banco foi sincronizado com sucesso
+                            if(retornoNovidadesExibir[0][0].retorno == 1){
+                                
+                              
+                                for (var i = 0; i < response.data.length; i++) {
+
+                                    var nmConvenio = "";
+                                    //Valida��o de categoria
+                                    if (response.data[i].meta.desc_convenio[0] != null) {
+                                        nmConvenio = response.data[i].meta.desc_convenio[0];
+                                    }
+
+                                    var dsTitulo = "";
+                                       //Valida��o de titulo
+                                    if (response.data[i].title.rendered != null) {
+                                        dsTitulo = response.data[i].title.rendered;
+                                    }
+                                    var dsNovidade = "";
+                                    //Valida��o da descri��o
+                                    if (response.data[i].content.rendered != null) {
+                                        dsNovidade = response.data[i].content.rendered;
+                                    }
+
+
+                                    var dtPublicacao = "";
+                                    //Valida��o de data de publicacao
+                                    if (response.data[i].meta.dt_publicacao_novidade_convenio[0] != null) {
+                                        dtPublicacao = response.data[i].meta.dt_publicacao_novidade_convenio[0];
+                                    }
+                                    var dtExpiracao = "";
+                                    if (response.data[i].meta.dt_expiracao_novidade_convenio[0] != null) {
+                                        dtExpiracao = response.data[i].meta.dt_expiracao_novidade_convenio[0];
+                                    }
+                                    var dtCadastro = "";
+                                    if (response.data[i].date != null) {
+                                        dtCadastro = response.data[i].date;
+                                    }
+                                    var dtAtualizacao = "";
+                                    if (response.data[i].modified != null) {
+                                        dtAtualizacao = response.data[i].modified;
+                                    }
+
+                                    var dsUrlImagem = "img/img_not_found.jpg";
+                                    //Valida��o da url da imagem
+                                    if (response.data[i].hasOwnProperty('_embedded')) {      
+                                        if (response.data[i]._embedded.hasOwnProperty('wp:featuredmedia')) {                        
+                                            if (response.data[i]._embedded['wp:featuredmedia'][0] != null) {
+                                                if (response.data[i]._embedded['wp:featuredmedia'][0].media_details != null) {
+                                                    if (response.data[i]._embedded['wp:featuredmedia'][0].media_details.sizes != null) {
+                                                        if (response.data[i]._embedded['wp:featuredmedia'][0].media_details.sizes.medium != null) {
+                                                            if (response.data[i]._embedded['wp:featuredmedia'][0].media_details.sizes.medium.source_url != null) {
+                                                                dsUrlImagem = response.data[i]._embedded['wp:featuredmedia'][0].media_details.sizes.medium.source_url;
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }    
+    
+                                    var dsUrlPDF = ""; 
+                                    if (response.data[i].meta.pdf_convenio != null) {
+                                        dsUrlPDF = response.data[i].meta.pdf_convenio;
+                                    }                                         
+                              
+                                    novidadesConveniosFactory.insert(response.data[i].id, response.data[i].meta.id_convenio[0], dtCadastro, nmConvenio, dsTitulo, dsNovidade, dtPublicacao, dtExpiracao, dsUrlImagem,dsUrlPDF,0,dtAtualizacao);                                    
+                                      
+                                }                          
+
+                       
+                                //Após excluídas as noticias, seleciona as noticias salvas no banco
+                                novidadesConveniosFactory.selectListaNovidades(idConvenio).then(function (dadosOnline) {      
+                                                        
+                                    deferred.resolve(dadosOnline);
+                                });                                   
+
+                            }                                      
+
+                        });    
+                    }             
+
+                     return deferred.promise;                       
+               
+            });
+
+        },
+
+        obterMais: function (pagina, idConvenio) {
+            //Tratamento para buscar somente novidades de um convenio caso seja passado o id
+            var idConvenioUrl = "";
+            if(idConvenio != null){
+                idConvenioUrl = "&id_convenio="+idConvenio;
+            }
+          
+            return   $http.get(WEB_METODOS.urlServicosPortalNovidadesConvenios+"&page="+pagina+idConvenioUrl,{headers: {'Authorization': window.localStorage.getItem(LOCAL_STORAGE.local_token)}}).then(function (response) {
+                       
+                         //Lendo todas as noticias                       
+                         var listaNovidades = [];
+                         var deferred = $q.defer();
+
+                         for (var i = 0; i < response.data.length; i++) {
+
+                            var nmConvenio = "";
+                            //Valida��o de categoria
+                            if (response.data[i].meta.desc_convenio[0] != null) {
+                                nmConvenio = response.data[i].meta.desc_convenio[0];
+                            }
+
+                            var dsTitulo = "";
+                               //Valida��o de titulo
+                            if (response.data[i].title.rendered != null) {
+                                dsTitulo = response.data[i].title.rendered;
+                            }
+                            var dsNovidade = "";
+                            //Valida��o da descri��o
+                            if (response.data[i].content.rendered != null) {
+                                dsNovidade = response.data[i].content.rendered;
+                            }
+
+
+                            var dtPublicacao = "";
+                            //Valida��o de data de publicacao
+                            if (response.data[i].meta.dt_publicacao_novidade_convenio[0] != null) {
+                                dtPublicacao = response.data[i].meta.dt_publicacao_novidade_convenio[0];
+                            }
+                            var dtExpiracao = "";
+                            if (response.data[i].meta.dt_expiracao_novidade_convenio[0] != null) {
+                                dtExpiracao = response.data[i].meta.dt_expiracao_novidade_convenio[0];
+                            }
+                            var dtCadastro = "";
+                            if (response.data[i].date != null) {
+                                dtCadastro = response.data[i].date;
+                            }
+                            var dtAtualizacao = "";
+                            if (response.data[i].modified != null) {
+                                dtAtualizacao = response.data[i].modified;
+                            }
+
+                            var dsUrlImagem = "img/img_not_found.jpg";
+                            //Valida��o da url da imagem
+                            if (response.data[i].hasOwnProperty('_embedded')) {      
+                                if (response.data[i]._embedded.hasOwnProperty('wp:featuredmedia')) {                        
+                                    if (response.data[i]._embedded['wp:featuredmedia'][0] != null) {
+                                        if (response.data[i]._embedded['wp:featuredmedia'][0].media_details != null) {
+                                            if (response.data[i]._embedded['wp:featuredmedia'][0].media_details.sizes != null) {
+                                                if (response.data[i]._embedded['wp:featuredmedia'][0].media_details.sizes.medium != null) {
+                                                    if (response.data[i]._embedded['wp:featuredmedia'][0].media_details.sizes.medium.source_url != null) {
+                                                        dsUrlImagem = response.data[i]._embedded['wp:featuredmedia'][0].media_details.sizes.medium.source_url;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }    
+
+                            var dsUrlPDF = ""; 
+                            if (response.data[i].meta.pdf_convenio != null) {
+                                dsUrlPDF = response.data[i].meta.pdf_convenio;
+                            }
+
+                            
+                          /*  var objDtAtual= new Date();
+                            var dtExpiracaoObj= new  Date(dtExpiracao);
+                            //Colocando o gmt pois a data estava ficando com um dia a menos         
+                            dtExpiracaoObj = new Date(dtExpiracaoObj.getTime() + Math.abs(dtExpiracaoObj.getTimezoneOffset() * 60000));*/
+                   
+                            //SO irá exibir caso não esteja expirada novidade
+                           // if(dtExpiracaoObj >= objDtAtual){
+                                
+                                listaNovidades.push({
+                                    "id": response.data[i].id,
+                                    "id_convenio": response.data[i].meta.id_convenio[0],
+                                    "nmConvenio": nmConvenio,                          
+                                    "dsTitulo": dsTitulo,
+                                    "dsUrlImagem": dsUrlImagem
+                                });
+                          
+                         //   }
+
+                            novidadesConveniosFactory.insert(response.data[i].id, response.data[i].meta.id_convenio[0], dtCadastro, nmConvenio, dsTitulo, dsNovidade, dtPublicacao, dtExpiracao, dsUrlImagem,dsUrlPDF,1,dtAtualizacao);                                    
+    
+                        }            
+                       
+                         return listaNovidades;      
+ 
+ 
+             });
+ 
+         }
+    };
+        
 }])

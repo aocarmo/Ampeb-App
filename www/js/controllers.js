@@ -3,10 +3,10 @@
         template: '<ion-spinner icon="spiral" class="spinner-assertive"></ion-spinner>',
         duration: 30000
     })
-    .controller('aMPEBCtrl', ['$scope', '$stateParams', '$state', '$q', '$cordovaCamera', '$ionicPopup', 'LOCAL_STORAGE', '$timeout', 'noticiasFactory', 'eventosFactory', 'obterNoticiasService', 'obterEventosService', 'atualizarFotoAssociado', '$cordovaNetwork', '$ionicLoading', '$ionicHistory', 'fiquePorDentroFactory', 'obterFiquePorDentroService', 'getListaEnquete', 'enqueteFactory', 'getToken', 'getConfiguracaoAplicativo', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+    .controller('aMPEBCtrl', ['$scope', '$stateParams', '$state', '$q', '$cordovaCamera', '$ionicPopup', 'LOCAL_STORAGE', '$timeout', 'noticiasFactory', 'eventosFactory', 'obterNoticiasService', 'obterEventosService', 'atualizarFotoAssociado', '$cordovaNetwork', '$ionicLoading', '$ionicHistory', 'fiquePorDentroFactory', 'obterFiquePorDentroService', 'getListaEnquete', 'enqueteFactory', 'getToken', 'getConfiguracaoAplicativo','novidadesConveniosFactory','obterNovidadesConveniosService', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
         // You can include any angular dependencies as parameters for this function
         // TIP: Access Route Parameters for your page via $stateParams.parameterName
-        function ($scope, $stateParams, $state, $q, $cordovaCamera, $ionicPopup, LOCAL_STORAGE, $timeout, noticiasFactory, eventosFactory, obterNoticiasService, obterEventosService, atualizarFotoAssociado, $cordovaNetwork, $ionicLoading, $ionicHistory, fiquePorDentroFactory, obterFiquePorDentroService, getListaEnquete, enqueteFactory, getToken, getConfiguracaoAplicativo) {
+        function ($scope, $stateParams, $state, $q, $cordovaCamera, $ionicPopup, LOCAL_STORAGE, $timeout, noticiasFactory, eventosFactory, obterNoticiasService, obterEventosService, atualizarFotoAssociado, $cordovaNetwork, $ionicLoading, $ionicHistory, fiquePorDentroFactory, obterFiquePorDentroService, getListaEnquete, enqueteFactory, getToken, getConfiguracaoAplicativo,novidadesConveniosFactory,obterNovidadesConveniosService) {
 
             $scope.exibirBtnLista = false;
             /***************** Bloco para atualizações de notificações ********************/
@@ -56,15 +56,19 @@
                     return qtdEnqueteNaoLido;
                 });
 
+                var qtdNovidades = novidadesConveniosFactory.obterQtdNovidadeNaoLida().then(function (qtdNovidadeNaoLido) {
+                    return qtdNovidadeNaoLido;
+                });
+
                 var retornoNotificacoes = [];
 
                 //Pega o retorno de forma sincrona do ajax.
-                $q.all([qtdNoticias, qtdEventos, qtdFiquePorDentro, qtdEnquete]).then(function (result) {
+                $q.all([qtdNoticias, qtdEventos, qtdFiquePorDentro, qtdEnquete, qtdNovidades]).then(function (result) {
                     for (var i = 0; i < result.length; i++) {
                         retornoNotificacoes.push(result[i]);
                     }
 
-                    if (retornoNotificacoes[0] != null && retornoNotificacoes[1] != null && retornoNotificacoes[2] != null && retornoNotificacoes[3] != null) {
+                    if (retornoNotificacoes[0] != null && retornoNotificacoes[1] != null && retornoNotificacoes[2] != null && retornoNotificacoes[3] != null && retornoNotificacoes[4] != null) {
                         //Testa caso o a quantidade seja maior que 0 exibe os itens não lidos.
 
                         if (retornoNotificacoes[0][0].qtdNoticiasNaoLidas > 0) {
@@ -90,6 +94,12 @@
                             document.getElementById("enquetesBadge").textContent = retornoNotificacoes[3][0].qtdEnqueteNaoLidas;
                         } else {
                             document.getElementById("enquetesBadge").textContent = "";
+                        }
+
+                        if (retornoNotificacoes[4][0].qtdNovidadesNaoLidas > 0) {
+                            document.getElementById("novidadesBadge").textContent = retornoNotificacoes[4][0].qtdNovidadesNaoLidas;
+                        } else {
+                            document.getElementById("novidadesBadge").textContent = "";
                         }
 
                     }
@@ -134,15 +144,19 @@
                             return dadosEnquete;
                         });
 
+                        var novidadesConvenios = obterNovidadesConveniosService.obterNovidadesConvenios().then(function (dadosNovidades) {
+                            return dadosNovidades;
+                        });
+
                         var retornos = [];
 
-                        $q.all([eventos, noticias, fiquePorDentro, enquete]).then(function (result) {
+                        $q.all([eventos, noticias, fiquePorDentro, enquete, novidadesConvenios]).then(function (result) {
 
                             for (var i = 0; i < result.length; i++) {
                                 retornos.push(result[i]);
                             }
 
-                            if (retornos[0] != null && retornos[1] != null && retornos[2] != null && retornos[3] != null) {
+                            if (retornos[0] != null && retornos[1] != null && retornos[2] != null && retornos[3] != null  && retornos[4] != null) {
                                 //Setando a variavel de sessão para informar ao controller de cada tela para buscar a informação atualizada do banco.                      
                                 $scope.obterNotificacoes();
 
@@ -174,13 +188,17 @@
                     return dadosEnquetes;
                 });
 
+                var novidadesConvenios = obterNovidadesConveniosService.obterNovidadesConvenios().then(function (dadosNovidades) {
+                    return dadosNovidades;
+                });
+
                 var retornos = [];
 
-                $q.all([noticias, eventos, fiquePorDentro, enquetes]).then(function (result) {
+                $q.all([noticias, eventos, fiquePorDentro, enquetes, novidadesConvenios]).then(function (result) {
                     for (var i = 0; i < result.length; i++) {
                         retornos.push(result[i]);
                     }
-                    if (retornos[0] != null && retornos[1] != null && retornos[2] != null && retornos[3] != null) {
+                    if (retornos[0] != null && retornos[1] != null && retornos[2] != null && retornos[3] != null && retornos[4] != null) {
                         $scope.obterNotificacoes();
                     }
                 });
@@ -2682,37 +2700,60 @@
             };
 
         }])
-    .controller('novidadesConveniosCtrl', ['$scope', '$stateParams', 'obterNoticiasService', 'noticiasFactory', '$ionicPopup', 'LOCAL_STORAGE', '$ionicLoading', '$cordovaNetwork', '$ionicHistory', 'obterNoticiasServiceObterMais', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+    .controller('novidadesConveniosCtrl', ['$scope', '$stateParams', 'obterNovidadesConveniosService',  '$ionicPopup', 'LOCAL_STORAGE', '$ionicLoading', '$cordovaNetwork', '$ionicHistory', 'novidadesConveniosFactory', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
         // You can include any angular dependencies as parameters for this function
         // TIP: Access Route Parameters for your page via $stateParams.parameterName
-        function ($scope, $stateParams, obterNoticiasService, noticiasFactory, $ionicPopup, LOCAL_STORAGE, $ionicLoading, $cordovaNetwork, $ionicHistory, obterNoticiasServiceObterMais) {
+        function ($scope, $stateParams, obterNovidadesConveniosService,  $ionicPopup, LOCAL_STORAGE, $ionicLoading, $cordovaNetwork, $ionicHistory, novidadesConveniosFactory) {
             //Variáveis declaradas para paginação
             $scope.pagina = 1;
-            $scope.listaNoticias = [];
+            $scope.listaNovidades = [];
             $scope.moreDataCanBeLoaded = true;
+            var idConvenio = $stateParams.id;
+          
             //Verifica se estivar online pega dados via serviço 
             if ($cordovaNetwork.isOnline()) {
 
                 $ionicLoading.show({ template: '<ion-spinner icon="spiral" class="spinner-assertive"></ion-spinner> <br/> Buscando...' }).then(function () {
 
-                    obterNoticiasService.obterNoticiasOnline().then(function (dados) {
+                    obterNovidadesConveniosService.obterNovidadesConvenios(idConvenio).then(function (dados) {                        
+                        
+                        if(dados[0] != null){
+                            $scope.listaNovidades = dados;
 
-                        $scope.listaNoticias = dados;
+                            novidadesConveniosFactory.marcarNovidadesLidas(idConvenio).then(function (marcados) {
+    
+                            }).finally(function () {
+                                //em qualquer caso remove o spinner de loading
+                                $ionicLoading.hide();
+                            });
+                        }else{
 
-                        noticiasFactory.marcarNoticiasLidas().then(function (marcados) {
+                            var alertPopup = $ionicPopup.alert({
+                                title: 'Não há campanhas disponíveis no momento.',                             
+                                okText: 'Ok', // String (default: 'OK'). The text of the OK button.
+                                okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+                            });
 
-                        }).finally(function () {
-                            //em qualquer caso remove o spinner de loading
-                            $ionicLoading.hide();
-                        });
+                            alertPopup.then(function (res) {
 
+                                $backView = $ionicHistory.backView();
+                                $backView.go();
+
+                            });
+
+                        }
+                     
+
+                    }).finally(function () {
+                        //em qualquer caso remove o spinner de loading
+                        $ionicLoading.hide();
                     });
                 });
 
-            } else {
+            }else {
                 //Pega dados do banco
                 $ionicLoading.show().then(function () {
-                    noticiasFactory.selectListaNoticias($stateParams.tipo).then(function (dados) {
+                    novidadesConveniosFactory.selectListaNovidades(idConvenio).then(function (dados) {
 
                         if (dados[0] == null) {
                             var alertPopup = $ionicPopup.alert({
@@ -2730,8 +2771,8 @@
                             });
 
                         } else {
-                            $scope.listaNoticias = dados;
-                            noticiasFactory.marcarNoticiasLidas().then(function (marcados) {
+                            $scope.listaNovidades = dados;
+                            novidadesConveniosFactory.marcarNovidadesLidas(idConvenio).then(function (marcados) {
 
                             });
                         }
@@ -2756,10 +2797,10 @@
                     //Contador para pedir proxima pagina ao seviço
                     $scope.pagina++;
 
-                    obterNoticiasServiceObterMais.obter($scope.pagina).then(function (retorno) {
+                    obterNovidadesConveniosService.obterMais($scope.pagina,idConvenio).then(function (retorno) {
 
                         //Concatenando as novas informações ao array existente de noticias
-                        $scope.listaNoticias = $scope.listaNoticias.concat(retorno);
+                        $scope.listaNovidades = $scope.listaNovidades.concat(retorno);
 
                         //Teste para verificar quando tem mais posts para carregar, caso não tenha faz com que o loading do infinte scroll pare de rodar
                         if (retorno.length == 0) {
@@ -2776,18 +2817,152 @@
                         okText: 'Ok', // String (default: 'OK'). The text of the OK button.
                         okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
                     });
-                }
+                }              
+           
 
             };
 
 
 
         }])
-    .controller('novidadesConveniosDetalheCtrl', ['$scope', '$stateParams', 'obterNoticiasService', 'noticiasFactory', '$ionicPopup', 'LOCAL_STORAGE', '$ionicLoading', '$cordovaNetwork', '$ionicHistory', 'obterNoticiasServiceObterMais', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+    .controller('novidadesConveniosDetalheCtrl', ['$scope', '$stateParams',  '$ionicPopup', 'LOCAL_STORAGE', '$ionicLoading', '$cordovaNetwork', '$ionicHistory', 'novidadesConveniosFactory','$sce','$cordovaFileOpener2', '$cordovaFileTransfer','obterNovidadesConveniosService', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
         // You can include any angular dependencies as parameters for this function
         // TIP: Access Route Parameters for your page via $stateParams.parameterName
-        function ($scope, $stateParams, obterNoticiasService, noticiasFactory, $ionicPopup, LOCAL_STORAGE, $ionicLoading, $cordovaNetwork, $ionicHistory, obterNoticiasServiceObterMais) {
+        function ($scope, $stateParams, $ionicPopup, LOCAL_STORAGE, $ionicLoading, $cordovaNetwork, $ionicHistory, novidadesConveniosFactory, $sce, $cordovaFileOpener2,$cordovaFileTransfer,obterNovidadesConveniosService) {
             //Variáveis declaradas para paginação
+
+            $scope.novidade = {};
+            var currentPlatform = ionic.Platform.platform();  
+            $scope.downloadProgress ="";
+
+           if($stateParams.isPush){
+            
+                //Verifica se estivar online pega dados via serviço 
+                if ($cordovaNetwork.isOnline()) {
+
+                    $ionicLoading.show({ template: '<ion-spinner icon="spiral" class="spinner-assertive"></ion-spinner> <br/> Aguarde...' }).then(function () {
+
+                        obterNovidadesConveniosService.obterNovidadesConvenios(null, $stateParams.id).then(function (dados) {                        
+                            
+                            if(dados[0] != null){                            
+
+                                var str = dados[0].dsNovidade;
+                                //Fazendo replace com expressão regular para abrir os links no ionic
+                                var newNovidade = str.replace(/<a href(.*?)/g, "<a onclick=\"window.open(this.href, '_system'); return false;\" href");
+                                $scope.novidade = dados;
+                                $scope.novidade[0].dsNovidade = newNovidade;
+
+                               novidadesConveniosFactory.marcarNovidadesLidas(null, $stateParams.id).then(function (marcados) {
+        
+                                }).finally(function () {
+                                    //em qualquer caso remove o spinner de loading
+                                    $ionicLoading.hide();
+                                });
+                            }else{
+
+                                var alertPopup = $ionicPopup.alert({
+                                    title: 'Não há campanhas disponíveis no momento.',                             
+                                    okText: 'Ok', // String (default: 'OK'). The text of the OK button.
+                                    okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+                                });
+
+                                alertPopup.then(function (res) {
+
+                                    $backView = $ionicHistory.backView();
+                                    $backView.go();
+
+                                });
+
+                            }                        
+
+                        }).finally(function () {
+                            //em qualquer caso remove o spinner de loading
+                            $ionicLoading.hide();
+                        });
+                    });
+
+                }            
+             
+            }else{
+
+                //Pega dados do banco
+                $ionicLoading.show().then(function () {
+
+                    novidadesConveniosFactory.selectNovidade($stateParams.id).then(function (dados) {
+                    
+                        var str = dados[0].dsNovidade;
+                        //Fazendo replace com expressão regular para abrir os links no ionic
+                        var newNovidade = str.replace(/<a href(.*?)/g, "<a onclick=\"window.open(this.href, '_system'); return false;\" href");
+                        $scope.novidade = dados;
+                        $scope.novidade[0].dsNovidade = newNovidade;
+
+                    }).finally(function () {
+                        //em qualquer caso remove o spinner de loading
+                        $ionicLoading.hide();
+                    });
+
+                });
+              
+            }
+        
+
+            $scope.trustAsHtml = function (html) {
+                return $sce.trustAsHtml(html);
+            }
+
+            $scope.abrirPDF = function (url) {
+                  
+                var filename = url.split("/").pop();    
+                let filePath = "";
+                //Caso seja IOS uso fileOpner
+                if(currentPlatform == 'ios'){
+
+                    filePath = cordova.file.cacheDirectory + 'pdf/' + filename;       
+                    $cordovaFileTransfer.download(url, filePath, {}, true).then(function (result) {
+                    
+                        $cordovaFileOpener2.open(filePath).then(function(data) {                                
+                            console.log(JSON.stringify(data));
+                            $ionicLoading.hide();
+                        }, function() {
+                            console.log(JSON.stringify(err));       
+                            $ionicLoading.hide();                         
+                        });  
+                    
+                        }, function (error) {                                  
+                    
+                        }, function (progress) {
+                            $scope.downloadProgress = (progress.loaded / progress.total) * 100;       
+                            $ionicLoading.show({template: '<ion-spinner icon="spiral" class="spinner-assertive"></ion-spinner> <br/> Download '+ Math.round($scope.downloadProgress)+'%'});                                                                
+                        });  
+                }else{
+                    //Caso seja Android
+                    filePath = cordova.file.externalDataDirectory + 'pdf/' + filename;        
+                    $cordovaFileTransfer.download(url, filePath, {}, true).then(function (result) {
+
+                        $ionicLoading.hide();                           
+                        window.resolveLocalFileSystemURL(filePath, function (entry) {
+                            cordova.plugins.fileOpener2.open(entry.toURL(),'application/pdf', {
+                                error: function (e) {
+                                    console.log('Error status: ' + e.status + ' - Error message: ' + e.message);
+                                },
+                                success: function () {
+                                    console.log('file opened successfully');
+                                }
+                            });
+                        }, function (e) {
+                            console.log('File Not Found');
+                        });
+                        // cordova.InAppBrowser.open(window.resolveLocalFileSystemURL(filePath), "_system", "location=no,toolbar=no,hardwareback=yes");   
+                    
+                        }, function (error) {                                  
+                            $ionicLoading.hide();
+                    }, function (progress) {
+                        $scope.downloadProgress = (progress.loaded / progress.total) * 100;     
+                        $ionicLoading.show({template: '<ion-spinner icon="spiral" class="spinner-assertive"></ion-spinner> <br/> Download '+ Math.round($scope.downloadProgress)+'%'});                                 
+                    });        
+                }  
+            };
+
 
             //Abrir o pdf com o google.
             $scope.openBrowserPdfConvenios = function (url) {
@@ -3204,67 +3379,7 @@
                     // TIP: Access Route Parameters for your page via $stateParams.parameterName
             function ($scope, $stateParams, $cordovaNetwork, LOCAL_STORAGE,$ionicLoading, $ionicPopup, $ionicHistory, getListaDocumentosAssociado, getDocumentoAssociado,$cordovaFileOpener2,$cordovaFileTransfer) {
 
-                 /*$scope.listaDocumentos = {};
-                $scope.$on('$ionicView.beforeEnter', function () {
-
-                    $scope.dadosUsuario = JSON.parse(window.localStorage.getItem(LOCAL_STORAGE.local_dados_key));
-                    var data = {
-                        cpf: $scope.dadosUsuario.cpf                    
-                    }   
-
-                    if ($cordovaNetwork.isOnline()) {
-    
-                        $ionicLoading.show().then(function () {
-                            getListaDocumentosAssociado.obter(data).then(function (listaDocumentos) {    
-                                $scope.listaDocumentos = listaDocumentos.data.data;                                          
-                            }).finally(function () {
-                                $ionicLoading.hide();
-                            });    
-                        });
-                        
-                    }else {
-                        var alertPopup = $ionicPopup.alert({
-                            title: 'Sem conexão com a internet',
-                            template: 'Por favor, conecte seu dispositivo a uma rede WIFI ou dados móveis.',
-                            okText: 'Ok',
-                            okType: 'button-assertive',
-                        });
-        
-                        alertPopup.then(function (res) {
-                            $backView = $ionicHistory.backView();
-                            $backView.go();
-                        });
-                    }
-                });     
-
-
-                
-                $scope.exibirDocumento = function (tipoDocumento, idDocumento,url) {
-
-                    if(tipoDocumento == 'geracao'){
-                        var data = {
-                            cpf: $scope.dadosUsuario.cpf,
-                            id: idDocumento                 
-                        } 
-
-                        $ionicLoading.show().then(function () {
-                            getDocumentoAssociado.obter(data).then(function (retorno) {                                                                 
-                            
-                              var link = "http://docs.google.com/viewer?url=" + encodeURIComponent(retorno.data.data[0].url) + "&embedded=true";
-                              cordova.InAppBrowser.open(link, "_system", "location=no,toolbar=no,hardwareback=yes");
-                            }).finally(function () {
-                                $ionicLoading.hide();
-                            });    
-                        });
-
-                    }else if(tipoDocumento == 'anexo'){                 
-
-                        var link = "http://docs.google.com/viewer?url=" + encodeURIComponent(url) + "&embedded=true";
-                        cordova.InAppBrowser.open(link, "_system", "location=no,toolbar=no,hardwareback=yes");
-                    
-                    }
-                     
-                };*/
+             
                 $scope.listaDocumentos = {};
                 var currentPlatform = ionic.Platform.platform();  
                 $scope.downloadProgress ="";
@@ -3443,6 +3558,7 @@
                         $scope.verificarPermissoesAcessoLocalizacao();      
                 });    
 
+          
 
                 $scope.verificarPermissoesAcessoLocalizacao = function () {
                  
@@ -3673,7 +3789,9 @@
                                     var data = {
                                         raio: $stateParams.raio,
                                         latitude: lat,
-                                        longitude:lon      
+                                        longitude:lon,
+                                        nome_convenio:$stateParams.nmConvenio,
+                                        id_tipo_convenio: $stateParams.idTipoConvenio
                                     }                          
         
                                         getConveniosProximos.obter(data).then(function (listaEstabelecimentosProximos) {   
