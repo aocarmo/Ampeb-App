@@ -849,16 +849,18 @@
 
         }])
 
-    .controller('detalheDoConvNioCtrl', ['$scope', '$stateParams', '$ionicLoading', 'conveniosFactory', 'LOCAL_STORAGE', '$cordovaGeolocation','$ionicPopup','$cordovaNetwork','$rootScope', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+    .controller('detalheDoConvNioCtrl', ['$scope', '$stateParams', '$ionicLoading', 'conveniosFactory', 'LOCAL_STORAGE', '$cordovaGeolocation','$ionicPopup','$cordovaNetwork','$rootScope','obterNovidadesConveniosService','novidadesConveniosFactory', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
         // You can include any angular dependencies as parameters for this function
         // TIP: Access Route Parameters for your page via $stateParams.parameterName
-        function ($scope, $stateParams, $ionicLoading, conveniosFactory, LOCAL_STORAGE, $cordovaGeolocation,$ionicPopup,$cordovaNetwork,$rootScope) {
+        function ($scope, $stateParams, $ionicLoading, conveniosFactory, LOCAL_STORAGE, $cordovaGeolocation,$ionicPopup,$cordovaNetwork,$rootScope,obterNovidadesConveniosService,novidadesConveniosFactory) {
 
-            $rootScope.side_menu.style.visibility = "hidden";
-            $scope.exibirMapa = false;
             var currentPlatform = ionic.Platform.platform();  
                  
-            $scope.$on('$ionicView.beforeEnter', function () {    
+            $scope.$on('$ionicView.beforeEnter', function () {   
+                
+            $rootScope.side_menu.style.visibility = "hidden";
+            $scope.btnCampanhas = false;
+            $scope.exibirMapa = false; 
                 $scope.verificarPermissoesAcessoLocalizacao();            
             });    
 
@@ -1000,6 +1002,35 @@
                     conveniosFactory.selectConvenio(null, null, null, $stateParams.id).then(function (dados) {
 
                         $scope.convenios = dados;   
+
+                         //Verifica se estivar online pega dados via serviço 
+                        if ($cordovaNetwork.isOnline()) {                           
+                           
+                            obterNovidadesConveniosService.obterNovidadesConvenios($stateParams.id).then(function (dados) {                        
+                                   
+                                if(dados[0] != null){
+                                    $scope.btnCampanhas = true;
+                                }
+
+                            }).finally(function () {
+                                    //em qualquer caso remove o spinner de loading
+                                    $ionicLoading.hide();
+                            });
+                           
+
+                        }else {
+                   
+           
+                            novidadesConveniosFactory.selectListaNovidades($stateParams.id).then(function (dados) {
+                                if (dados[0] != null) {
+                                    $scope.btnCampanhas = true;
+                                } 
+                            }).finally(function () {
+                                //em qualquer caso remove o spinner de loading
+                                $ionicLoading.hide();
+                            });
+
+                        }
                         //So exibe o mapa caso a localização esteja ativa e com permissões 
                         if(exibirMapa){
                             var posOptions = { timeout: 10000, enableHighAccuracy: true };
@@ -1018,7 +1049,7 @@
 
                     }).finally(function () {
                         //em qualquer caso remove o spinner de loading
-                        $ionicLoading.hide();
+                       // $ionicLoading.hide();
                     });
 
                 });
@@ -2729,7 +2760,7 @@
                         }else{
 
                             var alertPopup = $ionicPopup.alert({
-                                title: 'Não há campanhas disponíveis no momento.',                             
+                                title: 'Não existem promoções disponíveis no momento.',                             
                                 okText: 'Ok', // String (default: 'OK'). The text of the OK button.
                                 okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
                             });
@@ -2861,7 +2892,7 @@
                             }else{
 
                                 var alertPopup = $ionicPopup.alert({
-                                    title: 'Não há campanhas disponíveis no momento.',                             
+                                    title: 'Não existem promoções disponíveis no momento.',                             
                                     okText: 'Ok', // String (default: 'OK'). The text of the OK button.
                                     okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
                                 });
@@ -3550,11 +3581,11 @@
             // TIP: Access Route Parameters for your page via $stateParams.parameterName
             function ($scope, $stateParams, $cordovaGeolocation, $cordovaNetwork, WEB_METODOS, $ionicLoading, $ionicPopup, $ionicHistory,getConveniosProximos ,$rootScope,  $ionicPlatform) {
                 
-                $rootScope.side_menu.style.visibility = "hidden";
+               
                 var currentPlatform = ionic.Platform.platform();  
                  
                 $scope.$on('$ionicView.beforeEnter', function () {    
-         
+                    $rootScope.side_menu.style.visibility = "hidden";
                         $scope.verificarPermissoesAcessoLocalizacao();      
                 });    
 

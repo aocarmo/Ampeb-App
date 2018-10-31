@@ -5,8 +5,30 @@
       <div align="center">
         <img ion-img-cache  ng-src="{{convenio.dsUrlImagem != '' && convenio.dsUrlImagem || 'img/img_not_found.jpg'}}" > 
       </div>
+      <div align="center" class="item item-text-wrap bg-color-rodape-card">
+          <div align="center" class="row">
+            <div class="col col-99">
+              {{convenio.dsDesconto}}
+            </div>
+          </div>
+          <div ng-if="convenio.urlAnexo != ''" align="center" class="row">
+            <div class="col col-99">
+              <a ng-click="openBrowserPdfConvenios(convenio.urlAnexo)" class="button button-icon">
+                <i class="icon ion-document-text">  Visualizar PDF</i>         
+              </a>
+            </div>
+          </div>   
+       
+          </div>
+          <br>  
+       
+          <div ng-if="btnCampanhas" align="center" style="height: 80px;"  class="item bg-color-campanha">
+              <a style="" ui-sref="menu.novidadesConvenios({id: convenio.id})" class="button button-icon">
+                  <i style="color:white;" class="icon ion-ios-pricetags">&nbsp;Ver {{lblNovidadesConvenios}}</i>         
+                </a>
+          </div>        
     
-      <div class="spacer" style="width: 300px; height: 38px;"></div>
+      <div class="spacer" style="width: 300px; height: 20px;"></div>
       <div class="list">
         <div ng-if="convenio.dsConvenio != ''" class="item item-divider">
           Descrição
@@ -50,29 +72,7 @@
       </div>
       <h5 ng-if="convenio.dtTerminoVigencia === null" id="detalheDoConvNio-heading17" style="color:#000000;font-weight:600;text-align:center;">{{convenio.dtInicioVigencia}} até (indefinido)</h5>
       <h5 ng-if="convenio.dtTerminoVigencia !== null" id="detalheDoConvNio-heading17" style="color:#000000;font-weight:600;text-align:center;">{{convenio.dtInicioVigencia}} até {{(convenio.dtTerminoVigencia)}}</h5>
-      <div align="center" class="item item-text-wrap bg-color-rodape-card">
-        <div align="center" class="row">
-          <div class="col col-99">
-            {{convenio.dsDesconto}}
-          </div>
-        </div>
-        <div ng-if="convenio.urlAnexo != ''" align="center" class="row">
-          <div class="col col-99">
-            <a ng-click="openBrowserPdfConvenios(convenio.urlAnexo)" class="button button-icon">
-              <i class="icon ion-document-text">  Visualizar PDF</i>         
-            </a>
-          </div>
-        </div>   
-     
-        </div>
-        <br>  
-     
-        <div align="center" style="height: 80px;"  class="item bg-color-campanha">
-            <a style="" ui-sref="menu.novidadesConvenios({id: convenio.id})" class="button button-icon">
-                <i style="color:white;" class="icon ion-ios-pricetags">&nbsp;Ver Campanhas Promocionais</i>         
-              </a>
-        </div>
-        <br>  
+   
     </div>
   </ion-content>
 </ion-view>

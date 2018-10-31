@@ -987,15 +987,17 @@ sqlite.factory('enqueteFactory', function ($q, $cordovaSQLite) {
 sqlite.factory('novidadesConveniosFactory', function ($q, $cordovaSQLite) {
     return {
         insert: function (id, id_convenio, dtCadastro, nmConvenio, dsTitulo, dsNovidade, dtPublicacao, dtExpiracao, dsUrlImagem, dsUrlPdf, flLido, dtAtualizacao) {
+           
             var query = "INSERT INTO novidadesConvenios (id, id_convenio, dtCadastro, nmConvenio, dsTitulo, dsNovidade, dtPublicacao, dtExpiracao, dsUrlImagem, dsUrlPdf, flLido, dtAtualizacao) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             var values = [id, id_convenio, dtCadastro, nmConvenio, dsTitulo, dsNovidade, dtPublicacao, dtExpiracao, dsUrlImagem, dsUrlPdf, flLido, dtAtualizacao];
             var outputs = [];
+           
             //Usada para fazer o retorno do banco aguardar esta completa
             var deferred = $q.defer();
-
+   
             $cordovaSQLite.execute(db, query, values).then(
               function (res) {
-          
+   
                   outputs.push({ "retorno": res.insertId });
                   deferred.resolve(outputs);
                   
@@ -1053,16 +1055,17 @@ sqlite.factory('novidadesConveniosFactory', function ($q, $cordovaSQLite) {
           
             var query = "";
             if(idConvenio != null ){
-                 query = "SELECT  id, id_convenio, nmConvenio, dsTitulo, dsNovidade, strftime('%d/%m/%Y %H:%M:%S', datetime(dtPublicacao)) as dtPublicacao, strftime('%d/%m/%Y %H:%M:%S', datetime(dtExpiracao)) as dtExpiracao, dsUrlImagem, dsUrlPdf, flLido FROM novidadesConvenios WHERE strftime('%d/%m/%Y', datetime(dtExpiracao)) >= strftime('%d/%m/%Y', datetime('now')) AND id_convenio = "+idConvenio+" ORDER BY datetime(dtCadastro) DESC";
+                 query = "SELECT  id, id_convenio, nmConvenio, dsTitulo, dsNovidade, strftime('%d/%m/%Y %H:%M:%S', datetime(dtPublicacao)) as dtPublicacao, strftime('%d/%m/%Y %H:%M:%S', datetime(dtExpiracao)) as dtExpiracao, dsUrlImagem, dsUrlPdf, flLido FROM novidadesConvenios WHERE id_convenio = "+idConvenio+" ORDER BY datetime(dtCadastro) DESC";
             }else{
-                 query = "SELECT  id, id_convenio, nmConvenio, dsTitulo, dsNovidade, strftime('%d/%m/%Y %H:%M:%S', datetime(dtPublicacao)) as dtPublicacao, strftime('%d/%m/%Y %H:%M:%S', datetime(dtExpiracao)) as dtExpiracao, dsUrlImagem, dsUrlPdf, flLido FROM novidadesConvenios WHERE strftime('%d/%m/%Y', datetime(dtExpiracao)) >= strftime('%d/%m/%Y', datetime('now'))  ORDER BY datetime(dtCadastro) DESC";
+                 query = "SELECT  id, id_convenio, nmConvenio, dsTitulo, dsNovidade, strftime('%d/%m/%Y %H:%M:%S', datetime(dtPublicacao)) as dtPublicacao, strftime('%d/%m/%Y %H:%M:%S', datetime(dtExpiracao)) as dtExpiracao, dsUrlImagem, dsUrlPdf, flLido FROM novidadesConvenios ORDER BY datetime(dtCadastro) DESC";
             }
-        
+      
             var outputs = [];
 
             //Usada para fazer o retorno do banco aguardar esta completa
             var deferred = $q.defer();
             $cordovaSQLite.execute(db, query).then(function (data) {
+               
                 if (data.rows.length > 0) {
 
                    for (var i = 0; i < data.rows.length; i++) {
@@ -1083,7 +1086,7 @@ sqlite.factory('novidadesConveniosFactory', function ($q, $cordovaSQLite) {
                     deferred.resolve(outputs);
                 }
             }, function (error) {
-                selectListaNovidades
+                
                 deferred.reject(error);
             });
 
@@ -1099,6 +1102,7 @@ sqlite.factory('novidadesConveniosFactory', function ($q, $cordovaSQLite) {
             //Usada para fazer o retorno do banco aguardar esta completa
             var deferred = $q.defer();
             $cordovaSQLite.execute(db, query).then(function (data) {
+                
                 if (data.rows.length > 0) {
 
                     outputs.push({ "qtdNovidadesNaoLidas": data.rows.item(0).qtd});

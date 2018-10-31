@@ -1685,10 +1685,10 @@ angular.module('app.services', [])
             }else if(idNovidade != null){
                 url = url + "&include="+idNovidade;
             }
-
+            
            return   $http.get(url,{headers: {'Authorization': window.localStorage.getItem(LOCAL_STORAGE.local_token)}}).then(function (response) {
-                  
-                       
+  
+                      
                         //Lendo todas as noticias                      
                         var idNovidadeConvenio = [];
                         var deferred = $q.defer();
@@ -1697,7 +1697,7 @@ angular.module('app.services', [])
                       
                             for (var i = 0; i < response.data.length; i++) {
                                 novidadesConveniosFactory.deleteNovidadesDesatualizadas(response.data[i].id, response.data[i].modified);
-
+                                
                                 var nmConvenio = "";
                                 //Valida��o de categoria
                                 if (response.data[i].meta.desc_convenio[0] != null) {
@@ -1760,8 +1760,6 @@ angular.module('app.services', [])
                                 novidadesConveniosFactory.insert(response.data[i].id, response.data[i].meta.id_convenio[0], dtCadastro, nmConvenio, dsTitulo, dsNovidade, dtPublicacao, dtExpiracao, dsUrlImagem,dsUrlPDF,0,dtAtualizacao);                                    
                               
                             }
-
-
 
                             novidadesConveniosFactory.selectNovidade(idNovidade).then(function (dadosNovidade) {                    
                                 deferred.resolve(dadosNovidade);    
@@ -1851,20 +1849,20 @@ angular.module('app.services', [])
                                             }
                                         }
                                     }    
-    
+                                 
                                     var dsUrlPDF = ""; 
                                     if (response.data[i].meta.pdf_convenio != null) {
                                         dsUrlPDF = response.data[i].meta.pdf_convenio;
                                     }                                         
-                              
+                              console.log(response.data[i].id +"|"+ response.data[i].meta.id_convenio[0]+"|"+ dtCadastro+"|"+ nmConvenio+"|"+ dsTitulo+"|"+  dsNovidade+"|"+ dtPublicacao+"|"+  dtExpiracao+"|"+  dsUrlImagem+"|"+ dsUrlPDF+"|"+ 0+"|"+ dtAtualizacao);
                                     novidadesConveniosFactory.insert(response.data[i].id, response.data[i].meta.id_convenio[0], dtCadastro, nmConvenio, dsTitulo, dsNovidade, dtPublicacao, dtExpiracao, dsUrlImagem,dsUrlPDF,0,dtAtualizacao);                                    
-                                      
+                                   
                                 }                          
 
                        
                                 //Após excluídas as noticias, seleciona as noticias salvas no banco
                                 novidadesConveniosFactory.selectListaNovidades(idConvenio).then(function (dadosOnline) {      
-                                                        
+                                   
                                     deferred.resolve(dadosOnline);
                                 });                                   
 

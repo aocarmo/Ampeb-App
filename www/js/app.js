@@ -152,9 +152,10 @@ angular.module('app', ['ionic', 'app.controllers', 'app.routes', 'app.directives
     $httpProvider.interceptors.push('MyHttpInterceptor');
 
   })
-  .run(function ($ionicPlatform, $cordovaSQLite,$ionicPopup,$injector,LOCAL_STORAGE) {
+  .run(function ($ionicPlatform, $cordovaSQLite,$ionicPopup,$injector,LOCAL_STORAGE, getConfiguracaoAplicativo,$rootScope) {
     $ionicPlatform.ready(function () {
         var $state = $injector.get('$state');
+        var $cordovaNetwork = $injector.get('$cordovaNetwork');
       // Enable to debug issues.
       // window.plugins.OneSignal.setLogLevel({logLevel: 4, visualLevel: 4});
       
@@ -182,10 +183,10 @@ angular.module('app', ['ionic', 'app.controllers', 'app.routes', 'app.directives
      
 
       };
-   // .startInit("b47e67f6-405e-4041-9597-571b12e2f80d")
-   //.startInit("774c0150-e398-4ed0-a600-e9d32ac8a6b5")
+   // .startInit("b47e67f6-405e-4041-9597-571b12e2f80d") prod
+   //.startInit("774c0150-e398-4ed0-a600-e9d32ac8a6b5") hml
       window.plugins.OneSignal    
-       .startInit("774c0150-e398-4ed0-a600-e9d32ac8a6b5")
+       .startInit("b47e67f6-405e-4041-9597-571b12e2f80d")
         .handleNotificationOpened(notificationOpenedCallback)
         .endInit();
 
@@ -231,8 +232,28 @@ angular.module('app', ['ionic', 'app.controllers', 'app.routes', 'app.directives
       $cordovaSQLite.execute(db, "DELETE FROM tipo_convenio");
       $cordovaSQLite.execute(db, "DELETE FROM convenio");
 
+      /***** Treçho de codigo para pegar configurações antes do app rodar.****/
+      if ($cordovaNetwork.isOnline()) {
+
+        //Pegando a configuração do label do modulo de novidades de convenios
+        var paramLabelConfirmacao = { chave: "label_global_novidades_convenios" };
+        getConfiguracaoAplicativo.obter(paramLabelConfirmacao).then(function (retornoConfiguracao) {
+          //alert(JSON.stringify(retornoConfiguracao.data.data[0].valor)); 
+          window.localStorage.setItem("lblNovidadesConvenios", retornoConfiguracao.data.data[0].valor);//Salvando no localstorage para quando estiver sem rede obter o que esta em cache       
+          $rootScope.lblNovidadesConvenios = retornoConfiguracao.data.data[0].valor;
+        });
+      
+      }else{
+
+        $rootScope.lblNovidadesConvenios = window.localStorage.getItem("lblNovidadesConvenios");//Pegando o nome quando não tem internet do cache     
+
+      }
+
+    /***** Fim do Treçho de codigo para pegar configurações antes do app rodar.****/
+
 
     });
+
 
 
   })
