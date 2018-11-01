@@ -162,7 +162,7 @@ angular.module('app', ['ionic', 'app.controllers', 'app.routes', 'app.directives
       //Push notifications config
       var notificationOpenedCallback = function (jsonData) {
         //console.log('notificationOpenedCallback: ' + JSON.stringify(jsonData));
-    
+
         //Verifica se está logado
         var tipo_retorno_post =  window.localStorage.getItem(LOCAL_STORAGE.tipo_retorno_post);
         //tratamento feito provisóriamente para saber quando é uma novidade

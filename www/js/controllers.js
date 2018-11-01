@@ -1006,7 +1006,7 @@
                          //Verifica se estivar online pega dados via serviço 
                         if ($cordovaNetwork.isOnline()) {                           
                            
-                            obterNovidadesConveniosService.obterNovidadesConvenios($stateParams.id).then(function (dados) {                        
+                            obterNovidadesConveniosService.varificarNovidadesConvenios($stateParams.id).then(function (dados) {                        
                                    
                                 if(dados[0] != null){
                                     $scope.btnCampanhas = true;

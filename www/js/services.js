@@ -1692,11 +1692,13 @@ angular.module('app.services', [])
                         //Lendo todas as noticias                      
                         var idNovidadeConvenio = [];
                         var deferred = $q.defer();
-                        
-                        if(idNovidade != null){
+                   
+                        if(idNovidade != null || idConvenio != null){
                       
                             for (var i = 0; i < response.data.length; i++) {
                                 novidadesConveniosFactory.deleteNovidadesDesatualizadas(response.data[i].id, response.data[i].modified);
+                            }
+                            for (var i = 0; i < response.data.length; i++) {                             
                                 
                                 var nmConvenio = "";
                                 //Valida��o de categoria
@@ -1757,13 +1759,26 @@ angular.module('app.services', [])
                                     dsUrlPDF = response.data[i].meta.pdf_convenio;
                                 }                                         
                               
-                                novidadesConveniosFactory.insert(response.data[i].id, response.data[i].meta.id_convenio[0], dtCadastro, nmConvenio, dsTitulo, dsNovidade, dtPublicacao, dtExpiracao, dsUrlImagem,dsUrlPDF,0,dtAtualizacao);                                    
+                                novidadesConveniosFactory.insert(response.data[i].id, response.data[i].meta.id_convenio[0], dtCadastro, nmConvenio, dsTitulo, dsNovidade, dtPublicacao, dtExpiracao, dsUrlImagem,dsUrlPDF,1,dtAtualizacao);                                    
                               
                             }
+                            if(idNovidade != null){
+                            
+                                novidadesConveniosFactory.selectNovidade(idNovidade).then(function (dadosNovidade) {    
+                             
+                                    deferred.resolve(dadosNovidade);    
+                                });   
 
-                            novidadesConveniosFactory.selectNovidade(idNovidade).then(function (dadosNovidade) {                    
-                                deferred.resolve(dadosNovidade);    
-                            });
+                            }else if(idConvenio != null){
+                        
+                                //Após excluídas as noticias, seleciona as noticias salvas no banco
+                                novidadesConveniosFactory.selectListaNovidades(idConvenio).then(function (dadosOnline) {      
+                                    
+                                    deferred.resolve(dadosOnline);
+                                });  
+
+                            }                          
+                               
 
                         }else{
 
@@ -1854,7 +1869,7 @@ angular.module('app.services', [])
                                     if (response.data[i].meta.pdf_convenio != null) {
                                         dsUrlPDF = response.data[i].meta.pdf_convenio;
                                     }                                         
-                              console.log(response.data[i].id +"|"+ response.data[i].meta.id_convenio[0]+"|"+ dtCadastro+"|"+ nmConvenio+"|"+ dsTitulo+"|"+  dsNovidade+"|"+ dtPublicacao+"|"+  dtExpiracao+"|"+  dsUrlImagem+"|"+ dsUrlPDF+"|"+ 0+"|"+ dtAtualizacao);
+                       
                                     novidadesConveniosFactory.insert(response.data[i].id, response.data[i].meta.id_convenio[0], dtCadastro, nmConvenio, dsTitulo, dsNovidade, dtPublicacao, dtExpiracao, dsUrlImagem,dsUrlPDF,0,dtAtualizacao);                                    
                                    
                                 }                          
@@ -1979,7 +1994,15 @@ angular.module('app.services', [])
  
              });
  
-         }
+         },
+         varificarNovidadesConvenios: function (idConvenio) {
+            var url = WEB_METODOS.urlServicosPortalNovidadesConvenios+"&id_convenio="+idConvenio;
+           return   $http.get(url,{headers: {'Authorization': window.localStorage.getItem(LOCAL_STORAGE.local_token)}}).then(function (response) {
+
+                    return response.data;
+            });
+
+        }
     };
         
 }])

@@ -28,12 +28,13 @@ sqlite.factory('noticiasFactory', function ($q, $cordovaSQLite) {
 
             $cordovaSQLite.execute(db, query, values).then(
               function (res) {
-                 
+                
                   outputs.push({ "retorno": res.insertId });
                   deferred.resolve(outputs);
                   
               },
               function (err) {
+               
                   deferred.reject(err);
                 
               
@@ -997,13 +998,13 @@ sqlite.factory('novidadesConveniosFactory', function ($q, $cordovaSQLite) {
    
             $cordovaSQLite.execute(db, query, values).then(
               function (res) {
-   
+              
                   outputs.push({ "retorno": res.insertId });
                   deferred.resolve(outputs);
                   
               },
               function (err) {
-         
+            
                   deferred.reject(err);
                 
               }
@@ -1013,6 +1014,7 @@ sqlite.factory('novidadesConveniosFactory', function ($q, $cordovaSQLite) {
             return deferred.promise;
         },
         selectNovidade: function (id) {
+     
             var query = "SELECT  id, id_convenio, nmConvenio, dsTitulo, dsNovidade, strftime('%d/%m/%Y', datetime(dtPublicacao)) as dtPublicacao, strftime('%d/%m/%Y', datetime(dtExpiracao)) as dtExpiracao, dsUrlImagem, dsUrlPdf, flLido FROM novidadesConvenios WHERE id=?";
             var values = [id];
             var outputs = [];
@@ -1020,8 +1022,9 @@ sqlite.factory('novidadesConveniosFactory', function ($q, $cordovaSQLite) {
             //Usada para fazer o retorno do banco aguardar esta completa
             var deferred = $q.defer();
             $cordovaSQLite.execute(db, query,values).then(function (data) {
+            
                 if (data.rows.length > 0) {
-
+                 
                     for (var i = 0; i < data.rows.length; i++) {
                         outputs.push({
                             "id": data.rows.item(i).id,
@@ -1170,18 +1173,18 @@ sqlite.factory('novidadesConveniosFactory', function ($q, $cordovaSQLite) {
            
         },
         deleteNovidadesDesatualizadas: function (id,dtAtualizacao) {
-            var query = "DELETE FROM novidadesConvenios WHERE id = "+id+" AND dtAtualizacao <> '"+dtAtualizacao+"'";
+            var query = "DELETE FROM novidadesConvenios WHERE id = "+id+" and dtAtualizacao != '"+dtAtualizacao+"'";
             var outputs = [];
 
             //Usada para fazer o retorno do banco aguardar esta completa
             var deferred = $q.defer();
             $cordovaSQLite.execute(db, query).then(function (data) {
-                  
+           
                     outputs.push({ "retorno": 1});
                     deferred.resolve(outputs);
                
             }, function (error) {
-
+          
                 deferred.reject(error);
             });
 
