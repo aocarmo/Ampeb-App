@@ -153,6 +153,7 @@ angular.module('app', ['ionic', 'app.controllers', 'app.routes', 'app.directives
 
   })
   .run(function ($ionicPlatform, $cordovaSQLite,$ionicPopup,$injector,LOCAL_STORAGE, getConfiguracaoAplicativo,$rootScope) {
+    $rootScope.lblNovidadesConvenios = "Promoções de Conveniados";
     $ionicPlatform.ready(function () {
         var $state = $injector.get('$state');
         var $cordovaNetwork = $injector.get('$cordovaNetwork');
@@ -232,6 +233,7 @@ angular.module('app', ['ionic', 'app.controllers', 'app.routes', 'app.directives
       $cordovaSQLite.execute(db, "DELETE FROM tipo_convenio");
       $cordovaSQLite.execute(db, "DELETE FROM convenio");
 
+      
       /***** Treçho de codigo para pegar configurações antes do app rodar.****/
       if ($cordovaNetwork.isOnline()) {
 

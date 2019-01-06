@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.randernet.ampeb" version="1.2.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="com.randernet.ampeb" version="1.2.3" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>AMPEB</name>
     <description>
         Desenvolvido por RanderNet.
@@ -97,7 +97,7 @@
     <allow-navigation href="http://169.254.28.47:8100" />
     <allow-navigation href="http://169.254.184.46:8100" />
     <engine name="ios" spec="~4.5.4" />
-    <engine name="android" spec="~6.3.0" />
+    <engine name="android" spec="6.4.0" />
     <plugin name="cordova-plugin-actionsheet" spec="~2.3.3" />
     <plugin name="cordova-plugin-camera" spec="~2.4.0" />
     <plugin name="cordova-plugin-device" spec="~1.1.5" />
