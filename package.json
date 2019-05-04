@@ -5,7 +5,7 @@
   "dependencies": {
     "cordova-android": "6.4.0",
     "cordova-custom-config": "^5.0.2",
-    "cordova-ios": "~4.5.4",
+    "cordova-ios": "4.5.5",
     "cordova-open-native-settings": "^1.5.1",
     "cordova-plugin-actionsheet": "~2.3.3",
     "cordova-plugin-android-permissions": "^1.0.0",
@@ -102,8 +102,8 @@
       "onesignal-cordova-plugin": {}
     },
     "platforms": [
-      "ios",
-      "android"
+      "android",
+      "ios"
     ]
   }
 }
