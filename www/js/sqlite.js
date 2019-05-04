@@ -435,7 +435,7 @@ sqlite.factory('conveniosFactory', function ($q, $cordovaSQLite) {
             return deferred.promise;
         },
         selectTipoConvenio: function () {
-            var query = "SELECT * FROM tipo_convenio";
+            var query = "SELECT * FROM tipo_convenio ORDER BY nmTipoConvenio ASC";
             var outputs = [];
 
             //Usada para fazer o retorno do banco aguardar estar completa
@@ -491,7 +491,7 @@ sqlite.factory('conveniosFactory', function ($q, $cordovaSQLite) {
             return deferred.promise;
         },
         selectMunicipioConvenio: function () {
-            var query = "SELECT * FROM municipio_convenio";
+            var query = "SELECT * FROM municipio_convenio ORDER BY nmMunicipioConvenio ASC";
            
             var outputs = [];
 
@@ -568,8 +568,8 @@ sqlite.factory('conveniosFactory', function ($q, $cordovaSQLite) {
                filtroIdConvenio =  " AND id = " + idConvenio;
             }
 
-            var query = "SELECT id, nmConvenio, dsUrlImagem, dsConvenio, nmContato, dsTelefone, dsEmail, urlSite, dsEndereco, strftime('%d/%m/%Y', datetime(dtInicioVigencia)) as dtInicioVigencia, CASE WHEN dtTerminoVigencia IS NOT NULL THEN strftime('%d/%m/%Y', datetime(dtTerminoVigencia)) ELSE dtTerminoVigencia END as dtTerminoVigencia, dsDesconto,flPublicar, idTipoConvenio, nmMunicipio, nmEstado, flPrivado, nmPais, urlAnexo, latitude, longitude FROM convenios WHERE 1=1 " + filtroIdTipoConvenio + filtroNmConvenio + filtroNmMunicipio + filtroIdConvenio;
-         
+            var query = "SELECT id, nmConvenio, dsUrlImagem, dsConvenio, nmContato, dsTelefone, dsEmail, urlSite, dsEndereco, strftime('%d/%m/%Y', datetime(dtInicioVigencia)) as dtInicioVigencia, CASE WHEN dtTerminoVigencia IS NOT NULL THEN strftime('%d/%m/%Y', datetime(dtTerminoVigencia)) ELSE dtTerminoVigencia END as dtTerminoVigencia, dsDesconto,flPublicar, idTipoConvenio, nmMunicipio, nmEstado, flPrivado, nmPais, urlAnexo, latitude, longitude FROM convenios WHERE 1=1 " + filtroIdTipoConvenio + filtroNmConvenio + filtroNmMunicipio + filtroIdConvenio + " ORDER BY nmConvenio ASC";
+            
             var outputs = [];
 
             //Usada para fazer o retorno do banco aguardar estar completa

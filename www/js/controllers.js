@@ -1497,7 +1497,8 @@
                             });
 
                         } else {
-                            $scope.listaConvenios = dados;
+                          
+                            $scope.listaConvenios = dados; 
                         }
 
                     }).finally(function () {
