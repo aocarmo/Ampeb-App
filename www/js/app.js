@@ -217,7 +217,8 @@ angular.module('app', ['ionic', 'app.controllers', 'app.routes', 'app.directives
       //Criando tabelas
       $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS noticia (id integer primary key, dsCategoria varchar(50), dsTitulo varchar(250), dsNoticia text, dtNoticia text, dsUrlImagem text, flLido integer, status varchar(25), dtAtualizacao text, tpConsulta integer)");
       $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS fique_por_dentro (id integer primary key, dsCategoria varchar(50), dsTitulo varchar(250), dsNoticia text, dtNoticia text, dsUrlImagem text, flLido integer, status varchar(25), dtAtualizacao text)");
-      $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS evento (id integer primary key, dsCategoria varchar(50), dsTitulo varchar(250), dsNoticia text, dtNoticia text, dsUrlImagem text, flLido integer, status varchar(25), dtAtualizacao text, tpConsulta integer)");
+      $cordovaSQLite.execute(db, "DROP TABLE IF EXISTS evento"); //Tratamento para atualizar novas colunas nas tabelas em dispositivos que ja tem o app instalado
+      $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS evento (id integer primary key, dsCategoria varchar(50), dsTitulo varchar(250), dsNoticia text, dtNoticia text, dsUrlImagem text, flLido integer, status varchar(25), dtAtualizacao text, tpConsulta integer, dtEvento text)");
       $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS municipio_convenio (id integer primary key, nmMunicipioConvenio varchar(100))");
       $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS tipo_convenio (id integer primary key, nmTipoConvenio varchar(50), flPrivado integer, dsUrlImagem text)");
       
@@ -232,6 +233,7 @@ angular.module('app', ['ionic', 'app.controllers', 'app.routes', 'app.directives
       $cordovaSQLite.execute(db, "DELETE FROM municipio_convenio");
       $cordovaSQLite.execute(db, "DELETE FROM tipo_convenio");
       $cordovaSQLite.execute(db, "DELETE FROM convenio");
+      
 
       
       /***** Treçho de codigo para pegar configurações antes do app rodar.****/

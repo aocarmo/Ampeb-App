@@ -215,9 +215,9 @@ sqlite.factory('noticiasFactory', function ($q, $cordovaSQLite) {
 
 sqlite.factory('eventosFactory', function ($q, $cordovaSQLite) {
     return {
-        insert: function (id, dsCategoria, dsTitulo, dsNoticia, dtNoticia, dsUrlImagem, flLido, status, dtAtualizacao, tpConsulta) {
-            var query = "INSERT INTO evento (id, dsCategoria, dsTitulo, dsNoticia, dtNoticia, dsUrlImagem, flLido, status, dtAtualizacao, tpConsulta) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            var values = [id, dsCategoria, dsTitulo, dsNoticia, dtNoticia, dsUrlImagem, flLido, status, dtAtualizacao, tpConsulta];
+        insert: function (id, dsCategoria, dsTitulo, dsNoticia, dtNoticia, dsUrlImagem, flLido, status, dtAtualizacao, tpConsulta, dtEvento) {
+            var query = "INSERT INTO evento (id, dsCategoria, dsTitulo, dsNoticia, dtNoticia, dsUrlImagem, flLido, status, dtAtualizacao, tpConsulta, dtEvento) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            var values = [id, dsCategoria, dsTitulo, dsNoticia, dtNoticia, dsUrlImagem, flLido, status, dtAtualizacao, tpConsulta, dtEvento];
             var outputs = [];
             //Usada para fazer o retorno do banco aguardar esta completa
             var deferred = $q.defer();
@@ -240,7 +240,7 @@ sqlite.factory('eventosFactory', function ($q, $cordovaSQLite) {
             return deferred.promise;
         },
         selectNoticia: function (id) {
-            var query = "SELECT  id, dsCategoria, dsTitulo, dsNoticia, strftime('%d/%m/%Y %H:%M:%S', datetime(dtNoticia)) as dtNoticia, dsUrlImagem, flLido FROM evento WHERE id=?";
+            var query = "SELECT  id, dsCategoria, dsTitulo, dsNoticia, strftime('%d/%m/%Y %H:%M:%S', datetime(dtNoticia)) as dtNoticia, dsUrlImagem, flLido, strftime('%d/%m/%Y %H:%M', datetime(dtEvento)) as dtEvento FROM evento WHERE id=?";
             var values = [id];
             var outputs = [];
 
@@ -258,6 +258,7 @@ sqlite.factory('eventosFactory', function ($q, $cordovaSQLite) {
                             "dsNoticia": data.rows.item(i).dsNoticia,
                             "dsUrlImagem": data.rows.item(i).dsUrlImagem,
                             "flLido": data.rows.item(i).flLido,
+                            "dtEvento": data.rows.item(i).dtEvento,
                         });
                     }
 
@@ -277,11 +278,11 @@ sqlite.factory('eventosFactory', function ($q, $cordovaSQLite) {
         },
         selectListaNoticias: function (tipo) {
           
-            var query = "SELECT id, dsCategoria, dsTitulo, strftime('%d/%m/%Y %H:%M:%S', datetime(dtNoticia)) as dtNoticia, dsUrlImagem FROM evento WHERE status = 'publish' ORDER BY datetime(dtNoticia) DESC";
+            var query = "SELECT id, dsCategoria, dsTitulo, strftime('%d/%m/%Y %H:%M:%S', datetime(dtNoticia)) as dtNoticia, dsUrlImagem, strftime('%d/%m/%Y %H:%M', datetime(dtEvento)) as dtEvento FROM evento WHERE status = 'publish' ORDER BY datetime(dtEvento) DESC";
 
             if(tipo == "private"){
              
-                query = "SELECT id, dsCategoria, dsTitulo, strftime('%d/%m/%Y %H:%M:%S', datetime(dtNoticia)) as dtNoticia, dsUrlImagem FROM evento ORDER BY datetime(dtNoticia) DESC";
+                query = "SELECT id, dsCategoria, dsTitulo, strftime('%d/%m/%Y %H:%M:%S', datetime(dtNoticia)) as dtNoticia, dsUrlImagem, strftime('%d/%m/%Y %H:%M', datetime(dtEvento)) as dtEvento FROM evento ORDER BY datetime(dtEvento) DESC";
             }
           
             var outputs = [];
@@ -298,6 +299,7 @@ sqlite.factory('eventosFactory', function ($q, $cordovaSQLite) {
                             "dsTitulo": data.rows.item(i).dsTitulo,                          
                             "dtNoticia": data.rows.item(i).dtNoticia,
                             "dsUrlImagem": data.rows.item(i).dsUrlImagem,
+                            "dtEvento": data.rows.item(i).dtEvento,
                         });
                     }
 

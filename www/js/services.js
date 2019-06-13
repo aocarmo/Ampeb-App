@@ -616,6 +616,7 @@ angular.module('app.services', [])
                                     var dsStatus = "";
                                     var dtAtualizacao = "";
                                     var categorias = [];
+                                    var dtEvento = "";
                                     
                                     //Valida��o de categoria
                                     if (response.data[i]._embedded != null) {
@@ -669,6 +670,17 @@ angular.module('app.services', [])
                                         dtNoticia = dataNoticia[2] + "/" + dataNoticia[1] + "/" + dataNoticia[0] + " " + dataNoticiaArray[1];
                                         
                                     }
+
+                                    //Valida��o da data do evento
+                                    if (response.data[i].acf.data_evento != null) {
+                                       
+                                        var dataEventoArray = response.data[i].acf.data_evento.split(" ");
+                                        var dataEvento  = dataEventoArray[0].split("/");
+                                        dtEvento = dataEvento[2] + "-" + dataEvento[1] + "-" + dataEvento[0] + "T" + dataNoticiaArray[1];
+                                     
+                                        
+                                    }
+
                                     //Valida��o da url da imagem
                                     if (response.data[i]._embedded.hasOwnProperty('wp:featuredmedia')) {                        
                                         if (response.data[i]._embedded['wp:featuredmedia'][0] != null) {
@@ -696,7 +708,7 @@ angular.module('app.services', [])
                                    
                                     //Tratamento para não exibir eventos em noticias
                                     if(dsCategoria == "Próximos Eventos"){
-                                      eventosFactory.insert(response.data[i].id, dsCategoria, dsTitulo, dsNoticia, dtNoticiaBD, dsUrlImagem, 0, dsStatus, dtAtualizacao,tipoConsulta);                                    
+                                      eventosFactory.insert(response.data[i].id, dsCategoria, dsTitulo, dsNoticia, dtNoticiaBD, dsUrlImagem, 0, dsStatus, dtAtualizacao,tipoConsulta, dtEvento);                                    
                                      
                                     }
                                 
