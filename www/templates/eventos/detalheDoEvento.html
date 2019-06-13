@@ -3,7 +3,7 @@
     <h2 id="detalheDoEvento-heading19" style="color:#821723;font-weight:300;">{{evento[0].dsCategoria}}</h2>
     <hr class="hr-topoPagina">
     <h5 id="detalheDoEvento-heading20" style="color:#454545;font-weight:400;">Data de Publicação: {{evento[0].dtNoticia}}</h5>
-    <h5 id="detalheDoEvento-heading20" style="color:#454545;font-weight:400;">Data do Evento: {{evento[0].dtEvento}}</h5>
+    <h5 id="detalheDoEvento-heading20" style="color:#454545;font-weight:400;" ng-if="evento[0].dtEvento != ''" >Data do Evento: {{evento[0].dtEvento}}</h5>
     <h4 ng-bind-html="evento[0].dsTitulo" id="detalheDoEvento-heading21" style="color:#821723;font-weight:400;"></h4>
     <ion-slides ng-if="evento[0].dsUrlImagem != 'img/img_not_found.jpg'" disable-side-menu-drag="" options="{'loop': false}" slider="slider3" delegate-handle="slider3" id="detalheDoEvento-slider3" style="width:100%;height:200px;">
       <ion-slide-page ion-img-cache-bg id="detalheDoEvento-slide211" style="background:url({{evento[0].dsUrlImagem}}) no-repeat center;background-size:contain;"></ion-slide-page>

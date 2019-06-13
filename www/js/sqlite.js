@@ -278,11 +278,11 @@ sqlite.factory('eventosFactory', function ($q, $cordovaSQLite) {
         },
         selectListaNoticias: function (tipo) {
           
-            var query = "SELECT id, dsCategoria, dsTitulo, strftime('%d/%m/%Y %H:%M:%S', datetime(dtNoticia)) as dtNoticia, dsUrlImagem, strftime('%d/%m/%Y %H:%M', datetime(dtEvento)) as dtEvento FROM evento WHERE status = 'publish' ORDER BY datetime(dtEvento) DESC";
+            var query = "SELECT id, dsCategoria, dsTitulo, strftime('%d/%m/%Y %H:%M:%S', datetime(dtNoticia)) as dtNoticia, dsUrlImagem, strftime('%d/%m/%Y %H:%M', datetime(dtEvento)) as dtEvento FROM evento WHERE status = 'publish' and datetime(dtEvento) > DATE('now') and dtEvento <> '' ORDER BY datetime(dtEvento) ASC";
 
             if(tipo == "private"){
              
-                query = "SELECT id, dsCategoria, dsTitulo, strftime('%d/%m/%Y %H:%M:%S', datetime(dtNoticia)) as dtNoticia, dsUrlImagem, strftime('%d/%m/%Y %H:%M', datetime(dtEvento)) as dtEvento FROM evento ORDER BY datetime(dtEvento) DESC";
+                query = "SELECT id, dsCategoria, dsTitulo, strftime('%d/%m/%Y %H:%M:%S', datetime(dtNoticia)) as dtNoticia, dsUrlImagem, strftime('%d/%m/%Y %H:%M', datetime(dtEvento)) as dtEvento FROM evento WHERE datetime(dtEvento) > DATE('now') and dtEvento <> '' ORDER BY datetime(dtEvento) ASCS";
             }
           
             var outputs = [];
