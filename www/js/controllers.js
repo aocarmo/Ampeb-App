@@ -608,9 +608,28 @@
 
                 $ionicLoading.show({ template: '<ion-spinner icon="spiral" class="spinner-assertive"></ion-spinner> <br/> Buscando...' }).then(function () {
                     obterEventosService.obterEventosOnline().then(function (dados) {
+                        
+                        if( dados[0] ==  null){
 
-                        $scope.listaEventos = dados;
+                            var alertPopup = $ionicPopup.alert({
+                                title: 'Não há eventos agendados.',                             
+                                okText: 'Ok', // String (default: 'OK'). The text of the OK button.
+                                okType: 'button-assertive', // String (default: 'button-positive'). The type of the OK button.
+                            });
 
+                            alertPopup.then(function (res) {
+
+                                $backView = $ionicHistory.backView();
+                                $backView.go();
+
+                            });
+
+
+                        }else{
+                            $scope.listaEventos = dados;
+                        }
+                        
+                     
                         eventosFactory.marcarEventosLidos().then(function (marcados) {
 
                         }).finally(function () {
@@ -644,7 +663,7 @@
 
                         } else {
                             $scope.listaEventos = dadosArmazenados;
-
+                           
                             marcarEventosLidos.marcar().then(function (marcados) {
 
                             });
