@@ -88,10 +88,16 @@
         <splash density="port-xxxhdpi" src="resources/android/splash/drawable-port-xxxhdpi-screen.png" />
     </platform>
     <edit-config file="*-Info.plist" mode="merge" target="NSLocationWhenInUseUsageDescription">
-        <string>O AMPEB App precisa de permissão para acessar a sua localização para exibir a localização dos convênios.</string>
+        <string>Este aplicativo deseja obter sua localização enquanto este aplicativo é executado apenas.</string>
     </edit-config>
     <edit-config file="*-Info.plist" mode="merge" target="NSLocationAlwaysAndWhenInUseUsageDescription">
-        <string>O AMPEB App precisa de permissão para acessar a sua localização para exibir a localização dos convênios.</string>
+        <string>Este aplicativo quer obter a sua localização sempre, até mesmo este aplicativo é executado em segundo plano.</string>
+    </edit-config>
+    <edit-config file="*-Info.plist" mode="merge" overwrite="true" target="NSCameraUsageDescription">
+        <string>O aplicativo AMPEB precisará acessar a câmera do seu dispositivo deseja permitir?</string>
+    </edit-config>
+    <edit-config file="*-Info.plist" mode="merge" overwrite="true" target="NSPhotoLibraryUsageDescription">
+        <string>O aplicativo AMPEB precisará acessar a galeria de fotos do seu dispositivo deseja permitir?</string>
     </edit-config>
     <icon src="resources/android/icon/drawable-xhdpi-icon.png" />
     <allow-navigation href="http://169.254.28.47:8100" />
