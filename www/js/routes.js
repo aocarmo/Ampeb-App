@@ -112,7 +112,7 @@ angular.module('app.routes', [])
 
       .state('menu.detalheDoConvNio', {
         url: '/detalheConvenio',
-        params: { id: null, },
+        params: { id: null, isLogged: null },
         views: {
           'side-menu21': {
             templateUrl: 'templates/convenios/detalheDoConvNio.html',
@@ -123,7 +123,7 @@ angular.module('app.routes', [])
 
       .state('detalheDoConvNio', {
         url: '/detalheConvenio',
-        params: { id: null, },        
+        params: { id: null, isLogged: null},        
         templateUrl: 'templates/convenios/detalheDoConvNio.html',
         controller: 'detalheDoConvNioCtrl',      
       })
@@ -429,7 +429,7 @@ angular.module('app.routes', [])
       })
       .state('menu.conveniosProximos', {
         url: '/conveniosProximos',
-        params: { raio: null, nmConvenio: null, idTipoConvenio: null },
+        params: { raio: null, nmConvenio: null, idTipoConvenio: null, isLogged: null },
         views: {
           'side-menu21': {
             templateUrl: 'templates/convenios/conveniosProximos.html',
@@ -440,7 +440,7 @@ angular.module('app.routes', [])
 
       .state('conveniosProximos', {
         url: '/conveniosProximos',
-        params: { raio: null, nmConvenio: null, idTipoConvenio: null },        
+        params: { raio: null, nmConvenio: null, idTipoConvenio: null,  isLogged: null },        
         templateUrl: 'templates/convenios/conveniosProximos.html',
         controller: 'conveniosProximosCtrl',      
       })

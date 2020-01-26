@@ -876,8 +876,11 @@
             var currentPlatform = ionic.Platform.platform();  
                  
             $scope.$on('$ionicView.beforeEnter', function () {   
-                
-            $rootScope.side_menu.style.visibility = "hidden";
+             if($stateParams.isLogged){
+                $rootScope.side_menu.style.visibility = "hidden";
+             }   
+             
+
             $scope.btnCampanhas = false;
             $scope.exibirMapa = false; 
                 $scope.verificarPermissoesAcessoLocalizacao();            
@@ -1024,17 +1027,21 @@
 
                          //Verifica se estivar online pega dados via serviço 
                         if ($cordovaNetwork.isOnline()) {                           
-                           
-                            obterNovidadesConveniosService.varificarNovidadesConvenios($stateParams.id).then(function (dados) {                        
+                            if($stateParams.isLogged){
+                                obterNovidadesConveniosService.varificarNovidadesConvenios($stateParams.id).then(function (dados) {                        
                                    
-                                if(dados[0] != null){
-                                    $scope.btnCampanhas = true;
-                                }
-
-                            }).finally(function () {
-                                    //em qualquer caso remove o spinner de loading
-                                    $ionicLoading.hide();
-                            });
+                                    if(dados[0] != null){
+                                        $scope.btnCampanhas = true;
+                                    }
+    
+                                }).finally(function () {
+                                        //em qualquer caso remove o spinner de loading
+                                        $ionicLoading.hide();
+                                });
+                            }else{
+                                $ionicLoading.hide();
+                            }
+                         
                            
 
                         }else {
@@ -3605,8 +3612,12 @@
                 var currentPlatform = ionic.Platform.platform();  
                  
                 $scope.$on('$ionicView.beforeEnter', function () {    
-                    $rootScope.side_menu.style.visibility = "hidden";
-                        $scope.verificarPermissoesAcessoLocalizacao();      
+                    if($stateParams.isLogged){
+                        $rootScope.side_menu.style.visibility = "hidden";
+                    }
+                   
+                     $scope.verificarPermissoesAcessoLocalizacao();      
+                        console.log("teste");
                 });    
 
           
@@ -3826,14 +3837,14 @@
                 $scope.exibirConveniosProximos = function () {
 
                     if ($cordovaNetwork.isOnline()) {
-
+                        console.log('1');
                         $ionicLoading.show().then(function () {
                     
                             var posOptions = { timeout: 10000, enableHighAccuracy: true };
                             $cordovaGeolocation
                                 .getCurrentPosition(posOptions)
                                 .then(function (position) {
-                                
+                                    console.log(JSON.stringify(posOptions));
                                     var lat = position.coords.latitude
                                     var lon = position.coords.longitude
             
@@ -3886,6 +3897,7 @@
                                 }, function (err) {
                                     // error
                                     alert(err);
+                                    console.log(err);
                                 });
                         }); 
                                //Abrir o pdf com o google.

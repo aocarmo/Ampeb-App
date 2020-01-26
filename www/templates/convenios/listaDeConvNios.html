@@ -8,13 +8,13 @@
         </div>
 
         <div class="item item-body">
-            <a ui-sref="{{tipoRetornoPost == 'publish' ? 'detalheDoConvNio({id: convenio.id})' : 'menu.detalheDoConvNio({id: convenio.id})' }}">
+            <a ui-sref="{{tipoRetornoPost == 'publish' ? 'detalheDoConvNio({id: convenio.id, isLogged: false})' : 'menu.detalheDoConvNio({id: convenio.id, isLogged: false})' }}">
                  <img ion-img-cache class="full-image" ng-src="{{convenio.dsUrlImagem != '' && convenio.dsUrlImagem || 'img/img_not_found.jpg'}}">
             </a>
        
 
           <p align="center">
-            <a ui-sref="{{tipoRetornoPost == 'publish' ? 'detalheDoConvNio({id: convenio.id})' : 'menu.detalheDoConvNio({id: convenio.id})' }}">Mais detalhes</a>
+            <a ui-sref="{{tipoRetornoPost == 'publish' ? 'detalheDoConvNio({id: convenio.id, isLogged: false})' : 'menu.detalheDoConvNio({id: convenio.id, isLogged: true})' }}">Mais detalhes</a>
           </p>
 
           <!-- Testa se existe uma data de fim da vingencia para exibir-->
